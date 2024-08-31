@@ -1,20 +1,37 @@
-import routes from "@/routes";
-import cors from "cors";
-import express, { Application } from "express";
+import "reflect-metadata";
 
-const app: Application = express();
+import "@/controllers/ConfigController";
+import { TYPES } from "@/di";
+import { ConfigService } from "@/services/ConfigService";
+import { SQLiteService } from "@/services/SQLiteService";
+import bodyParser from "body-parser";
+import { Container } from "inversify";
+import { InversifyExpressServer } from "inversify-express-utils";
 
-// Middleware to parse JSON bodies
-app.use(express.json({ limit: "1mb" }));
+// set up container
+const container = new Container();
 
-// Middleware to parse URL-encoded bodies
-app.use(express.urlencoded({ extended: true }));
+// set up bindings
+container
+  .bind<SQLiteService>(TYPES.SQLiteService)
+  .to(SQLiteService)
+  .inSingletonScope();
+container
+  .bind<ConfigService>(TYPES.ConfigService)
+  .to(ConfigService)
+  .inSingletonScope();
 
-// Middelware CORS
-app.use(cors());
-app.options("*", cors());
+// create server
+const server = new InversifyExpressServer(container);
+server.setConfig((app) => {
+  // add body parser
+  app.use(
+    bodyParser.urlencoded({
+      extended: true,
+    }),
+  );
+  app.use(bodyParser.json());
+});
 
-app.use("/api", routes);
-
-//server
-app.listen(8080, () => console.log("server start por 8080"));
+const app = server.build();
+app.listen(3000);
