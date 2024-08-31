@@ -17,7 +17,7 @@ export class ConfigService {
       `
             CREATE TABLE IF NOT EXISTS config (
             id INTEGER PRIMARY KEY,
-            containerId TEXT NOT NULL,
+            command TEXT NOT NULL,
             regex TEXT NOT NULL
             );
             `,
@@ -32,6 +32,6 @@ export class ConfigService {
 
   create = (config: Config): Promise<Either<Error, void>> =>
     this.databaseService.run(
-      `INSERT INTO config (containerId, regex) VALUES ("${config.containerId}", "${config.regex}")`,
+      `INSERT INTO config (command, regex) VALUES ("${config.command}", "${config.regex}")`,
     );
 }

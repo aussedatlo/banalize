@@ -1,5 +1,5 @@
 export type Config = {
   id: number;
-  containerId: string;
+  param: string;
   regex: string;
 };

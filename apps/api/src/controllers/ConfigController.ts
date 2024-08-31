@@ -1,4 +1,5 @@
 import { TYPES } from "@/di";
+import { BackgroundTaskScheduler } from "@/monitoring/BackgroundTaskScheduler";
 import { ConfigService } from "@/services/ConfigService";
 import { Request, Response } from "express";
 import { inject } from "inversify";
@@ -15,6 +16,8 @@ import {
 export class ConfigController implements interfaces.Controller {
   constructor(
     @inject(TYPES.ConfigService) private configService: ConfigService,
+    @inject(TYPES.BackgroundTaskScheduler)
+    private backgroundTaskScheduler: BackgroundTaskScheduler,
   ) {}
 
   @httpGet("/")
@@ -39,6 +42,7 @@ export class ConfigController implements interfaces.Controller {
       },
       Right: () => {
         res.status(200).json({ message: "Config created" });
+        this.backgroundTaskScheduler.start();
       },
     });
   }

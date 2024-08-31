@@ -7,6 +7,9 @@ import { SQLiteService } from "@/services/SQLiteService";
 import bodyParser from "body-parser";
 import { Container } from "inversify";
 import { InversifyExpressServer } from "inversify-express-utils";
+import { BackgroundTaskScheduler } from "./monitoring/BackgroundTaskScheduler";
+
+const PORT = process.env.PORT || 3000;
 
 // set up container
 const container = new Container();
@@ -19,6 +22,10 @@ container
 container
   .bind<ConfigService>(TYPES.ConfigService)
   .to(ConfigService)
+  .inSingletonScope();
+container
+  .bind<BackgroundTaskScheduler>(TYPES.BackgroundTaskScheduler)
+  .to(BackgroundTaskScheduler)
   .inSingletonScope();
 
 // create server
@@ -34,4 +41,12 @@ server.setConfig((app) => {
 });
 
 const app = server.build();
-app.listen(3000);
+app.listen(PORT, async () => {
+  console.log(`Server started on http://localhost:${PORT}`);
+
+  // start background task scheduler
+  const backgroundTaskScheduler = container.get<BackgroundTaskScheduler>(
+    TYPES.BackgroundTaskScheduler,
+  );
+  await backgroundTaskScheduler.start();
+});
