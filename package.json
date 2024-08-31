@@ -1,0 +1,28 @@
+{
+  "name": "money-monorepo",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "clean": "turbo clean",
+    "ui:add": "pnpm --filter ui ui:add",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "api": "pnpm --filter api",
+    "web": "pnpm --filter web",
+    "commit": "gitmoji -c"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "gitmoji-cli": "^9.4.0",
+    "prettier": "^3.3.3",
+    "prettier-plugin-organize-imports": "^4.0.0",
+    "turbo": "2.0.9"
+  },
+  "packageManager": "pnpm@9.1.1",
+  "engines": {
+    "node": ">=18"
+  }
+}
