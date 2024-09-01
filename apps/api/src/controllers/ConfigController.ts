@@ -1,5 +1,5 @@
+import { BackgroundTaskScheduler } from "@/background/monitoring/BackgroundTaskScheduler";
 import { TYPES } from "@/di";
-import { BackgroundTaskScheduler } from "@/monitoring/BackgroundTaskScheduler";
 import { ConfigService } from "@/services/ConfigService";
 import { Request, Response } from "express";
 import { inject } from "inversify";
@@ -16,7 +16,7 @@ import {
 export class ConfigController implements interfaces.Controller {
   constructor(
     @inject(TYPES.ConfigService) private configService: ConfigService,
-    @inject(TYPES.BackgroundTaskScheduler)
+    @inject(TYPES.RegexMonitorManager)
     private backgroundTaskScheduler: BackgroundTaskScheduler,
   ) {}
 

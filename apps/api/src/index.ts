@@ -7,7 +7,12 @@ import { SQLiteService } from "@/services/SQLiteService";
 import bodyParser from "body-parser";
 import { Container } from "inversify";
 import { InversifyExpressServer } from "inversify-express-utils";
-import { BackgroundTaskScheduler } from "./monitoring/BackgroundTaskScheduler";
+import { PeriodicTaskManager } from "./background/managers/PeriodicTaskManager";
+import { RegexMonitorManager } from "./background/managers/RegexMonitorManager";
+import { IBackgroundTask } from "./background/tasks/IBackgroundTask";
+import { UnbanTask } from "./background/tasks/UnbanTask";
+import { IFirewallService } from "./services/firewall/IFirewallService";
+import { IPTablesService } from "./services/firewall/IPTablesService";
 
 const PORT = process.env.PORT || 3000;
 
@@ -24,14 +29,20 @@ container
   .to(ConfigService)
   .inSingletonScope();
 container
-  .bind<BackgroundTaskScheduler>(TYPES.BackgroundTaskScheduler)
-  .to(BackgroundTaskScheduler)
+  .bind<IFirewallService>(TYPES.FirewallService)
+  .to(IPTablesService)
   .inSingletonScope();
 
-// create server
+container
+  .bind<RegexMonitorManager>(TYPES.RegexMonitorManager)
+  .to(RegexMonitorManager);
+container
+  .bind<PeriodicTaskManager>(TYPES.PeriodicTaskManager)
+  .to(PeriodicTaskManager);
+container.bind<IBackgroundTask>(TYPES.BackgroundTask).to(UnbanTask);
+
 const server = new InversifyExpressServer(container);
 server.setConfig((app) => {
-  // add body parser
   app.use(
     bodyParser.urlencoded({
       extended: true,
@@ -44,9 +55,7 @@ const app = server.build();
 app.listen(PORT, async () => {
   console.log(`Server started on http://localhost:${PORT}`);
 
-  // start background task scheduler
-  const backgroundTaskScheduler = container.get<BackgroundTaskScheduler>(
-    TYPES.BackgroundTaskScheduler,
-  );
-  await backgroundTaskScheduler.start();
+  // start background tasks
+  await container.get<RegexMonitorManager>(TYPES.RegexMonitorManager).start();
+  container.get<PeriodicTaskManager>(TYPES.PeriodicTaskManager).start();
 });

@@ -1,11 +1,11 @@
 import { TYPES } from "@/di";
 import { ConfigService } from "@/services/ConfigService";
 import { inject, injectable } from "inversify";
-import { FileRegexMonitor } from "./FileRegexMonitor";
-import { RegexMonitor } from "./RegexMonitor";
+import { FileRegexMonitor } from "../monitoring/FileRegexMonitor";
+import { RegexMonitor } from "../monitoring/RegexMonitor";
 
 @injectable()
-export class BackgroundTaskScheduler {
+export class RegexMonitorManager {
   private monitors: RegexMonitor[] = [];
 
   constructor(
@@ -32,5 +32,9 @@ export class BackgroundTaskScheduler {
         });
       });
     });
+  }
+
+  stop() {
+    this.monitors.forEach((monitor) => monitor.stop());
   }
 }

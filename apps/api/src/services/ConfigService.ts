@@ -32,6 +32,6 @@ export class ConfigService {
 
   create = (config: Config): Promise<Either<Error, void>> =>
     this.databaseService.run(
-      `INSERT INTO config (command, regex) VALUES ("${config.command}", "${config.regex}")`,
+      `INSERT INTO config (command, regex) VALUES ("${config.param}", "${config.regex}")`,
     );
 }
