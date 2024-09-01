@@ -1,6 +1,6 @@
-import { BackgroundTaskScheduler } from "@/background/monitoring/BackgroundTaskScheduler";
+import { MatchMonitorManager } from "@/background/managers/MatchMonirorManager";
 import { TYPES } from "@/di";
-import { ConfigService } from "@/services/ConfigService";
+import { ConfigRepository } from "@/repositories/ConfigRepository";
 import { Request, Response } from "express";
 import { inject } from "inversify";
 import {
@@ -15,9 +15,9 @@ import {
 @controller("/config")
 export class ConfigController implements interfaces.Controller {
   constructor(
-    @inject(TYPES.ConfigService) private configService: ConfigService,
-    @inject(TYPES.RegexMonitorManager)
-    private backgroundTaskScheduler: BackgroundTaskScheduler,
+    @inject(TYPES.ConfigRepository) private configService: ConfigRepository,
+    @inject(TYPES.MatchMonitorManager)
+    private monitor: MatchMonitorManager,
   ) {}
 
   @httpGet("/")
@@ -42,7 +42,7 @@ export class ConfigController implements interfaces.Controller {
       },
       Right: () => {
         res.status(200).json({ message: "Config created" });
-        this.backgroundTaskScheduler.start();
+        this.monitor.start();
       },
     });
   }

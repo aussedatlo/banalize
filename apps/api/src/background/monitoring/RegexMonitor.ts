@@ -1,4 +1,7 @@
+import { MatchEventHandler } from "@/background/handlers/MatchEventHandler";
+import { TYPES } from "@/di";
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
+import { inject } from "inversify";
 import { Just, Maybe, Nothing } from "purify-ts";
 import { IRegexMonitor } from "./IRegexMonitor";
 
@@ -9,6 +12,7 @@ export class RegexMonitor implements IRegexMonitor {
     private command: string,
     private args: string[],
     private regex: string,
+    @inject(TYPES.MatchEventHandler) private handler: MatchEventHandler,
   ) {}
 
   spawn(): void {
@@ -30,6 +34,7 @@ export class RegexMonitor implements IRegexMonitor {
       const maybe = this._extractIp(this.regex, logs);
       maybe.map((ip: string) => {
         console.log(`Regex ${this.regex} matched: ${ip}`);
+        this.handler.handle(ip, this.regex);
       });
       this.process?.kill();
     });

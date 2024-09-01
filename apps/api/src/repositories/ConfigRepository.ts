@@ -2,10 +2,10 @@ import { TYPES } from "@/di";
 import { Config } from "@/models/Config";
 import { inject, injectable } from "inversify";
 import { Either } from "purify-ts";
-import { SQLiteService } from "./SQLiteService";
+import { SQLiteService } from "../services/SQLiteService";
 
 @injectable()
-export class ConfigService {
+export class ConfigRepository {
   constructor(
     @inject(TYPES.SQLiteService) private databaseService: SQLiteService,
   ) {

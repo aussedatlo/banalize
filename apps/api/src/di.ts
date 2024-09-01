@@ -1,8 +1,15 @@
 export const TYPES = {
-  ConfigService: Symbol.for("ConfigService"),
+  ConfigRepository: Symbol.for("ConfigRepository"),
+  MatchEventRepository: Symbol.for("MatchEventRepository"),
+  MatchEventHandler: Symbol.for("MatchEventHandler"),
+  BanEventRepository: Symbol.for("BanEventRepository"),
   SQLiteService: Symbol.for("SQLiteService"),
   FirewallService: Symbol.for("FirewallService"),
-  RegexMonitorManager: Symbol.for("RegexMonitorManager"),
+  MatchMonitorManager: Symbol.for("MatchMonitorManager"),
   PeriodicTaskManager: Symbol.for("PeriodicTaskManager"),
   BackgroundTask: Symbol.for("BackgroundTask"),
+  RegexMonitorFactory: Symbol.for("RegexMonitorFactory"),
+  RegexMonitor: Symbol.for("RegexMonitor"),
+  FileRegexMonitor: Symbol.for("FileRegexMonitor"),
+  DockerRegexMonitor: Symbol.for("DockerRegexMonitor"),
 };

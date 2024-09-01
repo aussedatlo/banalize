@@ -1,15 +1,16 @@
 import { TYPES } from "@/di";
-import { ConfigService } from "@/services/ConfigService";
+import { ConfigRepository } from "@/repositories/ConfigRepository";
 import { inject, injectable } from "inversify";
-import { FileRegexMonitor } from "../monitoring/FileRegexMonitor";
 import { RegexMonitor } from "../monitoring/RegexMonitor";
 
 @injectable()
-export class RegexMonitorManager {
+export class MatchMonitorManager {
   private monitors: RegexMonitor[] = [];
 
   constructor(
-    @inject(TYPES.ConfigService) private configService: ConfigService,
+    @inject(TYPES.ConfigRepository) private configService: ConfigRepository,
+    @inject(TYPES.RegexMonitorFactory)
+    private monitorFactory: (param: string, regex: string) => RegexMonitor,
   ) {}
 
   async start() {
@@ -22,8 +23,8 @@ export class RegexMonitorManager {
         `Found ${configs.length} configs: ${JSON.stringify(configs)}`,
       );
 
-      this.monitors = configs.map(
-        (config) => new FileRegexMonitor(config.param, config.regex),
+      this.monitors = configs.map((config) =>
+        this.monitorFactory(config.param, config.regex),
       );
 
       this.monitors.forEach((watcher) => {
