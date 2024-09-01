@@ -1,4 +1,6 @@
+import { EitherAsync } from "purify-ts";
+
 export interface IFirewallService {
-  ban(ip: string): void;
-  unban(ip: string): void;
+  ban(ip: string): EitherAsync<Error, boolean>;
+  unban(ip: string): EitherAsync<Error, boolean>;
 }
