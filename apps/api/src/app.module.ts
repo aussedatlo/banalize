@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ScheduleModule } from "@nestjs/schedule";
@@ -10,7 +11,8 @@ import { WatchersModule } from "./watchers/watchers.module";
 
 @Module({
   imports: [
-    MongooseModule.forRoot("mongodb://admin:pass@localhost:27017/admin"),
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     ConfigsModule,

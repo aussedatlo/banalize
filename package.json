@@ -11,7 +11,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "api": "pnpm --filter api",
     "web": "pnpm --filter web",
-    "commit": "gitmoji -c"
+    "commit": "gitmoji -c",
+    "docker:api:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up api",
+    "docker:web:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up web",
+    "docker:mongodb:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up mongodb"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

@@ -1,13 +1,25 @@
 services:
   mongodb:
     image: mongo:latest
-    container_name: mongodb-container
+    container_name: banalize-mongodb
     restart: always
-    ports:
-      - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: pass
       MONGO_INITDB_DATABASE: admin
     volumes:
-      - ./mongo-data:/data/db
+      - mongodb-data:/data/db
+
+  api:
+    image: banalize-api:latest
+    container_name: banalize-api
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://admin:pass@banalize-mongodb:27017/admin
+
+volumes:
+  mongodb-data:
