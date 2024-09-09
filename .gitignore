@@ -53,3 +53,6 @@ next-env.d.ts
 *.njsproj
 *.sln
 *.sw?
+
+# coverage
+coverage

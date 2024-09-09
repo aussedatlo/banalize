@@ -1,0 +1,45 @@
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { CreateBanDto, UpdateBanDto } from "./dto/create-ban.dto";
+import { Ban } from "./schemas/ban.schema";
+
+@Injectable()
+export class BansService {
+  constructor(
+    @InjectModel(Ban.name)
+    private readonly banEventModel: Model<Ban>,
+  ) {}
+
+  // create and set active to true
+  async create(createBanDto: CreateBanDto): Promise<Ban> {
+    return this.banEventModel.create({ ...createBanDto, active: true });
+  }
+
+  async update(id: string, updateBanDto: UpdateBanDto): Promise<Ban> {
+    return this.banEventModel.findByIdAndUpdate(id, updateBanDto).exec();
+  }
+
+  async findAll(): Promise<Ban[]> {
+    return this.banEventModel.find().exec();
+  }
+
+  async findOne(id: string): Promise<Ban> {
+    return this.banEventModel.findOne({ _id: id }).exec();
+  }
+
+  async findByIpAndConfigIdAndActive(
+    ip: string,
+    configId: string,
+  ): Promise<Ban> {
+    return this.banEventModel.findOne({ ip, configId, active: true }).exec();
+  }
+
+  async findActiveBans(): Promise<Ban[]> {
+    return this.banEventModel.find({ active: true }).exec();
+  }
+
+  async findActiveBansByIp(ip: string): Promise<Ban[]> {
+    return this.banEventModel.find({ ip, active: true }).exec();
+  }
+}

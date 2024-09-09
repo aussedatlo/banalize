@@ -2,14 +2,8 @@
   "extends": "@repo/typescript-config/node.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "dist",
-    "paths": {
-      "@/*": ["src/*"]
-    },
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "experimentalDecorators": true
+    "outDir": "dist"
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "include": ["src", "test"],
+  "exclude": ["node_modules", "dist"]
 }

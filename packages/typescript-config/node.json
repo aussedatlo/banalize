@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "commonjs",
     "importsNotUsedAsValues": "remove",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "ES2021",
+    "removeComments": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noPropertyAccessFromIndexSignature": false,
+    "forceConsistentCasingInFileNames": false,
     "skipLibCheck": true,
     "declaration": true
   }
