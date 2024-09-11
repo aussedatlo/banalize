@@ -1,0 +1,36 @@
+{
+  "name": "@banalize/web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next build && next export",
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint && pnpm lint:stylelint",
+    "lint:fix": "next lint --fix && pnpm lint:stylelint --fix",
+    "lint:stylelint": "stylelint '**/*.css' --cache"
+  },
+  "dependencies": {
+    "@mantine/core": "7.12.2",
+    "@mantine/hooks": "7.12.2",
+    "@tabler/icons-react": "^3.6.0",
+    "next": "14.2.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@types/node": "^20.14.8",
+    "@types/react": "18.3.3",
+    "babel-loader": "^9.1.3",
+    "eslint": "^8.57.0",
+    "postcss": "^8.4.38",
+    "postcss-preset-mantine": "1.17.0",
+    "postcss-simple-vars": "^7.0.1",
+    "stylelint": "^16.6.1",
+    "typescript": "5.5.2"
+  },
+  "packageManager": "yarn@4.4.1"
+}

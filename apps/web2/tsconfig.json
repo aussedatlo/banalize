@@ -1,0 +1,22 @@
+{
+  "extends": "@banalize/typescript-config/next.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "dist",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "components",
+    "pages",
+    "theme.ts",
+    "postcss.config.cjs",
+    "next.config.mjs",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,1 +1,1 @@
-# Banalize API
+# Banalize Api

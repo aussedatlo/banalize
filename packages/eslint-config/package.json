@@ -1,15 +1,13 @@
 {
-  "name": "@repo/eslint-config",
+  "name": "@banalize/eslint-config",
   "version": "0.0.0",
-  "main": "library.js",
+  "main": "main.js",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^7.17.0",
     "@typescript-eslint/parser": "^7.17.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-react": "7.35.0",
-    "eslint-plugin-react-hooks": "^4.6.2"
+    "eslint-plugin-prettier": "^5.0.0"
   },
   "publishConfig": {
     "access": "public"

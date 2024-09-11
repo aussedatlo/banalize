@@ -1,0 +1,12 @@
+{
+  "name": "@banalize/stylelint-config",
+  "version": "0.0.0",
+  "main": "main.js",
+  "dependencies": {
+    "stylelint-config-standard": "^36.0.1",
+    "stylelint-prettier": "^5.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
