@@ -1,6 +1,7 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Controller, Get, Param, Query } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { BansService } from "./bans.service";
+import { FiltersBansDto } from "./dto/filters-ban.dto";
 import { Ban } from "./schemas/ban.schema";
 
 @ApiTags("bans")
@@ -11,8 +12,8 @@ export class BansController {
   @Get()
   @ApiOperation({ summary: "Get all bans" })
   @ApiResponse({ type: [Ban] })
-  async findAll(): Promise<Ban[]> {
-    return this.bansService.findAll();
+  async findAll(@Query() filters: FiltersBansDto): Promise<Ban[]> {
+    return this.bansService.findAll(filters);
   }
 
   @Get(":id")

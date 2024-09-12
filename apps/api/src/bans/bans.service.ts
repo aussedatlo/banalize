@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { CreateBanDto, UpdateBanDto } from "./dto/create-ban.dto";
+import { FiltersBansDto } from "./dto/filters-ban.dto";
 import { Ban } from "./schemas/ban.schema";
 
 @Injectable()
@@ -20,8 +21,8 @@ export class BansService {
     return this.banEventModel.findByIdAndUpdate(id, updateBanDto).exec();
   }
 
-  async findAll(): Promise<Ban[]> {
-    return this.banEventModel.find().exec();
+  async findAll(filters: FiltersBansDto): Promise<Ban[]> {
+    return this.banEventModel.find({ ...filters }).exec();
   }
 
   async findOne(id: string): Promise<Ban> {
