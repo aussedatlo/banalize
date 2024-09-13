@@ -1,0 +1,7 @@
+.breadcrumb {
+  text-transform: capitalize;
+}
+
+.link {
+  color: var(--mantine-color-yellow-filled);
+}

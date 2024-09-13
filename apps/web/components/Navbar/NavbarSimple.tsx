@@ -6,19 +6,16 @@ import {
   IconSquareRotatedOff,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import classes from "./NavbarSimple.module.css";
 
 const data = [
-  { link: "configs", label: "configs", icon: IconSettings2 },
-  { link: "matches", label: "matches", icon: IconSquareDot },
-  { link: "bans", label: "bans", icon: IconSquareRotatedOff },
+  { link: "/configs", label: "configs", icon: IconSettings2 },
+  { link: "/matches", label: "matches", icon: IconSquareDot },
+  { link: "/bans", label: "bans", icon: IconSquareRotatedOff },
 ];
 
 export function NavbarSimple() {
-  const router = useRouter();
-  console.log(router.pathname.replace("/", ""));
   const [active, setActive] = useState("configs");
 
   const links = data.map((item) => (
@@ -40,11 +37,7 @@ export function NavbarSimple() {
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>
         <Group className={classes.header} justify="space-between">
-          <Text
-            variant="gradient"
-            gradient={{ from: "pink", to: "yellow" }}
-            size="xl"
-          >
+          <Text color="yellow" size="xl">
             Banalize
           </Text>
           <Code fw={700}>v3.1.2</Code>

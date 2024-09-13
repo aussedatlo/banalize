@@ -12,6 +12,7 @@
   "include": [
     "components",
     "pages",
+    "types",
     "theme.ts",
     "postcss.config.cjs",
     "next.config.mjs",

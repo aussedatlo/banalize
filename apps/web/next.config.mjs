@@ -9,6 +9,14 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*", // The request coming into Next.js
+        destination: "http://localhost:3000/:path*", // The actual backend URL without "/api"
+      },
+    ];
+  },
 };
 
 export default nextConfig;

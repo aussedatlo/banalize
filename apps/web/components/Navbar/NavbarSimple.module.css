@@ -34,7 +34,7 @@
   color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-1));
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
   border-radius: var(--mantine-radius-sm);
-  font-weight: 500;
+  font-weight: 700;
   text-transform: capitalize;
 
   @mixin hover {
@@ -52,11 +52,11 @@
   &[data-active] {
     &,
     &:hover {
-      background-color: var(--mantine-color-blue-light);
-      color: var(--mantine-color-blue-light-color);
+      background-color: var(--mantine-color-yellow-filled);
+      color: var(--mantine-color-default);
 
       .linkIcon {
-        color: var(--mantine-color-blue-light-color);
+        color: var(--mantine-color-default);
       }
     }
   }
