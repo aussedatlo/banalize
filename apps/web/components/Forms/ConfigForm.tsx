@@ -1,6 +1,16 @@
 import { Button, Group, Notification, Select, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
+import { createConfig } from "utils/api";
+
+type ConfigFormType = {
+  param: string;
+  regex: string;
+  banTime: number;
+  findTime: number;
+  maxMatches: number;
+  watcherType: string;
+};
 
 type ConfigFormProps = {
   onDone: () => void;
@@ -8,7 +18,7 @@ type ConfigFormProps = {
 
 export const ConfigForm = ({ onDone }: ConfigFormProps) => {
   const [message, setMessage] = useState(undefined);
-  const form = useForm({
+  const form = useForm<ConfigFormType>({
     mode: "uncontrolled",
     initialValues: {
       param: "",
@@ -20,24 +30,21 @@ export const ConfigForm = ({ onDone }: ConfigFormProps) => {
     },
   });
 
-  const onSubmit = async (values) => {
-    const res = await fetch("/api/configs", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...values,
-        banTime: Number(values.banTime),
-        findTime: Number(values.findTime),
-        maxMatches: Number(values.maxMatches),
-        watcherType: values.watcherType.toLowerCase(),
-      }),
-    });
-    const data = await res.json();
+  const onSubmit = async (values: ConfigFormType) => {
+    const config = {
+      param: values.param,
+      regex: values.regex,
+      banTime: Number(values.banTime),
+      findTime: Number(values.findTime),
+      maxMatches: Number(values.maxMatches),
+      watcherType: values.watcherType.toLowerCase(),
+    };
 
-    if (res.status !== 201) {
-      setMessage(data.message);
+    const result = await createConfig(config);
+
+    if (!result._id) {
+      setMessage(result.message);
+      return;
     }
 
     onDone();

@@ -7,13 +7,10 @@ import { RouterBreadcrumbs } from "components/RouterBreadcrumbs/RouterBreadcrumb
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import { useRouter } from "next/router";
 import { Config } from "types/Config";
+import { fetchConfigs } from "utils/api";
 
 export const getStaticProps = (async () => {
-  console.log(process.env.SERVER_PORT);
-  const res = await fetch(
-    "http://localhost:" + process.env.SERVER_PORT + "/configs",
-  );
-  const configs = await res.json();
+  const configs = await fetchConfigs();
   return { props: { configs } };
 }) satisfies GetStaticProps<{
   configs: Config[];

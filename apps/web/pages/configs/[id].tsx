@@ -8,12 +8,16 @@ import { useRouter } from "next/router";
 import { Ban } from "types/Ban";
 import { Config } from "types/Config";
 import { Match } from "types/Match";
+import {
+  deleteConfig,
+  fetchBansByConfigId,
+  fetchConfigById,
+  fetchConfigs,
+  fetchMatchesByConfigId,
+} from "utils/api";
 
 export async function getStaticPaths() {
-  const res = await fetch(
-    "http://localhost:" + process.env.SERVER_PORT + "/configs",
-  );
-  const configs = await res.json();
+  const configs = await fetchConfigs();
 
   const paths = configs.map((config: Config) => ({
     params: { id: config._id },
@@ -22,40 +26,11 @@ export async function getStaticPaths() {
   return { paths, fallback: false };
 }
 
-const fetchMatches = async (configId: string) => {
-  const filters = {
-    configId,
-  };
-  const queryString = new URLSearchParams(filters).toString();
-  const res = await fetch(
-    "http://localhost:" + process.env.SERVER_PORT + `/matches?${queryString}`,
-  );
-  return await res.json();
-};
-
-const fetchBans = async (configId: string) => {
-  const filters = {
-    configId,
-  };
-  const queryString = new URLSearchParams(filters).toString();
-  const res = await fetch(
-    "http://localhost:" + process.env.SERVER_PORT + `/bans?${queryString}`,
-  );
-  return await res.json();
-};
-
-const fetchConfig = async (configId: string) => {
-  const res = await fetch(
-    "http://localhost:" + process.env.SERVER_PORT + `/configs/${configId}`,
-  );
-  return await res.json();
-};
-
 export const getStaticProps = (async (context) => {
   const configId = context.params?.id?.toString() ?? "";
-  const matches = await fetchMatches(configId);
-  const bans = await fetchBans(configId);
-  const config = await fetchConfig(configId);
+  const matches = await fetchMatchesByConfigId(configId);
+  const bans = await fetchBansByConfigId(configId);
+  const config = await fetchConfigById(configId);
   return { props: { matches, bans, config } };
 }) satisfies GetStaticProps<{
   matches: Match[];
@@ -70,12 +45,11 @@ export default function ConfigPage({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const router = useRouter();
 
-  const onDelete = () => {
-    fetch(`/api/configs/${router.query.id}`, {
-      method: "DELETE",
-    }).then(() => {
+  const onDelete = async () => {
+    const result = await deleteConfig(config._id);
+    if (result._id) {
       router.push("/configs");
-    });
+    }
   };
 
   return (

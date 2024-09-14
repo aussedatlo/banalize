@@ -13,6 +13,7 @@
     "components",
     "pages",
     "types",
+    "utils",
     "theme.ts",
     "postcss.config.cjs",
     "next.config.mjs",
