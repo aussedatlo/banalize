@@ -10,7 +10,9 @@ import { Config } from "types/Config";
 import { Match } from "types/Match";
 
 export async function getStaticPaths() {
-  const res = await fetch("http://localhost:3000" + "/configs");
+  const res = await fetch(
+    "http://localhost:" + process.env.SERVER_PORT + "/configs",
+  );
   const configs = await res.json();
 
   const paths = configs.map((config: Config) => ({
@@ -25,7 +27,9 @@ const fetchMatches = async (configId: string) => {
     configId,
   };
   const queryString = new URLSearchParams(filters).toString();
-  const res = await fetch("http://localhost:3000" + `/matches?${queryString}`);
+  const res = await fetch(
+    "http://localhost:" + process.env.SERVER_PORT + `/matches?${queryString}`,
+  );
   return await res.json();
 };
 
@@ -34,12 +38,16 @@ const fetchBans = async (configId: string) => {
     configId,
   };
   const queryString = new URLSearchParams(filters).toString();
-  const res = await fetch("http://localhost:3000" + `/bans?${queryString}`);
+  const res = await fetch(
+    "http://localhost:" + process.env.SERVER_PORT + `/bans?${queryString}`,
+  );
   return await res.json();
 };
 
 const fetchConfig = async (configId: string) => {
-  const res = await fetch("http://localhost:3000" + `/configs/${configId}`);
+  const res = await fetch(
+    "http://localhost:" + process.env.SERVER_PORT + `/configs/${configId}`,
+  );
   return await res.json();
 };
 

@@ -9,7 +9,10 @@ import { useRouter } from "next/router";
 import { Config } from "types/Config";
 
 export const getStaticProps = (async () => {
-  const res = await fetch("http://localhost:3000" + "/configs");
+  console.log(process.env.SERVER_PORT);
+  const res = await fetch(
+    "http://localhost:" + process.env.SERVER_PORT + "/configs",
+  );
   const configs = await res.json();
   return { props: { configs } };
 }) satisfies GetStaticProps<{
