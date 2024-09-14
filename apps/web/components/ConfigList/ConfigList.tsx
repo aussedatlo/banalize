@@ -7,7 +7,6 @@ type ConfigListProps = {
 };
 
 export const ConfigList = ({ configs }: ConfigListProps) => {
-  console.log("configs", configs);
   return (
     <Grid mt={"lg"}>
       {configs.map((config: Config) => (
