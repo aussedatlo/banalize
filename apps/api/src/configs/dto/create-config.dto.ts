@@ -1,10 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsIn, IsPositive, IsString } from "class-validator";
+import { IsIn, IsNotEmpty, IsPositive, IsString } from "class-validator";
 
 const watcherType = ["file", "docker"] as const;
 
 export class CreateConfigDto {
   @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     example: "/path/file.log",
     description: "the param of the watcher",
@@ -12,6 +13,7 @@ export class CreateConfigDto {
   readonly param: string;
 
   @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     example: "^test.*<IP>.*300$",
     description: "the regex to match",

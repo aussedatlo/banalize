@@ -1,0 +1,18 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.value {
+  margin-top: var(--mantine-spacing-lg);
+  color: var(--mantine-color-yellow-filled);
+  font-weight: 700;
+}
+
+.label {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: var(--mantine-font-size-xs);
+}

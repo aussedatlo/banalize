@@ -18,20 +18,17 @@ export class BanEventHandlerService {
     const { ip, config } = event;
     this.logger.log(`Ban ip: ${ip}, config: ${config.param}`);
 
-    const currentBan = await this.bansService.findByIpAndConfigIdAndActive(
+    // disable all current bans
+    const currentBans = await this.bansService.findAll({
       ip,
-      config._id,
-    );
-
-    if (currentBan) {
-      // update current ban timestamp
-      this.logger.log(`Updating ban for IP: ${ip}`);
-      this.bansService.update(currentBan._id, {
-        timestamp: new Date().getTime(),
+      configId: config._id,
+      active: true,
+    });
+    currentBans.forEach((ban) => {
+      this.bansService.update(ban._id, {
+        active: false,
       });
-
-      return;
-    }
+    });
 
     // create a new ban
     this.bansService.create({

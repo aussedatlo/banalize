@@ -13,6 +13,6 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "module": "NodeNext",
-    "declaration": true,
+    "declaration": true
   }
 }

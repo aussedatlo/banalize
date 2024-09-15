@@ -1,31 +1,43 @@
 {
-  "name": "web",
+  "name": "@banalize/web",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.1.0",
-  "type": "module",
   "scripts": {
-    "build": "tsc -b && vite build",
-    "clean": "rm -rf .turbo && rm -rf dist",
-    "dev": "vite",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next build && next export",
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint && pnpm lint:stylelint",
+    "lint:fix": "next lint --fix && pnpm lint:stylelint --fix",
+    "lint:stylelint": "stylelint '**/*.css'"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@mantine/core": "7.12.2",
+    "@mantine/form": "^7.12.2",
+    "@mantine/hooks": "7.12.2",
+    "@tabler/icons-react": "^3.6.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "next": "14.2.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@typescript-eslint/eslint-plugin": "^7.17.0",
-    "@typescript-eslint/parser": "^7.17.0",
-    "@vitejs/plugin-react-swc": "^3.5.0",
-    "autoprefixer": "^10.4.19",
+    "@babel/core": "^7.24.7",
+    "@banalize/eslint-config": "workspace:*",
+    "@banalize/stylelint-config": "workspace:*",
+    "@banalize/typescript-config": "workspace:*",
+    "@types/node": "^20.14.8",
+    "@types/react": "18.3.3",
+    "babel-loader": "^9.1.3",
     "eslint": "^8.57.0",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "eslint-plugin-react-refresh": "^0.4.7",
-    "postcss": "^8.4.40",
-    "typescript": "^5.5.4",
-    "vite": "^5.3.5"
-  }
+    "eslint-config-next": "^14.2.11",
+    "postcss": "^8.4.38",
+    "postcss-preset-mantine": "1.17.0",
+    "postcss-simple-vars": "^7.0.1",
+    "stylelint": "^16.6.1",
+    "typescript": "5.5.2"
+  },
+  "packageManager": "yarn@4.4.1"
 }

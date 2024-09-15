@@ -1,0 +1,4 @@
+.card {
+  padding: var(--mantine-spacing-lg);
+  background-color: var(--mantine-color-default);
+}

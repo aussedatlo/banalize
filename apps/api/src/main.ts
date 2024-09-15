@@ -1,9 +1,10 @@
-import { ValidationPipe } from "@nestjs/common";
+import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
+  const logger = new Logger("Bootstrap");
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
@@ -17,6 +18,8 @@ async function bootstrap() {
   // Enable validation globally
   app.useGlobalPipes(new ValidationPipe());
 
-  await app.listen(3000);
+  const port = process.env.SERVER_PORT || 5000;
+  logger.log(`Server running on port ${port}`);
+  await app.listen(port);
 }
 bootstrap();
