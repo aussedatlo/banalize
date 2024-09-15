@@ -1,5 +1,6 @@
-import { Divider, Group, Paper, Text, ThemeIcon } from "@mantine/core";
+import { Divider, Group, Text, ThemeIcon } from "@mantine/core";
 import { IconArrowRight, IconBrandDocker, IconFile } from "@tabler/icons-react";
+import { Paper } from "components/shared/Paper/ContainerPaper";
 import { StatPaper } from "components/StatPaper/StatPaper";
 import Link from "next/link";
 import { Config } from "types/Config";
@@ -11,7 +12,7 @@ type ConfigPaperProps = {
 
 export const ConfigPaper = ({ config }: ConfigPaperProps) => {
   return (
-    <Paper radius="md" withBorder className={classes.card} mt={20}>
+    <Paper>
       <Group justify="space-between">
         <Group>
           <ThemeIcon size={40} radius={15} color="yellow">

@@ -1,9 +1,9 @@
-import { Paper, Text } from "@mantine/core";
+import { Text } from "@mantine/core";
 import { CustomTable } from "components/shared/CustomTable/CustomTable";
+import { Paper } from "components/shared/Paper/ContainerPaper";
 import { formatDistance } from "date-fns";
 import { Ban } from "types/Ban";
 import { Match } from "types/Match";
-import classes from "./EventsTablePaper.module.css";
 
 type EventsTablePaperProps = {
   matches: Match[];
@@ -34,7 +34,7 @@ export const EventsTablePaper = ({ matches, bans }: EventsTablePaperProps) => {
     return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
   });
   return (
-    <Paper className={classes.root} mt="xl">
+    <Paper>
       <Text fz="h3" mb="xl">
         Events
       </Text>

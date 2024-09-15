@@ -1,9 +1,9 @@
-import { Grid, Paper, Text } from "@mantine/core";
+import { Grid, Text } from "@mantine/core";
+import { Paper } from "components/shared/Paper/ContainerPaper";
 import { StatPaper } from "components/StatPaper/StatPaper";
 import { Ban } from "types/Ban";
 import { Config } from "types/Config";
 import { Match } from "types/Match";
-import classes from "./HeaderStatPaper.module.css";
 
 type HeaderStatPaperProps = {
   matches: Match[];
@@ -22,7 +22,7 @@ export const HeaderStatPaper = ({
   );
   const currentBans = bans.filter((ban) => Number(ban.timestamp) > timeToWatch);
   return (
-    <Paper mt="lg" p="lg" className={classes.root}>
+    <Paper>
       <Text fz="h3">Statistics</Text>
       <Grid mt="xl">
         <Grid.Col span={{ base: 12, xs: 3 }}>
