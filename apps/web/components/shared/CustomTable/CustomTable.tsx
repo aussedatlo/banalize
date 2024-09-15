@@ -50,10 +50,10 @@ export const CustomTable = <T extends Record<string, string | number>>({
         onChange={handleSearchChange}
       />
       <ScrollArea
-        h={300}
+        mah={300}
         onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
       >
-        <Table miw={700}>
+        <Table>
           <Table.Thead
             className={cx(classes.header, { [classes.scrolled]: scrolled })}
           >
@@ -63,7 +63,7 @@ export const CustomTable = <T extends Record<string, string | number>>({
               ))}
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
+          <Table.Tbody className={classes.row}>{rows}</Table.Tbody>
         </Table>
       </ScrollArea>
     </>

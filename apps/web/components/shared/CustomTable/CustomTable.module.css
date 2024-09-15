@@ -18,3 +18,7 @@
 .scrolled {
   box-shadow: var(--mantine-shadow-sm);
 }
+
+.row {
+  background-color: var(--mantine-color-default-hover);
+}
