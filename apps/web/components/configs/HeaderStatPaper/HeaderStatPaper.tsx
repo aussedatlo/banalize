@@ -1,6 +1,6 @@
 import { Grid, Text } from "@mantine/core";
 import { Paper } from "components/shared/Paper/ContainerPaper";
-import { StatPaper } from "components/StatPaper/StatPaper";
+import { StatPaper } from "components/shared/StatPaper/StatPaper";
 import { Ban } from "types/Ban";
 import { Config } from "types/Config";
 import { Match } from "types/Match";

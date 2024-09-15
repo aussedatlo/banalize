@@ -1,7 +1,7 @@
 import { Divider, Group, Text, ThemeIcon } from "@mantine/core";
 import { IconArrowRight, IconBrandDocker, IconFile } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/ContainerPaper";
-import { StatPaper } from "components/StatPaper/StatPaper";
+import { StatPaper } from "components/shared/StatPaper/StatPaper";
 import Link from "next/link";
 import { Config } from "types/Config";
 import classes from "./ConfigPaper.module.css";
