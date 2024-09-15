@@ -1,7 +1,7 @@
 import { Box, Button, Group } from "@mantine/core";
 import { IconEyePause, IconTrash } from "@tabler/icons-react";
-import { EventsTablePaper } from "components/EventsTablePaper/EventsTablePaper";
-import { HeaderStatPaper } from "components/HeaderStatPaper/HeaderStatPaper";
+import { EventsTablePaper } from "components/configs/EventsTablePaper/EventsTablePaper";
+import { HeaderStatPaper } from "components/configs/HeaderStatPaper/HeaderStatPaper";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 import { GetStaticProps, InferGetStaticPropsType } from "next";
 import { useRouter } from "next/router";

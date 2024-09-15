@@ -1,8 +1,8 @@
 import { Box, Button, Group, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
-import { ConfigList } from "components/ConfigList/ConfigList";
-import { ConfigForm } from "components/Forms/ConfigForm";
+import { ConfigForm } from "components/configs/ConfigForm/ConfigForm";
+import { ConfigList } from "components/configs/ConfigList/ConfigList";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import { useRouter } from "next/router";

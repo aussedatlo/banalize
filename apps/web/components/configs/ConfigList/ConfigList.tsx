@@ -1,5 +1,5 @@
 import { Grid } from "@mantine/core";
-import { ConfigPaper } from "components/ConfigPaper/ConfigPaper";
+import { ConfigPaper } from "components/configs/ConfigPaper/ConfigPaper";
 import { Config } from "types/Config";
 
 type ConfigListProps = {
