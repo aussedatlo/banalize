@@ -28,19 +28,4 @@ export class BansService {
   async findOne(id: string): Promise<Ban> {
     return this.banEventModel.findOne({ _id: id }).exec();
   }
-
-  async findByIpAndConfigIdAndActive(
-    ip: string,
-    configId: string,
-  ): Promise<Ban> {
-    return this.banEventModel.findOne({ ip, configId, active: true }).exec();
-  }
-
-  async findActiveBans(): Promise<Ban[]> {
-    return this.banEventModel.find({ active: true }).exec();
-  }
-
-  async findActiveBansByIp(ip: string): Promise<Ban[]> {
-    return this.banEventModel.find({ ip, active: true }).exec();
-  }
 }
