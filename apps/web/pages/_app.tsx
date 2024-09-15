@@ -2,7 +2,7 @@ import "@mantine/core/styles.css";
 import "./global.css";
 
 import { MantineProvider } from "@mantine/core";
-import Layout from "components/Layout/Layout";
+import MainLayout from "components/Layout/MainLayout/MainLayout";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { theme } from "../theme";
@@ -18,9 +18,9 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <link rel="shortcut icon" href="/favicon.svg" />
       </Head>
-      <Layout>
+      <MainLayout>
         <Component {...pageProps} />
-      </Layout>
+      </MainLayout>
     </MantineProvider>
   );
 }

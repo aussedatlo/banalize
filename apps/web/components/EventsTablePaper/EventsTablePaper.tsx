@@ -1,5 +1,5 @@
 import { Paper, Text } from "@mantine/core";
-import { CustomTable } from "components/CustomTable/CustomTable";
+import { CustomTable } from "components/shared/CustomTable/CustomTable";
 import { formatDistance } from "date-fns";
 import { Ban } from "types/Ban";
 import { Match } from "types/Match";

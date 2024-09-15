@@ -1,9 +1,9 @@
 import { Container } from "@mantine/core";
 import { PropsWithChildren } from "react";
 import { NavbarSimple } from "../Navbar/NavbarSimple";
-import styles from "./Layout.module.css";
+import styles from "./MainLayout.module.css";
 
-const Layout = ({ children }: PropsWithChildren) => {
+const MainLayout = ({ children }: PropsWithChildren) => {
   return (
     <div className={styles.root}>
       <NavbarSimple />
@@ -14,4 +14,4 @@ const Layout = ({ children }: PropsWithChildren) => {
     </div>
   );
 };
-export default Layout;
+export default MainLayout;

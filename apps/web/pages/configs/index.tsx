@@ -3,7 +3,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { ConfigList } from "components/ConfigList/ConfigList";
 import { ConfigForm } from "components/Forms/ConfigForm";
-import { RouterBreadcrumbs } from "components/RouterBreadcrumbs/RouterBreadcrumbs";
+import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import { useRouter } from "next/router";
 import { Config } from "types/Config";
