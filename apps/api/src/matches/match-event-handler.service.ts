@@ -31,11 +31,10 @@ export class MatchEventHandlerService {
       configId: config._id,
     });
 
-    const matches =
-      await this.matchsService.findAllByConfigIdAndTimestampGreaterThan(
-        config._id,
-        new Date().getTime() - config.findTime * 1000,
-      );
+    const matches = await this.matchsService.findAll({
+      configId: config._id,
+      timestamp_gt: new Date().getTime() - config.findTime * 1000,
+    });
 
     this.logger.debug(`Matched ${matches.length} times`);
 
