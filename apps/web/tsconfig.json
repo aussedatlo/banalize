@@ -7,13 +7,14 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "strictNullChecks": true
   },
   "include": [
+    "app",
     "components",
-    "pages",
     "types",
-    "utils",
+    "lib",
     "theme.ts",
     "postcss.config.cjs",
     "next.config.mjs",

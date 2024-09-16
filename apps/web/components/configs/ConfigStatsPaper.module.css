@@ -1,0 +1,11 @@
+.text {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: var(--mantine-font-size-xs);
+}
+
+.value {
+  margin-top: var(--mantine-spacing-lg);
+  color: var(--mantine-color-yellow-filled);
+  font-weight: 700;
+}
