@@ -29,4 +29,11 @@ export class ConfigsService {
       .exec();
     return deletedConfig;
   }
+
+  async update(id: string, createConfigDto: CreateConfigDto): Promise<Config> {
+    const updatedConfig = await this.configModel
+      .findByIdAndUpdate({ _id: id }, createConfigDto, { new: true })
+      .exec();
+    return updatedConfig;
+  }
 }

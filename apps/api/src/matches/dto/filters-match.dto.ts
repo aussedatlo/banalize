@@ -10,4 +10,12 @@ export class FiltersMatchesDto {
   @IsOptional()
   @IsString()
   readonly configId?: string;
+
+  @ApiProperty({
+    example: "1633311600000",
+    description: "the timestamp greater than",
+    required: false,
+  })
+  @IsOptional()
+  readonly timestamp_gt?: number;
 }

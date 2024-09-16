@@ -17,19 +17,13 @@ export class MatchesService {
   }
 
   async findAll(filters: FiltersMatchesDto): Promise<Match[]> {
-    return this.matchEventModel.find({ ...filters }).exec();
+    const { timestamp_gt, ...otherFilters } = filters;
+    return this.matchEventModel
+      .find({ ...otherFilters, timestamp: { $gt: timestamp_gt ?? 0 } })
+      .exec();
   }
 
   async findOne(id: string): Promise<Match> {
     return this.matchEventModel.findOne({ _id: id }).exec();
-  }
-
-  async findAllByConfigIdAndTimestampGreaterThan(
-    configId: string,
-    timestamp: number,
-  ): Promise<Match[]> {
-    return this.matchEventModel
-      .find({ configId, timestamp: { $gt: timestamp } })
-      .exec();
   }
 }

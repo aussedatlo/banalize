@@ -3,6 +3,6 @@ export type Match = {
   line: string;
   regex: string;
   ip: string;
-  timestamp: string;
+  timestamp: number;
   configId: string;
 };

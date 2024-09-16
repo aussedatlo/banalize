@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import {
@@ -55,5 +63,13 @@ export class ConfigsController {
       new ConfigRemovedEvent(result._id),
     );
     return result;
+  }
+
+  @Put(":id")
+  @ApiOperation({ summary: "Update a config by id" })
+  @ApiBody({ type: CreateConfigDto })
+  @ApiResponse({ type: Config })
+  async update(@Param("id") id: string, @Body() configDto: CreateConfigDto) {
+    return this.configService.update(id, configDto);
   }
 }
