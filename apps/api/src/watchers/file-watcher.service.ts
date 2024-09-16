@@ -7,6 +7,9 @@ import { MatchEvent } from "src/events/match-event.types";
 import { extractIp } from "./regex.utils";
 import { Watcher } from "./watcher.interface";
 
+const TAIL_RETRY_INTERVAL = 5 * 1000;
+const TAIL_POLL_INTERVAL = 1000;
+
 export class FileWatcherService implements Watcher {
   private readonly logger = new Logger(FileWatcherService.name);
   private tail: TailFile | null;
@@ -24,8 +27,8 @@ export class FileWatcherService implements Watcher {
     try {
       this.tail = new TailFile(this.config.param, {
         encoding: "utf8",
-        pollFileIntervalMs: 100,
-        pollFailureRetryMs: 1000,
+        pollFileIntervalMs: TAIL_POLL_INTERVAL,
+        pollFailureRetryMs: TAIL_RETRY_INTERVAL,
       });
 
       this.tail.on("data", (chunk) => {
@@ -88,6 +91,6 @@ export class FileWatcherService implements Watcher {
     this.stop();
     this.timeout = setTimeout(() => {
       this.start();
-    }, 1000);
+    }, TAIL_RETRY_INTERVAL);
   }
 }
