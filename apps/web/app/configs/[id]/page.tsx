@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Box, Button, Grid, GridCol, Group } from "@mantine/core";
 import { IconEyePause } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";

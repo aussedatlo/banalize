@@ -12,7 +12,7 @@ import { WatchersModule } from "./watchers/watchers.module";
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    MongooseModule.forRoot(process.env.BANALIZE_API_MONGO_URI),
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     ConfigsModule,
