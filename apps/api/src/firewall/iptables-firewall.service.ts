@@ -12,9 +12,18 @@ export class IptablesFirewallService implements Firewall {
   async denyIp(ip: string): Promise<void> {
     try {
       // iptables command to drop packets from a specific IP
-      const command = `iptables -A ${this.chain} -s ${ip} -j DROP`;
-      this.logger.log(`Executing: ${command}`);
-      await this.execAsync(command);
+      const checkCommand = `iptables -C ${this.chain} -s ${ip}/32 -j DROP`;
+      const addCommand = `iptables -A ${this.chain} -s ${ip}/32 -j DROP`;
+
+      // Check if the rule already exists
+      try {
+        await this.execAsync(checkCommand);
+        this.logger.log(`Rule for IP ${ip} already exists, not adding.`);
+      } catch (checkError) {
+        // Rule does not exist, so we can add it
+        this.logger.log(`Adding rule for IP ${ip}: ${addCommand}`);
+        await this.execAsync(addCommand);
+      }
     } catch (error) {
       this.logger.error(`Failed to add iptables rule: ${error.message}`);
     }
@@ -24,7 +33,7 @@ export class IptablesFirewallService implements Firewall {
   async allowIp(ip: string): Promise<void> {
     try {
       // iptables command to remove the rule blocking the IP
-      const command = `iptables -D ${this.chain} -s ${ip} -j DROP`;
+      const command = `iptables -D ${this.chain} -s ${ip}/32 -j DROP`;
       this.logger.log(`Executing: ${command}`);
       await this.execAsync(command);
     } catch (error) {
