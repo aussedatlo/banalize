@@ -60,7 +60,7 @@ describe("BansController", () => {
 
   describe("findAll", () => {
     it("should return an array of bans", async () => {
-      const result = await bansController.findAll();
+      const result = await bansController.findAll({});
       expect(result).toEqual(mockBanArray);
       expect(bansService.findAll).toHaveBeenCalled();
     });

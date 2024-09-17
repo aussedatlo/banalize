@@ -3,6 +3,7 @@
 import { Button, Group, Notification, Select, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
+import { Config } from "types/Config";
 
 type ConfigFormType = {
   _id?: string;
@@ -16,7 +17,7 @@ type ConfigFormType = {
 
 type ConfigFormProps = {
   onDone: () => void;
-  onSumbit: (config: ConfigFormType) => Promise<any>;
+  onSumbit: (config: ConfigFormType) => Promise<Config | { message: string }>;
   initialConfig?: ConfigFormType;
 };
 
@@ -52,8 +53,8 @@ export const ConfigForm = ({
 
     const result = await onSumbit(config);
 
-    if (!result._id) {
-      setMessage(result.message);
+    if ("message" in result) {
+      setMessage(message);
       return;
     }
 

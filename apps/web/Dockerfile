@@ -6,4 +6,6 @@ RUN npm install -g pnpm
 
 COPY . .
 
-RUN pnpm i && pnpm build
+RUN pnpm i && pnpm web build
+
+CMD ["pnpm", "web", "start"]

@@ -12,6 +12,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import {
   ConfigCreatedEvent,
   ConfigRemovedEvent,
+  ConfigUpdatedEvent,
 } from "src/events/config-event.types";
 import { Events } from "src/events/events.enum";
 import { ConfigsService } from "./configs.service";
@@ -70,6 +71,13 @@ export class ConfigsController {
   @ApiBody({ type: CreateConfigDto })
   @ApiResponse({ type: Config })
   async update(@Param("id") id: string, @Body() configDto: CreateConfigDto) {
-    return this.configService.update(id, configDto);
+    const result = await this.configService.update(id, configDto);
+
+    this.eventEmitter.emit(
+      Events.CONFIG_UPDATED,
+      new ConfigUpdatedEvent(result),
+    );
+
+    return result;
   }
 }

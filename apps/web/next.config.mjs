@@ -13,7 +13,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*", // The request coming into Next.js
-        destination: `${process.env.SERVER_URL}:${process.env.SERVER_PORT}/:path*`, // The actual backend URL without "/api"
+        destination: `${process.env.BANALIZE_WEB_API_SERVER_URL}:${process.env.BANALIZE_WEB_API_SERVER_PORT}/:path*`,
       },
     ];
   },

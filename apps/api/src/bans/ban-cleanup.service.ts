@@ -1,17 +1,21 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { Events } from "src/events/events.enum";
 import { BansService } from "./bans.service";
 
 @Injectable()
-export class BanCleanupService {
+export class BanCleanupService implements OnModuleInit {
   private readonly logger = new Logger(BanCleanupService.name);
 
   constructor(
     private readonly bansService: BansService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
+
+  async onModuleInit() {
+    await this.handleCron();
+  }
 
   @Cron(CronExpression.EVERY_MINUTE)
   async handleCron() {
