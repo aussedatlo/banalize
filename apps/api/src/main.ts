@@ -1,11 +1,17 @@
-import { Logger, ValidationPipe } from "@nestjs/common";
+import { Logger, LogLevel, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const logger = new Logger("Bootstrap");
-  const app = await NestFactory.create(AppModule);
+  const loggerLevels: LogLevel[] = ["error", "warn", "log"];
+  if (process.env.BANALIZE_API_LOG_DEBUG === "true") {
+    loggerLevels.push("debug");
+  }
+  const app = await NestFactory.create(AppModule, {
+    logger: loggerLevels,
+  });
 
   const config = new DocumentBuilder()
     .setTitle("Banalize API")
