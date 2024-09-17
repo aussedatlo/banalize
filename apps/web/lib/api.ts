@@ -3,20 +3,30 @@ import { Config } from "types/Config";
 import { Match } from "types/Match";
 
 const getServerUrlAndPort = (): string =>
-  process.env.SERVER_URL && process.env.SERVER_PORT
-    ? `${process.env.SERVER_URL}:${process.env.SERVER_PORT}`
+  process.env.BANALIZE_WEB_API_SERVER_URL &&
+  process.env.BANALIZE_WEB_API_SERVER_PORT
+    ? `${process.env.BANALIZE_WEB_API_SERVER_URL}:${process.env.BANALIZE_WEB_API_SERVER_PORT}`
     : "/api";
 
-const fetchFromApi = async (endpoint: string, options?: RequestInit) => {
-  const res = await fetch(getServerUrlAndPort() + endpoint, {
-    cache: "no-store",
-    ...options,
-  });
-  return await res.json();
+const fetchFromApi = async (
+  endpoint: string,
+  options?: RequestInit,
+  defaultValue?: object,
+) => {
+  try {
+    const res = await fetch(getServerUrlAndPort() + endpoint, {
+      cache: "no-store",
+      ...options,
+    });
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return defaultValue;
+  }
 };
 
 export const fetchConfigs = async (): Promise<Config[]> => {
-  return fetchFromApi("/configs");
+  return fetchFromApi("/configs", undefined, []);
 };
 
 export const fetchConfigById = async (id: string): Promise<Config> => {
