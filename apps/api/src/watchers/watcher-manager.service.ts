@@ -9,6 +9,7 @@ import { ConfigsService } from "src/configs/configs.service";
 import {
   ConfigCreatedEvent,
   ConfigRemovedEvent,
+  ConfigUpdatedEvent,
 } from "src/events/config-event.types";
 import { Events } from "src/events/events.enum";
 import { WatcherFactory } from "src/watchers/watcher.factory";
@@ -43,6 +44,13 @@ export class WatcherManagerService implements OnModuleInit, OnModuleDestroy {
   @OnEvent(Events.CONFIG_REMOVED)
   handleConfigRemoved(event: ConfigRemovedEvent) {
     this.logger.log(`Config removed: ${event.configId}`);
+    this.watchers.forEach((watcher) => watcher.stop());
+    this.startWatchers();
+  }
+
+  @OnEvent(Events.CONFIG_UPDATED)
+  handleConfigUpdated(event: ConfigUpdatedEvent) {
+    this.logger.log(`Config updated: ${event.config.param}`);
     this.watchers.forEach((watcher) => watcher.stop());
     this.startWatchers();
   }
