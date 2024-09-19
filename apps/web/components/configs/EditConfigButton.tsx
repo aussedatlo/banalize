@@ -3,8 +3,7 @@
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconEdit } from "@tabler/icons-react";
-import { ConfigForm } from "components/configs/ConfigForm";
-import { updateConfig } from "lib/api";
+import { ConfigForm, ConfigFormType } from "components/configs/ConfigForm";
 import { useRouter } from "next/navigation";
 import { Config } from "types/Config";
 
@@ -15,6 +14,19 @@ type EditConfigButtonProps = {
 export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
   const [opened, { open, close }] = useDisclosure(false);
   const router = useRouter();
+
+  const onConfigEdit = async (
+    config: ConfigFormType,
+  ): Promise<Config | { message: string }> => {
+    const res = await fetch(`/api/configs/${config._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(config),
+    });
+    return await res.json();
+  };
 
   const onDone = () => {
     close();
@@ -33,7 +45,7 @@ export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
 
       <Modal opened={opened} onClose={close} title="Edit config">
         <ConfigForm
-          onSumbit={(config) => updateConfig({ _id: "", ...config })}
+          onSumbit={onConfigEdit}
           onDone={onDone}
           initialConfig={config}
         />

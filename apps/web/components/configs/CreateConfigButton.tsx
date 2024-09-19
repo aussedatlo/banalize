@@ -3,13 +3,23 @@
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
-import { ConfigForm } from "components/configs/ConfigForm";
-import { createConfig } from "lib/api";
+import { ConfigForm, ConfigFormType } from "components/configs/ConfigForm";
 import { useRouter } from "next/navigation";
 
 export const CreateConfigButton = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const router = useRouter();
+
+  const onConfigCreate = async (config: ConfigFormType) => {
+    const res = await fetch("/api/configs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(config),
+    });
+    return await res.json();
+  };
 
   const onDone = () => {
     close();
@@ -27,10 +37,7 @@ export const CreateConfigButton = () => {
       </Button>
 
       <Modal opened={opened} onClose={close} title="Create a new configuration">
-        <ConfigForm
-          onSumbit={(config) => createConfig(config)}
-          onDone={onDone}
-        />
+        <ConfigForm onSumbit={onConfigCreate} onDone={onDone} />
       </Modal>
     </>
   );

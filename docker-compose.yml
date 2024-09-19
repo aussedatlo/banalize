@@ -50,8 +50,8 @@ services:
     depends_on:
       - api
     environment:
-      BANALIZE_WEB_API_SERVER_PORT: 5000
-      BANALIZE_WEB_API_SERVER_URL: http://localhost
+      BANALIZE_WEB_API_SERVER_URL: http://localhost:5000
+      BANALIZE_WEB_PORT: 3000
 
 volumes:
   mongodb-data:

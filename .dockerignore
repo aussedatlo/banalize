@@ -1,6 +1,12 @@
-# .dockerignore
+.dockerignore
 
-.env
+# Not needed as we are bundling the whole app
+
 node_modules
-dist
-coverage
+.git
+.turbo
+
+**/node_modules
+**/dist
+**/.next
+**/.env

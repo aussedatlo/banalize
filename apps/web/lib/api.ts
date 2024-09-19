@@ -2,22 +2,23 @@ import { Ban } from "types/Ban";
 import { Config } from "types/Config";
 import { Match } from "types/Match";
 
-const getServerUrlAndPort = (): string =>
-  process.env.BANALIZE_WEB_API_SERVER_URL &&
-  process.env.BANALIZE_WEB_API_SERVER_PORT
-    ? `${process.env.BANALIZE_WEB_API_SERVER_URL}:${process.env.BANALIZE_WEB_API_SERVER_PORT}`
-    : "/api";
-
 const fetchFromApi = async (
   endpoint: string,
   options?: RequestInit,
   defaultValue?: object,
 ) => {
+  console.log(
+    "API request to",
+    process.env.BANALIZE_WEB_API_SERVER_URL + endpoint,
+  );
   try {
-    const res = await fetch(getServerUrlAndPort() + endpoint, {
-      cache: "no-store",
-      ...options,
-    });
+    const res = await fetch(
+      process.env.BANALIZE_WEB_API_SERVER_URL + endpoint,
+      {
+        cache: "no-store",
+        ...options,
+      },
+    );
     return await res.json();
   } catch (error) {
     console.error(error);

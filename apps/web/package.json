@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "[ -e .env ] && set -a && . ./.env; next dev --turbo --port ${BANALIZE_WEB_PORT-3000}",
     "build": "next build",
-    "start": "next start",
+    "start": "[ -e .env ] && set -a && . ./.env; next start --port ${BANALIZE_WEB_PORT-3000}",
     "export": "next build && next export",
     "typecheck": "tsc --noEmit",
     "lint": "next lint && pnpm lint:stylelint",

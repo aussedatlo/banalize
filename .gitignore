@@ -56,3 +56,7 @@ next-env.d.ts
 
 # coverage
 coverage
+
+# docker overrides
+docker-compose.override.yml
+docker-compose.override.yaml

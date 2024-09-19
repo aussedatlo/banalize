@@ -5,7 +5,7 @@ import { useForm } from "@mantine/form";
 import { useState } from "react";
 import { Config } from "types/Config";
 
-type ConfigFormType = {
+export type ConfigFormType = {
   _id?: string;
   param: string;
   regex: string;

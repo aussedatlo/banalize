@@ -2,10 +2,10 @@ FROM node:22
 
 WORKDIR /usr/src/app
 
-RUN npm install -g pnpm
-
 COPY . .
+
+RUN npm install -g pnpm
 
 RUN pnpm i && pnpm web build
 
-CMD ["pnpm", "web", "start"]
+CMD ["/bin/sh", "-c", "./apps/web/bin/entrypoint.sh"]

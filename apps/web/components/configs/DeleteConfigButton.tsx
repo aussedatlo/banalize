@@ -2,7 +2,6 @@
 
 import { Button } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { deleteConfig } from "lib/api";
 import { useRouter } from "next/navigation";
 
 type DeleteConfigButtonProps = {
@@ -12,7 +11,10 @@ type DeleteConfigButtonProps = {
 export const DeleteConfigButton = ({ configId }: DeleteConfigButtonProps) => {
   const router = useRouter();
   const onDelete = async () => {
-    const response = await deleteConfig(configId);
+    const res = await fetch(`/api/configs/${configId}`, {
+      method: "DELETE",
+    });
+    const response = await res.json();
 
     if (response._id) {
       router.replace("/configs");
