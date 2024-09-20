@@ -38,7 +38,7 @@ export class FileWatcherService implements Watcher {
           .forEach((line: string) => {
             if (line.length) {
               const ip = extractIp(this.config.regex, line);
-              if (ip) {
+              if (ip && !this.config.ignoreIps.includes(ip)) {
                 this.logger.debug("Matched line");
                 this.eventEmitter.emit(
                   Events.MATCH_CREATE,

@@ -45,7 +45,7 @@ export const ConfigStatsPaper = ({
   ];
 
   return (
-    <Paper title="Statistics" icon={<IconChartArcs />} h={250}>
+    <Paper title="Statistics" icon={<IconChartArcs />} h={265}>
       <Grid w="100%">
         {items.map((item, index) => (
           <GridCol span={{ base: 12, xs: 3 }} key={`${index}-stat`}>

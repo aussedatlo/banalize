@@ -13,6 +13,7 @@ export type ConfigFormType = {
   findTime: number;
   maxMatches: number;
   watcherType: string;
+  ignoreIps: string;
 };
 
 type ConfigFormProps = {
@@ -26,7 +27,7 @@ export const ConfigForm = ({
   onDone,
   initialConfig,
 }: ConfigFormProps) => {
-  const [message, setMessage] = useState(undefined);
+  const [message, setMessage] = useState<string | undefined>(undefined);
   const form = useForm<ConfigFormType>({
     mode: "uncontrolled",
     initialValues: {
@@ -37,10 +38,11 @@ export const ConfigForm = ({
       maxMatches: 3,
       ...initialConfig,
       watcherType: initialConfig?.watcherType === "docker" ? "Docker" : "File",
+      ignoreIps: initialConfig?.ignoreIps ?? "",
     },
   });
 
-  const onSubmit = async (values: ConfigFormType) => {
+  const onSubmitRequested = async (values: ConfigFormType) => {
     const config = {
       _id: values._id,
       param: values.param,
@@ -49,12 +51,13 @@ export const ConfigForm = ({
       findTime: Number(values.findTime),
       maxMatches: Number(values.maxMatches),
       watcherType: values.watcherType.toLowerCase(),
+      ignoreIps: values.ignoreIps,
     };
 
     const result = await onSumbit(config);
 
     if ("message" in result) {
-      setMessage(message);
+      setMessage(result.message);
       return;
     }
 
@@ -62,7 +65,7 @@ export const ConfigForm = ({
   };
 
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <form onSubmit={form.onSubmit(onSubmitRequested)}>
       {initialConfig?._id ? (
         <TextInput
           mt="md"
@@ -124,6 +127,15 @@ export const ConfigForm = ({
         label="Type of watcher"
         key={form.key("watcherType")}
         {...form.getInputProps("watcherType")}
+      />
+
+      <TextInput
+        mt="md"
+        label="Ignore IPs"
+        placeholder=""
+        type="string"
+        key={form.key("ignoreIps")}
+        {...form.getInputProps("ignoreIps")}
       />
 
       {message !== undefined ? (

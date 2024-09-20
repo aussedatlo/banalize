@@ -1,8 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
 import {
   Contains,
+  IsArray,
   IsIn,
+  IsIP,
   IsNotEmpty,
+  IsOptional,
   IsPositive,
   IsString,
 } from "class-validator";
@@ -55,4 +58,15 @@ export class CreateConfigDto {
     description: "the watcher type",
   })
   readonly watcherType: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsIP("4", { each: true })
+  @IsOptional()
+  @ApiProperty({
+    example: ["192.168.1.1"],
+    description: "the list of IPs to ignore",
+    required: false,
+  })
+  readonly ignoreIps?: string[];
 }

@@ -23,6 +23,7 @@ describe("ConfigsController", () => {
     findTime: 600,
     maxMatches: 3,
     watcherType: "file",
+    ignoreIps: [],
   };
 
   const mockConfigArray = [mockConfig];
