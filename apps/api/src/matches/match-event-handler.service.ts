@@ -23,7 +23,7 @@ export class MatchEventHandlerService {
 
     const timestamp = new Date().getTime();
 
-    this.matchesService.create({
+    await this.matchesService.create({
       line,
       regex: config.regex,
       ip,
