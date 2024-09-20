@@ -24,14 +24,14 @@ export class BanEventHandlerService {
       configId: config._id,
       active: true,
     });
-    currentBans.forEach((ban) => {
-      this.bansService.update(ban._id, {
+    currentBans.forEach(async (ban) => {
+      await this.bansService.update(ban._id, {
         active: false,
       });
     });
 
     // create a new ban
-    this.bansService.create({
+    await this.bansService.create({
       ip,
       timestamp: new Date().getTime(),
       banTime: config.banTime,
