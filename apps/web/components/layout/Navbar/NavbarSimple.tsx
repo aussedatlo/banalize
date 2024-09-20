@@ -40,7 +40,7 @@ export function NavbarSimple() {
           <Text color="yellow" size="xl">
             Banalize
           </Text>
-          <Code fw={700}>v3.1.2</Code>
+          <Code fw={700}>v{process.env.NEXT_PUBLIC_BANALIZE_WEB_VERSION}</Code>
         </Group>
         {links}
       </div>

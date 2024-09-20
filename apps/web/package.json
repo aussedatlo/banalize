@@ -1,6 +1,6 @@
 {
   "name": "@banalize/web",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "[ -e .env ] && set -a && . ./.env; next dev --turbo --port ${BANALIZE_WEB_PORT-3000}",
