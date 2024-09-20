@@ -39,7 +39,7 @@ export default async function ConfigPage({
 
   const activeMatches = await fetchActiveMatches(
     configId,
-    new Date().getTime() - config.banTime * 1000,
+    new Date().getTime() - config.findTime * 1000,
   );
 
   const activeBans = await fetchActiveBans(configId);
