@@ -6,6 +6,6 @@ COPY . .
 
 RUN npm install -g pnpm
 
-RUN pnpm i && pnpm web build
+RUN pnpm i && pnpm build
 
 CMD ["/bin/sh", "-c", "./apps/web/bin/entrypoint.sh"]

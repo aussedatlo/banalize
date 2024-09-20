@@ -6,4 +6,5 @@ export type Config = {
   findTime: number;
   maxMatches: number;
   watcherType: string;
+  ignoreIps: string[];
 };

@@ -1,10 +1,10 @@
+import { extractIp } from "@banalize/shared-utils";
 import TailFile from "@logdna/tail-file";
 import { Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Config } from "src/configs/schemas/config.schema";
 import { Events } from "src/events/events.enum";
 import { MatchEvent } from "src/events/match-event.types";
-import { extractIp } from "./regex.utils";
 import { Watcher } from "./watcher.interface";
 
 const TAIL_RETRY_INTERVAL = 5 * 1000;
@@ -38,7 +38,7 @@ export class FileWatcherService implements Watcher {
           .forEach((line: string) => {
             if (line.length) {
               const ip = extractIp(this.config.regex, line);
-              if (ip) {
+              if (ip && !this.config.ignoreIps.includes(ip)) {
                 this.logger.debug("Matched line");
                 this.eventEmitter.emit(
                   Events.MATCH_CREATE,

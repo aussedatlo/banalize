@@ -1,5 +1,14 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsIn, IsNotEmpty, IsPositive, IsString } from "class-validator";
+import {
+  Contains,
+  IsArray,
+  IsIn,
+  IsIP,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from "class-validator";
 
 const watcherType = ["file", "docker"] as const;
 
@@ -14,6 +23,7 @@ export class CreateConfigDto {
 
   @IsString()
   @IsNotEmpty()
+  @Contains("<IP>")
   @ApiProperty({
     example: "^test.*<IP>.*300$",
     description: "the regex to match",
@@ -48,4 +58,15 @@ export class CreateConfigDto {
     description: "the watcher type",
   })
   readonly watcherType: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsIP("4", { each: true })
+  @IsOptional()
+  @ApiProperty({
+    example: ["192.168.1.1"],
+    description: "the list of IPs to ignore",
+    required: false,
+  })
+  readonly ignoreIps?: string[];
 }

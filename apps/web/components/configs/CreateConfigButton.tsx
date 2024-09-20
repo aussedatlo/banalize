@@ -16,7 +16,10 @@ export const CreateConfigButton = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(config),
+      body: JSON.stringify({
+        ...config,
+        ignoreIps: config.ignoreIps.split(","),
+      }),
     });
     return await res.json();
   };

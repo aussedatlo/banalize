@@ -23,7 +23,10 @@ export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(config),
+      body: JSON.stringify({
+        ...config,
+        ignoreIps: config.ignoreIps.split(","),
+      }),
     });
     return await res.json();
   };
@@ -47,7 +50,7 @@ export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
         <ConfigForm
           onSumbit={onConfigEdit}
           onDone={onDone}
-          initialConfig={config}
+          initialConfig={{ ...config, ignoreIps: config.ignoreIps.join(",") }}
         />
       </Modal>
     </>

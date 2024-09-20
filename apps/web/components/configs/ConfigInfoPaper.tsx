@@ -14,9 +14,14 @@ export const ConfigInfoPaper = ({ config }: ConfigInfoPaperProps) => {
     { text: "Ban time", value: `${config.banTime} sec` },
     { text: "Find time", value: `${config.findTime} sec` },
     { text: "Max matches", value: config.maxMatches },
+    { text: "Watcher type", value: config.watcherType },
+    {
+      text: "Ignored Ips",
+      value: config.ignoreIps.length ? config.ignoreIps.join(", ") : "None",
+    },
   ];
   return (
-    <Paper title="Informations" icon={<IconInfoCircle />} h={250}>
+    <Paper title="Informations" icon={<IconInfoCircle />} h={265}>
       {items.map((item, index) => (
         <Group justify="space-between" w="100%" key={`${index}-stat`}>
           <Text>{item.text}:</Text>

@@ -57,6 +57,13 @@ export class Config {
     description: "the watcher type",
   })
   watcherType: string;
+
+  @Prop()
+  @ApiProperty({
+    example: ["192.168.1.1"],
+    description: "the ips to ignore",
+  })
+  ignoreIps: string[];
 }
 
 export const ConfigSchema = SchemaFactory.createForClass(Config);

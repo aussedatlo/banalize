@@ -10,7 +10,7 @@ export class MatchEventHandlerService {
   private readonly logger = new Logger(MatchEventHandlerService.name);
 
   constructor(
-    private matchsService: MatchesService,
+    private matchesService: MatchesService,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -23,7 +23,7 @@ export class MatchEventHandlerService {
 
     const timestamp = new Date().getTime();
 
-    this.matchsService.create({
+    await this.matchesService.create({
       line,
       regex: config.regex,
       ip,
@@ -31,9 +31,9 @@ export class MatchEventHandlerService {
       configId: config._id,
     });
 
-    const matches = await this.matchsService.findAll({
+    const matches = await this.matchesService.findAll({
       configId: config._id,
-      timestamp_gt: new Date().getTime() - config.findTime * 1000,
+      timestamp_gt: timestamp - config.findTime * 1000,
     });
 
     this.logger.debug(`Matched ${matches.length} times`);

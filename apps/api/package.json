@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@banalize/eslint-config": "workspace:^",
+    "@banalize/shared-utils": "workspace:*",
     "@banalize/typescript-config": "workspace:^",
     "@logdna/tail-file": "^4.0.2",
     "@nestjs/common": "^10.0.0",

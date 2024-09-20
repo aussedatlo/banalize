@@ -11,7 +11,10 @@ export class ConfigsService {
   ) {}
 
   async create(createConfigDto: CreateConfigDto): Promise<Config> {
-    const createdCat = await this.configModel.create(createConfigDto);
+    const createdCat = await this.configModel.create({
+      ...createConfigDto,
+      ignoreIps: createConfigDto.ignoreIps || [],
+    });
     return createdCat;
   }
 
