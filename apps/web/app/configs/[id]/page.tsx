@@ -7,6 +7,7 @@ import { ConfigInfoPaper } from "components/configs/ConfigInfoPaper";
 import { ConfigStatsPaper } from "components/configs/ConfigStatsPaper";
 import { DeleteConfigButton } from "components/configs/DeleteConfigButton";
 import { EditConfigButton } from "components/configs/EditConfigButton";
+import { TryRegexConfigButton } from "components/configs/TryRegexConfigButton";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 import {
   fetchActiveBans,
@@ -50,6 +51,7 @@ export default async function ConfigPage({
       <Group justify="space-between">
         <RouterBreadcrumbs path={`/configs/${configId}`} />
         <Group>
+          <TryRegexConfigButton config={config} />
           <EditConfigButton config={config} />
           <Button leftSection={<IconEyePause size={18} />} color="yellow">
             Disable

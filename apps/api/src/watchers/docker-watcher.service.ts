@@ -1,10 +1,10 @@
+import { extractIp } from "@banalize/shared-utils";
 import { Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import Docker from "dockerode";
 import { Config } from "src/configs/schemas/config.schema";
 import { Events } from "src/events/events.enum";
 import { MatchEvent } from "src/events/match-event.types";
-import { extractIp } from "./regex.utils";
 import { Watcher } from "./watcher.interface";
 
 const DOCKER_RETRY_INTERVAL = 5 * 1000;
