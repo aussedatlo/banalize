@@ -24,12 +24,11 @@ export class BanEventHandlerService {
       configId: config._id,
       active: true,
     });
-    currentBans.forEach(async (ban) => {
-      await this.bansService.update(ban._id, {
-        active: false,
-      });
-    });
 
+    if (currentBans.length > 0) {
+        this.logger.log(`Ban already exists for ${ip}`);
+        return
+    }
     // create a new ban
     await this.bansService.create({
       ip,
