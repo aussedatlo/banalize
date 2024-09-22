@@ -7,6 +7,7 @@ import { BansModule } from "./bans/bans.module";
 import { ConfigsModule } from "./configs/configs.module";
 import { FirewallModule } from "./firewall/firewall.module";
 import { MatchesModule } from "./matches/matches.module";
+import { StatsModule } from "./stats/stats.module";
 import { WatchersModule } from "./watchers/watchers.module";
 
 @Module({
@@ -20,6 +21,7 @@ import { WatchersModule } from "./watchers/watchers.module";
     WatchersModule,
     BansModule,
     FirewallModule,
+    StatsModule,
   ],
 })
 export class AppModule {}

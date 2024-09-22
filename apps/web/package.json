@@ -13,6 +13,7 @@
     "lint:stylelint": "stylelint '**/*.css'"
   },
   "dependencies": {
+    "@banalize/api": "workspace:*",
     "@banalize/shared-utils": "workspace:*",
     "@mantine/core": "7.12.2",
     "@mantine/form": "^7.12.2",
