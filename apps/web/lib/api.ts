@@ -87,3 +87,7 @@ export const fetchActiveBans = async (configId: string): Promise<Ban[]> => {
   });
   return fetchFromApi(`/bans?${queryString}`);
 };
+
+export const fetchStatsCount = async () => {
+  return fetchFromApi("/stats/count");
+};

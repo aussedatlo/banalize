@@ -2,10 +2,11 @@ import { Box, Group } from "@mantine/core";
 import { ConfigPaperList } from "components/configs/ConfigPaperList";
 import { CreateConfigButton } from "components/configs/CreateConfigButton";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
-import { fetchConfigs } from "lib/api";
+import { fetchConfigs, fetchStatsCount } from "lib/api";
 
 export default async function ConfigsPage() {
   const configs = await fetchConfigs();
+  const stats = await fetchStatsCount();
 
   return (
     <Box mt={"xl"}>
@@ -14,7 +15,7 @@ export default async function ConfigsPage() {
         <CreateConfigButton />
       </Group>
 
-      <ConfigPaperList configs={configs} />
+      <ConfigPaperList configs={configs} stats={stats} />
     </Box>
   );
 }
