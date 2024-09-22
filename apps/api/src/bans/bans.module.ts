@@ -10,5 +10,6 @@ import { Ban, BanSchema } from "./schemas/ban.schema";
   imports: [MongooseModule.forFeature([{ name: Ban.name, schema: BanSchema }])],
   controllers: [BansController],
   providers: [BansService, BanEventHandlerService, BanCleanupService],
+  exports: [BansService],
 })
 export class BansModule {}
