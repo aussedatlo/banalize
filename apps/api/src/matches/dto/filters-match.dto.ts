@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsOptional, IsString } from "class-validator";
+import { IsIP, IsOptional, IsString } from "class-validator";
 
 export class FiltersMatchesDto {
   @ApiProperty({
@@ -10,6 +10,16 @@ export class FiltersMatchesDto {
   @IsOptional()
   @IsString()
   readonly configId?: string;
+
+  @ApiProperty({
+    example: "192.168.1.1",
+    description: "the ip",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  @IsIP(4)
+  readonly ip?: string;
 
   @ApiProperty({
     example: "1633311600000",

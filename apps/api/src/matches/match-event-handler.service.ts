@@ -33,6 +33,7 @@ export class MatchEventHandlerService {
 
     const matches = await this.matchesService.findAll({
       configId: config._id,
+      ip,
       timestamp_gt: timestamp - config.findTime * 1000,
     });
 

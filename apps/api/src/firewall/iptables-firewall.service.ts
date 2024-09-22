@@ -12,8 +12,8 @@ export class IptablesFirewallService implements Firewall {
   async denyIp(ip: string): Promise<void> {
     try {
       // iptables command to drop packets from a specific IP
-      const checkCommand = `iptables -C ${this.chain} -s ${ip}/32 -j DROP`;
-      const addCommand = `iptables -A ${this.chain} -s ${ip}/32 -j DROP`;
+      const checkCommand = `iptables -C ${this.chain} -s ${ip}/32 -j REJECT --reject-with icmp-port-unreachable`;
+      const addCommand = `iptables -I ${this.chain} -s ${ip}/32 -j REJECT --reject-with icmp-port-unreachable`;
 
       // Check if the rule already exists
       try {
@@ -33,7 +33,7 @@ export class IptablesFirewallService implements Firewall {
   async allowIp(ip: string): Promise<void> {
     try {
       // iptables command to remove the rule blocking the IP
-      const command = `iptables -D ${this.chain} -s ${ip}/32 -j DROP`;
+      const command = `iptables -D ${this.chain} -s ${ip}/32 -j REJECT --reject-with icmp-port-unreachable`;
       this.logger.log(`Executing: ${command}`);
       await this.execAsync(command);
     } catch (error) {
