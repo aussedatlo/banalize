@@ -35,7 +35,7 @@ export class StatsCountService implements OnModuleInit {
   @OnEvent(Events.BAN_CREATE)
   @OnEvent(Events.BAN_REMOVE)
   async handleEvent(event: BanEvent | MatchEvent): Promise<void> {
-    this.computeStats(event.config._id);
+    await this.computeStats(event.config._id);
   }
 
   async computeStats(configId: string): Promise<void> {
@@ -61,10 +61,10 @@ export class StatsCountService implements OnModuleInit {
     );
 
     this.record.data[configId] = {
-      bansCount: currentBans.length,
-      matchesCount: currentMatches.length,
-      currentBansCount: allBans.length,
-      currentMatchesCount: allMatches.length,
+      bansCount: allBans.length,
+      matchesCount: allMatches.length,
+      currentBansCount: currentBans.length,
+      currentMatchesCount: currentMatches.length,
     };
   }
 }
