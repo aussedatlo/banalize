@@ -9,7 +9,6 @@ export default async function ConfigsPage() {
   const stats = await fetchStatsCount();
   const status = await fetchWatcherStatus();
 
-
   return (
     <Box mt={"xl"}>
       <Group justify="space-between">

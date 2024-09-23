@@ -1,16 +1,16 @@
-import { ConfGraphPaper } from "../../../components/configs/ConfigGraphPaper";
-
 export const dynamic = "force-dynamic";
 
 import { Box, Button, Grid, GridCol, Group } from "@mantine/core";
 import { IconEyePause } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
+import { ConfGraphPaper } from "components/configs/ConfigGraphPaper";
 import { ConfigInfoPaper } from "components/configs/ConfigInfoPaper";
 import { ConfigStatsPaper } from "components/configs/ConfigStatsPaper";
 import { DeleteConfigButton } from "components/configs/DeleteConfigButton";
 import { EditConfigButton } from "components/configs/EditConfigButton";
 import { TryRegexConfigButton } from "components/configs/TryRegexConfigButton";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
+
 import {
   fetchActiveBans,
   fetchActiveMatches,

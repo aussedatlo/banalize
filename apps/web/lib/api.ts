@@ -100,6 +100,7 @@ export const fetchStatsCount = async (): Promise<StatsCountRecordModel> => {
   return fetchFromApi("/stats/count");
 };
 
+
 export const fetchWatcherStatus =
   async (): Promise<WatcherStatusRecordModel> => {
     return fetchFromApi("/watchers/status");
