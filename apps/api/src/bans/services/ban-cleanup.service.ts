@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Cron, CronExpression } from "@nestjs/schedule";
+import { BansService } from "src/bans/bans.service";
 import { Events } from "src/events/events.enum";
-import { BansService } from "./bans.service";
 
 @Injectable()
 export class BanCleanupService implements OnModuleInit {

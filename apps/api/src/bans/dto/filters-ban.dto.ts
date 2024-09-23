@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsOptional, IsString } from "class-validator";
+import { FiltersBan } from "src/bans/interfaces/filters-ban.interface";
 
-export class FiltersBansDto {
+export class FiltersBansDto implements FiltersBan {
   @ApiProperty({
     example: "66dca3ca17f21044b9dbcaf5",
     description: "the id of the config",

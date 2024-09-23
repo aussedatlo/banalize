@@ -1,15 +1,16 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
 import { HydratedDocument } from "mongoose";
+import { Ban } from "src/bans/interfaces/ban.interface";
 
-export type BanDocument = HydratedDocument<Ban>;
+export type BanSchemaDocument = HydratedDocument<BanSchema>;
 
 @Schema({
   toJSON: {
     versionKey: false,
   },
 })
-export class Ban {
+export class BanSchema implements Ban {
   @ApiProperty({
     example: "66dca3ca17f21044b9dbcaf5",
     description: "the id of the ban event",
@@ -52,4 +53,4 @@ export class Ban {
   active: boolean;
 }
 
-export const BanSchema = SchemaFactory.createForClass(Ban);
+export const BanSchemaDefinition = SchemaFactory.createForClass(BanSchema);

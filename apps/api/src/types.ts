@@ -1,4 +1,5 @@
 // interfaces are renamed to Models, Schema and Dto to match swagger naming conventions
+export type { Ban as BanSchema } from "src/bans/interfaces/ban.interface";
 export type { Config as ConfigSchema } from "src/configs/interfaces/config.interface";
 export type { CreateConfig as CreateConfigDto } from "src/configs/interfaces/create-config.interface";
 export type { Match as MatchSchema } from "src/matches/interfaces/match.interface";

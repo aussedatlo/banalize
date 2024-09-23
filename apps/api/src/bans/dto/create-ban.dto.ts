@@ -1,7 +1,8 @@
-import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { IsBoolean, IsOptional, IsPositive, IsString } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsPositive, IsString } from "class-validator";
+import { CreateBan } from "src/bans/interfaces/create-ban.interface";
 
-export class CreateBanDto {
+export class CreateBanDto implements CreateBan {
   @IsString()
   @ApiProperty({
     example: "192.168.1.1",
@@ -29,15 +30,4 @@ export class CreateBanDto {
     description: "the id of the config",
   })
   readonly configId: string;
-}
-
-export class UpdateBanDto extends PartialType(CreateBanDto) {
-  @IsBoolean()
-  @IsOptional()
-  @ApiProperty({
-    example: true,
-    description: "Indicates if the ban is currently active",
-    required: false, // This makes it optional in the API documentation
-  })
-  readonly active?: boolean;
 }

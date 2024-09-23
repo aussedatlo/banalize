@@ -1,8 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
+import { BansService } from "src/bans/bans.service";
 import { BanEvent } from "src/events/ban-event.types";
 import { Events } from "src/events/events.enum";
-import { BansService } from "./bans.service";
 
 @Injectable()
 export class BanEventHandlerService {
@@ -26,8 +26,8 @@ export class BanEventHandlerService {
     });
 
     if (currentBans.length > 0) {
-        this.logger.log(`Ban already exists for ${ip}`);
-        return
+      this.logger.log(`Ban already exists for ${ip}`);
+      return;
     }
     // create a new ban
     await this.bansService.create({

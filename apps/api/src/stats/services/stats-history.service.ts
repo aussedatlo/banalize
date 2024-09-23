@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { format, getISOWeek } from "date-fns";
 import { BansService } from "src/bans/bans.service";
-import { Ban } from "src/bans/schemas/ban.schema";
+import { BanSchema } from "src/bans/schemas/ban.schema";
 import { ConfigsService } from "src/configs/configs.service";
 import { BanEvent } from "src/events/ban-event.types";
 import { Events } from "src/events/events.enum";
@@ -66,7 +66,7 @@ export class StatsHistoryService implements OnModuleInit {
 
   async computeDailyStats(
     matches: MatchSchema[],
-    bans: Ban[],
+    bans: BanSchema[],
     configId?: string,
   ): Promise<void> {
     const stats: StatsHistoryModel = {
@@ -116,7 +116,7 @@ export class StatsHistoryService implements OnModuleInit {
 
   async computeWeeklyStats(
     matches: MatchSchema[],
-    bans: Ban[],
+    bans: BanSchema[],
     configId?: string,
   ): Promise<void> {
     const stats: StatsHistoryModel = {
@@ -163,7 +163,7 @@ export class StatsHistoryService implements OnModuleInit {
 
   async computeMonthlyStats(
     matches: MatchSchema[],
-    bans: Ban[],
+    bans: BanSchema[],
     configId?: string,
   ): Promise<void> {
     const stats: StatsHistoryModel = {
