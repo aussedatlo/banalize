@@ -1,9 +1,12 @@
-import { StatsCountCollection } from "@banalize/api/src/stats/entities/StatsCurrentCollection";
+import {
+  StatsCountCollection,
+  StatsCountData,
+} from "@banalize/api/dist/stats/entities/StatsCount";
 import { Grid, GridCol } from "@mantine/core";
 import { ConfigPaper } from "components/configs/ConfigPaper";
 import { Config } from "types/Config";
 
-const DEFAULT_VALUE: StatsCountCollection = {
+const DEFAULT_VALUE: StatsCountData = {
   bansCount: 0,
   matchesCount: 0,
   currentBansCount: 0,

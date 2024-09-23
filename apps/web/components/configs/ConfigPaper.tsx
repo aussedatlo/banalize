@@ -1,4 +1,4 @@
-import { StatsCountData } from "@banalize/api/src/stats/entities/StatsCurrentCollection";
+import { StatsCountData } from "@banalize/api/src/stats/entities/StatsCount";
 import { Badge, Group } from "@mantine/core";
 import { IconBrandDocker, IconFile } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/Paper";
