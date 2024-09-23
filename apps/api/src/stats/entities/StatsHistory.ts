@@ -10,7 +10,7 @@ export class StatsHistoryData {
       "14-09-2024": 2,
     },
   })
-  public data: Record<string, number>;
+  public data: Record<string, number> = {};
 }
 
 export class StatsHistory {
@@ -25,7 +25,7 @@ export class StatsHistory {
       },
     },
   })
-  bans: StatsHistoryData;
+  bans: StatsHistoryData = new StatsHistoryData();
 
   @ApiProperty({
     type: StatsHistoryData,
@@ -38,5 +38,5 @@ export class StatsHistory {
       },
     },
   })
-  matches: StatsHistoryData;
+  matches: StatsHistoryData = new StatsHistoryData();
 }

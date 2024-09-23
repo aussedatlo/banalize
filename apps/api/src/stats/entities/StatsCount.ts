@@ -5,25 +5,25 @@ export class StatsCountData {
     description: "Number of total bans.",
     example: 0,
   })
-  bansCount: number;
+  bansCount: number = 0;
 
   @ApiProperty({
     description: "Number of total matches.",
     example: 0,
   })
-  matchesCount: number;
+  matchesCount: number = 0;
 
   @ApiProperty({
     description: "Number of current bans.",
     example: 0,
   })
-  currentBansCount: number;
+  currentBansCount: number = 0;
 
   @ApiProperty({
     description: "Number of current matches.",
     example: 0,
   })
-  currentMatchesCount: number;
+  currentMatchesCount: number = 0;
 }
 
 export class StatsCountCollection {
@@ -49,5 +49,5 @@ export class StatsCountCollection {
       $ref: getSchemaPath(StatsCountData),
     },
   })
-  data: Record<string, StatsCountData>;
+  data: Record<string, StatsCountData> = {};
 }
