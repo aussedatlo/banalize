@@ -37,9 +37,9 @@ const StatGraph = ({ stats, timeSelected }: StatGraphProps) => {
   const maxBanValue = Math.max(...Object.values(bans.data));
   const maxMatchValue = Math.max(...Object.values(matches.data));
   const useTwoAxis =
-    maxMatchValue !== 0 && Math.abs(maxBanValue / maxMatchValue) > 0.5;
+    maxMatchValue !== 0 &&
+    (maxBanValue / maxMatchValue > 2 || maxBanValue - maxMatchValue > 100);
 
-  console.log(useTwoAxis);
   return (
     <LineChart
       h={300}
