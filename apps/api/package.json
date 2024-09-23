@@ -4,6 +4,11 @@
   "description": "Banalize API",
   "license": "MIT",
   "author": "Louis Aussedat",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.ts"
+    }
+  },
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch",
