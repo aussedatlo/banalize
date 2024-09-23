@@ -18,7 +18,10 @@ export const CreateConfigButton = () => {
       },
       body: JSON.stringify({
         ...config,
-        ignoreIps: config.ignoreIps.split(","),
+        ignoreIps:
+          config.ignoreIps?.length > 0
+            ? config.ignoreIps.split(",")
+            : undefined,
       }),
     });
     return await res.json();
