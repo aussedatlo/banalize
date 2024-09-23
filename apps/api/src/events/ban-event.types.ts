@@ -1,8 +1,8 @@
-import { Config } from "src/configs/schemas/config.schema";
+import { ConfigSchema } from "src/configs/schemas/config.schema";
 
 export class BanEvent {
   constructor(
     public readonly ip: string,
-    public readonly config: Config,
+    public readonly config: ConfigSchema,
   ) {}
 }

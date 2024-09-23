@@ -1,15 +1,17 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
 import { HydratedDocument } from "mongoose";
+import { WatcherType } from "src/configs/enums/watcher-type";
+import { Config } from "src/configs/interfaces/config.interface";
 
-export type ConfigDocument = HydratedDocument<Config>;
+export type ConfigSchemaDocument = HydratedDocument<ConfigSchema>;
 
 @Schema({
   toJSON: {
     versionKey: false,
   },
 })
-export class Config {
+export class ConfigSchema implements Config {
   @ApiProperty({
     example: "66dca3ca17f21044b9dbcaf5",
     description: "the id of the config",
@@ -56,7 +58,7 @@ export class Config {
     example: "file",
     description: "the watcher type",
   })
-  watcherType: string;
+  watcherType: WatcherType;
 
   @Prop()
   @ApiProperty({
@@ -66,4 +68,5 @@ export class Config {
   ignoreIps: string[];
 }
 
-export const ConfigSchema = SchemaFactory.createForClass(Config);
+export const ConfigSchemaDefinition =
+  SchemaFactory.createForClass(ConfigSchema);

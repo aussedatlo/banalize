@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsIP, IsOptional, IsString } from "class-validator";
+import { FiltersMatch } from "src/matches/interfaces/filters-match.interface";
 
-export class FiltersMatchesDto {
+export class FiltersMatchesDto implements FiltersMatch {
   @ApiProperty({
     example: "66dca3ca17f21044b9dbcaf5",
     description: "the id of the config",

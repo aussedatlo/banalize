@@ -1,14 +1,14 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { BansController } from "./bans.controller";
 import { BansService } from "./bans.service";
-import { Ban } from "./schemas/ban.schema";
+import { BanSchema } from "./schemas/ban.schema";
 
 describe("BansController", () => {
   let bansController: BansController;
   let bansService: BansService;
 
   // Mock data
-  const mockBan: Ban = {
+  const mockBan: BanSchema = {
     _id: "123",
     ip: "192.168.1.1",
     timestamp: 1633297200000,
@@ -17,7 +17,7 @@ describe("BansController", () => {
     active: true,
   };
 
-  const mockBanArray: Ban[] = [
+  const mockBanArray: BanSchema[] = [
     {
       _id: "123",
       ip: "192.168.1.1",

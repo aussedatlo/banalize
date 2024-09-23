@@ -1,8 +1,7 @@
-export type Match = {
-  _id: string;
+export interface CreateMatch {
   line: string;
   regex: string;
   ip: string;
   timestamp: number;
   configId: string;
-};
+}

@@ -1,9 +1,9 @@
 "use client";
 
+import { ConfigSchema } from "@banalize/api";
 import { Button, Group, Notification, Select, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
-import { Config } from "types/Config";
 
 export type ConfigFormType = {
   _id?: string;
@@ -18,7 +18,9 @@ export type ConfigFormType = {
 
 type ConfigFormProps = {
   onDone: () => void;
-  onSumbit: (config: ConfigFormType) => Promise<Config | { message: string }>;
+  onSumbit: (
+    config: ConfigFormType,
+  ) => Promise<ConfigSchema | { message: string }>;
   initialConfig?: ConfigFormType;
 };
 

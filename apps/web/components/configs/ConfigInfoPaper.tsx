@@ -1,10 +1,10 @@
+import { ConfigSchema } from "@banalize/api";
 import { Group, Text } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/Paper";
-import { Config } from "types/Config";
 
 type ConfigInfoPaperProps = {
-  config: Config;
+  config: ConfigSchema;
 };
 
 export const ConfigInfoPaper = ({ config }: ConfigInfoPaperProps) => {

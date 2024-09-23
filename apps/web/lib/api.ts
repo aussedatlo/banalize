@@ -1,6 +1,10 @@
-import { Ban } from "types/Ban";
-import { Config } from "types/Config";
-import { Match } from "types/Match";
+import {
+  BanSchema,
+  ConfigSchema,
+  MatchSchema,
+  StatsCountRecordModel,
+  WatcherStatusRecordModel,
+} from "@banalize/api";
 
 const fetchFromApi = async (
   endpoint: string,
@@ -26,15 +30,15 @@ const fetchFromApi = async (
   }
 };
 
-export const fetchConfigs = async (): Promise<Config[]> => {
+export const fetchConfigs = async (): Promise<ConfigSchema[]> => {
   return fetchFromApi("/configs", undefined, []);
 };
 
-export const fetchConfigById = async (id: string): Promise<Config> => {
+export const fetchConfigById = async (id: string): Promise<ConfigSchema> => {
   return fetchFromApi(`/configs/${id}`);
 };
 
-export const createConfig = async (config: Omit<Config, "_id">) => {
+export const createConfig = async (config: Omit<ConfigSchema, "_id">) => {
   return fetchFromApi("/configs", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -42,7 +46,7 @@ export const createConfig = async (config: Omit<Config, "_id">) => {
   });
 };
 
-export const updateConfig = async (config: Config) => {
+export const updateConfig = async (config: ConfigSchema) => {
   return fetchFromApi(`/configs/${config._id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -59,12 +63,14 @@ const createQueryString = (filters: Record<string, string>): string =>
 
 export const fetchMatchesByConfigId = async (
   configId: string,
-): Promise<Match[]> => {
+): Promise<MatchSchema[]> => {
   const queryString = createQueryString({ configId });
   return fetchFromApi(`/matches?${queryString}`);
 };
 
-export const fetchBansByConfigId = async (configId: string): Promise<Ban[]> => {
+export const fetchBansByConfigId = async (
+  configId: string,
+): Promise<BanSchema[]> => {
   const queryString = createQueryString({ configId });
   return fetchFromApi(`/bans?${queryString}`);
 };
@@ -72,7 +78,7 @@ export const fetchBansByConfigId = async (configId: string): Promise<Ban[]> => {
 export const fetchActiveMatches = async (
   configId: string,
   timestamp_gt: number,
-): Promise<Match[]> => {
+): Promise<MatchSchema[]> => {
   const queryString = createQueryString({
     configId,
     timestamp_gt: timestamp_gt.toString(),
@@ -80,7 +86,9 @@ export const fetchActiveMatches = async (
   return fetchFromApi(`/matches?${queryString}`);
 };
 
-export const fetchActiveBans = async (configId: string): Promise<Ban[]> => {
+export const fetchActiveBans = async (
+  configId: string,
+): Promise<BanSchema[]> => {
   const queryString = createQueryString({
     configId,
     active: true.toString(),
@@ -88,6 +96,11 @@ export const fetchActiveBans = async (configId: string): Promise<Ban[]> => {
   return fetchFromApi(`/bans?${queryString}`);
 };
 
-export const fetchStatsCount = async () => {
+export const fetchStatsCount = async (): Promise<StatsCountRecordModel> => {
   return fetchFromApi("/stats/count");
 };
+
+export const fetchWatcherStatus =
+  async (): Promise<WatcherStatusRecordModel> => {
+    return fetchFromApi("/watchers/status");
+  };

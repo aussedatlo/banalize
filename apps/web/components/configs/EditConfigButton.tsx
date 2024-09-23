@@ -1,14 +1,14 @@
 "use client";
 
+import { ConfigSchema } from "@banalize/api";
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconEdit } from "@tabler/icons-react";
 import { ConfigForm, ConfigFormType } from "components/configs/ConfigForm";
 import { useRouter } from "next/navigation";
-import { Config } from "types/Config";
 
 type EditConfigButtonProps = {
-  config: Config;
+  config: ConfigSchema;
 };
 
 export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
@@ -17,7 +17,7 @@ export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
 
   const onConfigEdit = async (
     config: ConfigFormType,
-  ): Promise<Config | { message: string }> => {
+  ): Promise<ConfigSchema | { message: string }> => {
     const res = await fetch(`/api/configs/${config._id}`, {
       method: "PUT",
       headers: {

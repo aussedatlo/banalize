@@ -2,15 +2,15 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { format, getISOWeek } from "date-fns";
 import { BansService } from "src/bans/bans.service";
-import { Ban } from "src/bans/schemas/ban.schema";
+import { BanSchema } from "src/bans/schemas/ban.schema";
 import { ConfigsService } from "src/configs/configs.service";
 import { BanEvent } from "src/events/ban-event.types";
 import { Events } from "src/events/events.enum";
 import { MatchEvent } from "src/events/match-event.types";
-import { MatchesService } from "src/matches/matches.service";
-import { Match } from "src/matches/schemas/match";
-import { FiltersStatsHistoryDto } from "./dto/filters-stats-history.dto";
-import { StatsHistory } from "./entities/StatsHistory";
+import { MatchSchema } from "src/matches/schemas/match.schema";
+import { MatchesService } from "src/matches/services/matches.service";
+import { FiltersStatsHistoryDto } from "src/stats/dto/filters-stats-history.dto";
+import { StatsHistoryModel } from "src/stats/models/stats-history.model";
 
 const SAMPLE_SIZE = 10;
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -19,7 +19,7 @@ const WEEK_IN_MS = 7 * DAY_IN_MS;
 @Injectable()
 export class StatsHistoryService implements OnModuleInit {
   private readonly logger = new Logger(StatsHistoryService.name);
-  private statsCollection: Record<string, StatsHistory> = {};
+  private record: Record<string, StatsHistoryModel> = {};
 
   constructor(
     private readonly matchesService: MatchesService,
@@ -27,11 +27,11 @@ export class StatsHistoryService implements OnModuleInit {
     private readonly configsService: ConfigsService,
   ) {}
 
-  async getStats(filters: FiltersStatsHistoryDto): Promise<StatsHistory> {
+  async getStats(filters: FiltersStatsHistoryDto): Promise<StatsHistoryModel> {
     const { period, configId } = filters;
     const key = `stats:${period}:${configId ? `${configId}` : "global"}`;
     this.logger.log(`Getting stats for key ${key}`);
-    const stats = this.statsCollection[key];
+    const stats = this.record[key];
     return stats;
   }
 
@@ -65,11 +65,11 @@ export class StatsHistoryService implements OnModuleInit {
   }
 
   async computeDailyStats(
-    matches: Match[],
-    bans: Ban[],
+    matches: MatchSchema[],
+    bans: BanSchema[],
     configId?: string,
   ): Promise<void> {
-    const stats: StatsHistory = {
+    const stats: StatsHistoryModel = {
       bans: { data: {} },
       matches: { data: {} },
     };
@@ -111,15 +111,15 @@ export class StatsHistoryService implements OnModuleInit {
     );
 
     const key = `stats:daily${configId ? `:${configId}` : ""}`;
-    this.statsCollection[key] = stats;
+    this.record[key] = stats;
   }
 
   async computeWeeklyStats(
-    matches: Match[],
-    bans: Ban[],
+    matches: MatchSchema[],
+    bans: BanSchema[],
     configId?: string,
   ): Promise<void> {
-    const stats: StatsHistory = {
+    const stats: StatsHistoryModel = {
       bans: { data: {} },
       matches: { data: {} },
     };
@@ -158,15 +158,15 @@ export class StatsHistoryService implements OnModuleInit {
     );
 
     const key = `stats:weekly${configId ? `:${configId}` : ""}`;
-    this.statsCollection[key] = stats;
+    this.record[key] = stats;
   }
 
   async computeMonthlyStats(
-    matches: Match[],
-    bans: Ban[],
+    matches: MatchSchema[],
+    bans: BanSchema[],
     configId?: string,
   ): Promise<void> {
-    const stats: StatsHistory = {
+    const stats: StatsHistoryModel = {
       bans: { data: {} },
       matches: { data: {} },
     };
@@ -209,6 +209,6 @@ export class StatsHistoryService implements OnModuleInit {
     );
 
     const key = `stats:monthly${configId ? `:${configId}` : ""}`;
-    this.statsCollection[key] = stats;
+    this.record[key] = stats;
   }
 }

@@ -1,13 +1,15 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { MatchEventHandlerService } from "./match-event-handler.service";
 import { MatchesController } from "./matches.controller";
-import { MatchesService } from "./matches.service";
-import { Match, MatchSchema } from "./schemas/match";
+import { MatchSchema, MatchSchemaDefinition } from "./schemas/match.schema";
+import { MatchEventHandlerService } from "./services/match-event-handler.service";
+import { MatchesService } from "./services/matches.service";
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Match.name, schema: MatchSchema }]),
+    MongooseModule.forFeature([
+      { name: MatchSchema.name, schema: MatchSchemaDefinition },
+    ]),
   ],
   controllers: [MatchesController],
   providers: [MatchEventHandlerService, MatchesService],

@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsPositive, IsString } from "class-validator";
+import { CreateMatch } from "src/matches/interfaces/create-match.interface";
 
-export class CreateMatchDto {
+export class CreateMatchDto implements CreateMatch {
   @IsString()
   @ApiProperty({
     example: "test 192.168.1.1 300",

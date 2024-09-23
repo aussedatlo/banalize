@@ -1,7 +1,7 @@
-import { Config } from "src/configs/schemas/config.schema";
+import { ConfigSchema } from "src/configs/schemas/config.schema";
 
 export class ConfigCreatedEvent {
-  constructor(public readonly config: Config) {}
+  constructor(public readonly config: ConfigSchema) {}
 }
 
 export class ConfigRemovedEvent {
@@ -9,5 +9,5 @@ export class ConfigRemovedEvent {
 }
 
 export class ConfigUpdatedEvent {
-  constructor(public readonly config: Config) {}
+  constructor(public readonly config: ConfigSchema) {}
 }

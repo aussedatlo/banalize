@@ -1,16 +1,16 @@
-import { StatsCountData } from "@banalize/api/src/stats/entities/StatsCount";
+import type { ConfigSchema, StatsCountModel } from "@banalize/api";
 import { Badge, Group } from "@mantine/core";
 import { IconBrandDocker, IconFile } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/Paper";
 import Link from "next/link";
-import { Config } from "types/Config";
 
 type ConfigPaperProps = {
-  config: Config;
-  stats: StatsCountData;
+  config: ConfigSchema;
+  stats: StatsCountModel;
+  status: string;
 };
 
-export const ConfigPaper = ({ config, stats }: ConfigPaperProps) => {
+export const ConfigPaper = ({ config, stats, status }: ConfigPaperProps) => {
   return (
     <Link href={`/configs/${config._id}`} legacyBehavior>
       <Paper
@@ -21,8 +21,18 @@ export const ConfigPaper = ({ config, stats }: ConfigPaperProps) => {
         }
       >
         <Group w="100%">
-          <Badge size="sm" variant="filled" color="green">
-            active
+          <Badge
+            size="sm"
+            variant="filled"
+            color={
+              status === "running"
+                ? "green"
+                : status === "error"
+                  ? "red"
+                  : "yellow"
+            }
+          >
+            {status}
           </Badge>
           {stats.bansCount && (
             <Badge size="sm" variant="dot" color="yellow">

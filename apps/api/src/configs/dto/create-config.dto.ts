@@ -9,10 +9,12 @@ import {
   IsPositive,
   IsString,
 } from "class-validator";
+import { CreateConfig } from "src/configs/interfaces/create-config.interface";
+import { WatcherType } from "../enums/watcher-type";
 
 const watcherType = ["file", "docker"] as const;
 
-export class CreateConfigDto {
+export class CreateConfigDto implements CreateConfig {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -57,7 +59,7 @@ export class CreateConfigDto {
     example: "file",
     description: "the watcher type",
   })
-  readonly watcherType: string;
+  readonly watcherType: WatcherType;
 
   @IsArray()
   @IsString({ each: true })

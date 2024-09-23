@@ -1,12 +1,13 @@
 import {
-  StatsCountCollection,
-  StatsCountData,
-} from "@banalize/api/dist/stats/entities/StatsCount";
+  ConfigSchema,
+  StatsCountModel,
+  StatsCountRecordModel,
+  WatcherStatusRecordModel,
+} from "@banalize/api";
 import { Grid, GridCol } from "@mantine/core";
 import { ConfigPaper } from "components/configs/ConfigPaper";
-import { Config } from "types/Config";
 
-const DEFAULT_VALUE: StatsCountData = {
+const DEFAULT_VALUE: StatsCountModel = {
   bansCount: 0,
   matchesCount: 0,
   currentBansCount: 0,
@@ -14,11 +15,16 @@ const DEFAULT_VALUE: StatsCountData = {
 };
 
 type ConfigPaperListProps = {
-  configs: Config[];
-  stats: StatsCountCollection;
+  configs: ConfigSchema[];
+  stats: StatsCountRecordModel;
+  status: WatcherStatusRecordModel;
 };
 
-export const ConfigPaperList = ({ configs, stats }: ConfigPaperListProps) => {
+export const ConfigPaperList = ({
+  configs,
+  stats,
+  status,
+}: ConfigPaperListProps) => {
   return (
     <Grid>
       {configs.map((config) => (
@@ -26,6 +32,7 @@ export const ConfigPaperList = ({ configs, stats }: ConfigPaperListProps) => {
           <ConfigPaper
             config={config}
             stats={stats.data[config._id] ?? DEFAULT_VALUE}
+            status={status.data[config._id].status ?? "unknown"}
           />
         </GridCol>
       ))}
