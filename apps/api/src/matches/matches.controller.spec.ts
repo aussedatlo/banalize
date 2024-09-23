@@ -1,14 +1,14 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { MatchesController } from "./matches.controller";
-import { MatchesService } from "./matches.service";
-import { Match } from "./schemas/match";
+import { MatchSchema } from "./schemas/match.schema";
+import { MatchesService } from "./services/matches.service";
 
 describe("MatchesController", () => {
   let matchesController: MatchesController;
   let matchesService: MatchesService;
 
   // Mock match data
-  const mockMatch: Match = {
+  const mockMatch: MatchSchema = {
     _id: "66dca3ca17f21044b9dbcaf5",
     line: "test 192.168.1.1 300",
     regex: "^test.*<IP>.*300$",
@@ -60,7 +60,7 @@ describe("MatchesController", () => {
 
   describe("findAll", () => {
     it("should return an array of matches", async () => {
-      const result = await matchesController.findAll();
+      const result = await matchesController.findAll({});
       expect(result).toEqual(mockMatchArray);
       expect(matchesService.findAll).toHaveBeenCalled();
     });

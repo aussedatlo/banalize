@@ -1,15 +1,16 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
 import { HydratedDocument } from "mongoose";
+import { Match } from "src/matches/interfaces/match.interface";
 
-export type MatchDocument = HydratedDocument<Match>;
+export type MatchSchemaDocument = HydratedDocument<MatchSchema>;
 
 @Schema({
   toJSON: {
     versionKey: false,
   },
 })
-export class Match {
+export class MatchSchema implements Match {
   @ApiProperty({
     example: "66dca3ca17f21044b9dbcaf5",
     description: "the id of the match event",
@@ -52,4 +53,4 @@ export class Match {
   configId: string;
 }
 
-export const MatchSchema = SchemaFactory.createForClass(Match);
+export const MatchSchemaDefinition = SchemaFactory.createForClass(MatchSchema);

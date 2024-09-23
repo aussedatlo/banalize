@@ -7,8 +7,8 @@ import { ConfigsService } from "src/configs/configs.service";
 import { BanEvent } from "src/events/ban-event.types";
 import { Events } from "src/events/events.enum";
 import { MatchEvent } from "src/events/match-event.types";
-import { MatchesService } from "src/matches/matches.service";
-import { Match } from "src/matches/schemas/match";
+import { MatchSchema } from "src/matches/schemas/match.schema";
+import { MatchesService } from "src/matches/services/matches.service";
 import { FiltersStatsHistoryDto } from "src/stats/dto/filters-stats-history.dto";
 import { StatsHistoryModel } from "src/stats/models/stats-history.model";
 
@@ -65,7 +65,7 @@ export class StatsHistoryService implements OnModuleInit {
   }
 
   async computeDailyStats(
-    matches: Match[],
+    matches: MatchSchema[],
     bans: Ban[],
     configId?: string,
   ): Promise<void> {
@@ -115,7 +115,7 @@ export class StatsHistoryService implements OnModuleInit {
   }
 
   async computeWeeklyStats(
-    matches: Match[],
+    matches: MatchSchema[],
     bans: Ban[],
     configId?: string,
   ): Promise<void> {
@@ -162,7 +162,7 @@ export class StatsHistoryService implements OnModuleInit {
   }
 
   async computeMonthlyStats(
-    matches: Match[],
+    matches: MatchSchema[],
     bans: Ban[],
     configId?: string,
   ): Promise<void> {

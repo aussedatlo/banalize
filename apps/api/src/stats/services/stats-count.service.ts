@@ -5,7 +5,7 @@ import { ConfigsService } from "src/configs/configs.service";
 import { BanEvent } from "src/events/ban-event.types";
 import { Events } from "src/events/events.enum";
 import { MatchEvent } from "src/events/match-event.types";
-import { MatchesService } from "src/matches/matches.service";
+import { MatchesService } from "src/matches/services/matches.service";
 import { StatsCountRecordModel } from "src/stats/models/stats-count-record.model";
 
 @Injectable()

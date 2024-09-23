@@ -1,4 +1,5 @@
-// interfaces are renamed to Models and Dto to match swagger naming conventions
+// interfaces are renamed to Models, Schema and Dto to match swagger naming conventions
+export type { Match as MatchSchema } from "src/matches/interfaces/match.interface";
 export type { FiltersStatsHistory as FiltersStatsHistoryDto } from "src/stats/interfaces/filters-stats-history.interface";
 export type { StatsCountRecord as StatsCountRecordModel } from "src/stats/interfaces/stats-count-record.interface";
 export type { StatsCount as StatsCountModel } from "src/stats/interfaces/stats-count.interface";
