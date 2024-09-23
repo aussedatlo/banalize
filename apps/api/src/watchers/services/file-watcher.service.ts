@@ -45,7 +45,7 @@ export class FileWatcherService implements Watcher {
       this.tail
         .start()
         .then(() => {
-          this.status = Status.STARTED;
+          this.status = Status.RUNNING;
           this.error = null;
         })
         .catch(this.onError);

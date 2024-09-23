@@ -7,7 +7,7 @@ export class WatcherStatusRecordModel implements WatcherStatusRecord {
     description: "Status of all watchers.",
     example: {
       "66ed87f0220c9d147e766754": {
-        status: "started",
+        status: "running",
         processedLines: 10,
         error: null,
       },

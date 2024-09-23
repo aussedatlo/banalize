@@ -44,7 +44,7 @@ export class DockerWatcherService implements Watcher {
       })
       .then((stream) => {
         this.stream = stream;
-        this.status = Status.STARTED;
+        this.status = Status.RUNNING;
         this.error = null;
 
         stream.on("data", this.onData);

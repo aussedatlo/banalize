@@ -1,6 +1,6 @@
 export enum Status {
   INIT = "init",
-  STARTED = "started",
+  RUNNING = "running",
   STOPPED = "stopped",
   ERROR = "error",
 }
