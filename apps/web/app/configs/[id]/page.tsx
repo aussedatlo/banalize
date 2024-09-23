@@ -19,16 +19,11 @@ import {
   fetchConfigs,
   fetchMatchesByConfigId,
   fetchStatsByConfigId,
-  fetchStatsCount,
 } from "lib/api";
 import { formatEvents } from "lib/events";
 
 export async function generateStaticParams() {
   const configs = await fetchConfigs();
-  const stats = await fetchStatsCount();
-
-  console.log(configs);
-  console.log(stats);
 
   return configs.map((config) => ({
     configId: config._id,
@@ -44,6 +39,14 @@ export default async function ConfigPage({
   const matches = await fetchMatchesByConfigId(configId);
   const bans = await fetchBansByConfigId(configId);
   const config = await fetchConfigById(configId);
+  const statsMonthly = await fetchStatsByConfigId(configId, "monthly");
+  const statsWeekly = await fetchStatsByConfigId(configId, "weekly");
+  const statsDaily = await fetchStatsByConfigId(configId, "daily");
+  const stats = {
+    monthly: statsMonthly,
+    weekly: statsWeekly,
+    daily: statsDaily,
+  };
 
   const activeMatches = await fetchActiveMatches(
     configId,
@@ -69,7 +72,7 @@ export default async function ConfigPage({
 
       <Grid>
         <GridCol span={12}>
-          <ConfGraphPaper configId={configId} />
+          <ConfGraphPaper {...stats} />
         </GridCol>
         <GridCol span={4}>
           <ConfigInfoPaper config={config} />

@@ -4,18 +4,29 @@ import { LineChart } from "@mantine/charts";
 import { Grid, GridCol, Select } from "@mantine/core";
 import { IconGraph } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/Paper";
-import { useEffect, useState } from "react";
-import { fetchStatsByConfigId } from "../../lib/api";
+import { useState } from "react";
 import { Stats } from "../../types/Stats";
 
 type ConfigGraphPaperProps = {
-  configId: string;
+  [key: string]: Stats;
 };
 
-const StatGraph = ({ bans, matches }: Stats) => {
-  if (!bans || !matches) {
+type StatGraphProps = {
+  stats: ConfigGraphPaperProps;
+  timeSelected: string;
+};
+
+const StatGraph = ({ stats, timeSelected }: StatGraphProps) => {
+  if (
+    !stats[timeSelected] ||
+    !stats[timeSelected].bans ||
+    !stats[timeSelected].matches
+  ) {
     return <div>No data</div>;
   }
+
+  const bans = stats[timeSelected].bans;
+  const matches = stats[timeSelected].matches;
 
   const formatData = Object.keys(matches.data).map((date) => ({
     date,
@@ -39,29 +50,22 @@ const StatGraph = ({ bans, matches }: Stats) => {
   );
 };
 
-export const ConfGraphPaper = ({ configId }: ConfigGraphPaperProps) => {
-  const [timeSelected, setTimeSelected] = useState<string | null>("daily");
-  const [stats, setStats] = useState<Stats | null>(null);
-
-  useEffect(() => {
-    fetchStatsByConfigId(configId, timeSelected).then((res) => {
-      setStats(res);
-    });
-  }, [configId, timeSelected]);
+export const ConfGraphPaper = (stats: ConfigGraphPaperProps) => {
+  const [timeSelected, setTimeSelected] = useState("monthly");
 
   return (
     <Paper title="Graph" icon={<IconGraph />}>
       <Grid w="100%">
         <GridCol offset={9} span={3}>
           <Select
-            onChange={(value) => setTimeSelected(value)}
+            onChange={(value) => setTimeSelected(value ?? "daily")}
             value={timeSelected}
             placeholder="Select time"
             data={["daily", "weekly", "monthly"]}
           />
         </GridCol>
         <GridCol span={12}>
-          <StatGraph bans={stats?.bans} matches={stats?.bans} />
+          <StatGraph stats={stats} timeSelected={timeSelected} />
         </GridCol>
       </Grid>
     </Paper>
