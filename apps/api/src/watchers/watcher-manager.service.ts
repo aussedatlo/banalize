@@ -13,6 +13,7 @@ import {
 } from "src/events/config-event.types";
 import { Events } from "src/events/events.enum";
 import { WatcherFactory } from "src/watchers/watcher.factory";
+import { WatcherStatusRecord } from "./models/watcher-status-record";
 import { Watcher } from "./watcher.interface";
 
 @Injectable()
@@ -31,6 +32,25 @@ export class WatcherManagerService implements OnModuleInit, OnModuleDestroy {
 
   onModuleDestroy() {
     this.watchers.forEach((watcher) => watcher.stop());
+  }
+
+  getStatus(): WatcherStatusRecord {
+    return {
+      data: this.watchers.reduce(
+        (acc, watcher) => ({
+          ...acc,
+          [watcher.config._id]: {
+            status: watcher.status,
+            processedLines: watcher.processedLines,
+            error:
+              watcher.error && "message" in watcher.error
+                ? watcher.error.message
+                : null,
+          },
+        }),
+        {},
+      ),
+    };
   }
 
   @OnEvent(Events.CONFIG_CREATED)
