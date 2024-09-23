@@ -1,11 +1,5 @@
 import { Config } from "src/configs/schemas/config.schema";
-
-export enum Status {
-  INIT = "init",
-  STARTED = "started",
-  STOPPED = "stopped",
-  ERROR = "error",
-}
+import { Status } from "src/watchers/enums/status.enum";
 
 export interface Watcher {
   readonly config: Config;

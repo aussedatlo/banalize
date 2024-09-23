@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Config } from "src/configs/schemas/config.schema";
-import { DockerWatcherService } from "./docker-watcher.service";
-import { FileWatcherService } from "./file-watcher.service";
-import { Watcher } from "./watcher.interface";
+import { Watcher } from "./interfaces/watcher.interface";
+import { DockerWatcherService } from "./services/docker-watcher.service";
+import { FileWatcherService } from "./services/file-watcher.service";
 
 @Injectable()
 export class WatcherFactory {

@@ -1,18 +1,19 @@
 import { extractIp } from "@banalize/shared-utils";
-import TailFile from "@logdna/tail-file";
 import { Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
+import Docker from "dockerode";
 import { Config } from "src/configs/schemas/config.schema";
 import { Events } from "src/events/events.enum";
 import { MatchEvent } from "src/events/match-event.types";
-import { Status, Watcher } from "./watcher.interface";
+import { Status } from "src/watchers/enums/status.enum";
+import { Watcher } from "src/watchers/interfaces/watcher.interface";
 
-const TAIL_RETRY_INTERVAL = 5 * 1000;
-const TAIL_POLL_INTERVAL = 1000;
+const DOCKER_RETRY_INTERVAL = 5 * 1000;
 
-export class FileWatcherService implements Watcher {
-  private readonly logger = new Logger(FileWatcherService.name);
-  private tail: TailFile | null;
+export class DockerWatcherService implements Watcher {
+  private readonly logger = new Logger(DockerWatcherService.name);
+  private docker: Docker;
+  private stream: NodeJS.ReadableStream | null;
   private timeout: NodeJS.Timeout | null;
   processedLines: number;
   status: Status;
@@ -22,53 +23,45 @@ export class FileWatcherService implements Watcher {
     readonly config: Config,
     private readonly eventEmitter: EventEmitter2,
   ) {
-    this.tail = null;
+    this.logger.log(`Creating watcher for container ${this.config.param}`);
+    this.docker = new Docker({ socketPath: "/var/run/docker.sock" });
+    this.stream = null;
     this.timeout = null;
-    this.processedLines = 0;
     this.status = Status.INIT;
     this.error = null;
   }
 
   start = (): void => {
-    try {
-      this.tail = new TailFile(this.config.param, {
-        encoding: "utf8",
-        pollFileIntervalMs: TAIL_POLL_INTERVAL,
-        pollFailureRetryMs: TAIL_RETRY_INTERVAL,
-      });
+    this.logger.log(`Starting watcher for container ${this.config.param}`);
+    const container = this.docker.getContainer(this.config.param);
 
-      this.tail.on("data", this.onData);
-      this.tail.on("tail_error", this.onError);
-      this.tail.on("error", this.onError);
+    container
+      .logs({
+        follow: true,
+        stdout: true,
+        stderr: true,
+        tail: 0,
+      })
+      .then((stream) => {
+        this.stream = stream;
+        this.status = Status.STARTED;
+        this.error = null;
 
-      this.tail
-        .start()
-        .then(() => {
-          this.status = Status.STARTED;
-          this.error = null;
-        })
-        .catch(this.onError);
-    } catch (error) {
-      this.onError(error);
-    }
+        stream.on("data", this.onData);
+        stream.on("error", this.onError);
+        stream.on("end", this.onError);
+      })
+      .catch(this.onError);
   };
 
   stop = (): void => {
-    this.logger.debug("Stopping tail");
     clearTimeout(this.timeout);
-    this.tail?.removeAllListeners();
-    this.tail
-      ?.quit()
-      .then(() => {
-        this.tail = null;
-      })
-      .catch((err) => {
-        console.error(err.message);
-      });
+    this.stream?.removeAllListeners();
+    this.stream = null;
     this.status = Status.STOPPED;
   };
 
-  onData = (chunk: Buffer) => {
+  private onData = (chunk: Buffer) => {
     chunk
       .toString()
       .split("\n")
@@ -88,7 +81,7 @@ export class FileWatcherService implements Watcher {
   };
 
   private onError = (err: Error) => {
-    this.logger.error("Error tailing file");
+    this.logger.error("Error tailing container logs");
     this.logger.error(err.message);
     this.retry();
     this.status = Status.ERROR;
@@ -96,10 +89,8 @@ export class FileWatcherService implements Watcher {
   };
 
   private retry = () => {
-    this.logger.debug("Retrying tail");
-    this.stop();
     this.timeout = setTimeout(() => {
       this.start();
-    }, TAIL_RETRY_INTERVAL);
+    }, DOCKER_RETRY_INTERVAL);
   };
 }
