@@ -1,9 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsIn, IsOptional, IsString } from "class-validator";
+import { FiltersStatsHistory } from "src/stats/interfaces/filters-stats-history.interface";
 
 const period = ["monthly", "weekly", "daily"] as const;
 
-export class FiltersStatsHistoryDto {
+export class FiltersStatsHistoryDto implements FiltersStatsHistory {
   @IsString()
   @IsIn(period)
   @ApiProperty({
