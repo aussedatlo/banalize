@@ -1,9 +1,8 @@
+import { BanSchema, MatchSchema } from "@banalize/api";
 import { Grid, GridCol, Text } from "@mantine/core";
 import { IconChartArcs } from "@tabler/icons-react";
 import { Card } from "components/shared/Card/Card";
 import { Paper } from "components/shared/Paper/Paper";
-import { Ban } from "types/Ban";
-import { Match } from "types/Match";
 import classes from "./ConfigStatsPaper.module.css";
 
 type StatCardProps = {
@@ -25,10 +24,10 @@ const StatCard = ({ text, value }: StatCardProps) => {
 };
 
 type ConfigStatsPaperProps = {
-  matches: Match[];
-  bans: Ban[];
-  activeMatches: Match[];
-  activeBans: Ban[];
+  matches: MatchSchema[];
+  bans: BanSchema[];
+  activeMatches: MatchSchema[];
+  activeBans: BanSchema[];
 };
 
 export const ConfigStatsPaper = ({

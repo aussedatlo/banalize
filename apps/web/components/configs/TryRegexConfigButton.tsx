@@ -1,14 +1,14 @@
 "use client";
 
+import { ConfigSchema } from "@banalize/api";
 import { extractIp } from "@banalize/shared-utils";
 import { Button, Group, Modal, Notification, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconRegex } from "@tabler/icons-react";
 import { useState } from "react";
-import { Config } from "types/Config";
 
 type TryRegexConfigButtonProps = {
-  config: Config;
+  config: ConfigSchema;
 };
 
 export const TryRegexConfigButton = ({ config }: TryRegexConfigButtonProps) => {

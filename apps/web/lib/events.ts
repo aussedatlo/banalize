@@ -1,6 +1,5 @@
+import { BanSchema, MatchSchema } from "@banalize/api";
 import { formatDistance } from "date-fns";
-import { Ban } from "types/Ban";
-import { Match } from "types/Match";
 
 type EventTypes = "match" | "ban";
 type Event = {
@@ -11,7 +10,10 @@ type Event = {
   line: string;
 };
 
-export const formatEvents = (matches: Match[], bans: Ban[]): Event[] => {
+export const formatEvents = (
+  matches: MatchSchema[],
+  bans: BanSchema[],
+): Event[] => {
   const events: Event[] = [];
 
   matches.forEach((match) => {

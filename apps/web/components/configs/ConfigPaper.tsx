@@ -1,13 +1,12 @@
-import { StatsCountData } from "@banalize/api/src/stats/entities/StatsCount";
+import { ConfigSchema, StatsCountModel } from "@banalize/api";
 import { Badge, Group } from "@mantine/core";
 import { IconBrandDocker, IconFile } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/Paper";
 import Link from "next/link";
-import { Config } from "types/Config";
 
 type ConfigPaperProps = {
-  config: Config;
-  stats: StatsCountData;
+  config: ConfigSchema;
+  stats: StatsCountModel;
 };
 
 export const ConfigPaper = ({ config, stats }: ConfigPaperProps) => {
