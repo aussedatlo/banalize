@@ -45,7 +45,7 @@ const StatGraph = ({ stats, timeSelected }: StatGraphProps) => {
         { name: "Matches", color: "indigo.6" },
         { name: "Bans", color: "blue.6" },
       ]}
-      curveType="natural"
+      curveType="monotone"
     />
   );
 };
