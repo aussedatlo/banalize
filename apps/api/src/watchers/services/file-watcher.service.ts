@@ -2,7 +2,7 @@ import { extractIp } from "@banalize/shared-utils";
 import TailFile from "@logdna/tail-file";
 import { Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { Config } from "src/configs/schemas/config.schema";
+import { ConfigSchema } from "src/configs/schemas/config.schema";
 import { Events } from "src/events/events.enum";
 import { MatchEvent } from "src/events/match-event.types";
 import { Status } from "src/watchers/enums/status.enum";
@@ -20,7 +20,7 @@ export class FileWatcherService implements Watcher {
   error: Error | null;
 
   constructor(
-    readonly config: Config,
+    readonly config: ConfigSchema,
     private readonly eventEmitter: EventEmitter2,
   ) {
     this.tail = null;

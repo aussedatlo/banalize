@@ -8,21 +8,22 @@ import { Events } from "src/events/events.enum";
 import { ConfigsController } from "./configs.controller";
 import { ConfigsService } from "./configs.service";
 import { CreateConfigDto } from "./dto/create-config.dto";
-import { Config } from "./schemas/config.schema";
+import { WatcherType } from "./enums/watcher-type";
+import { ConfigSchema } from "./schemas/config.schema";
 
 describe("ConfigsController", () => {
   let configsController: ConfigsController;
   let configsService: ConfigsService;
   let eventEmitter: EventEmitter2;
 
-  const mockConfig: Config = {
+  const mockConfig: ConfigSchema = {
     _id: "66dca3ca17f21044b9dbcaf5",
     param: "/path/file.log",
     regex: "^test.*<IP>.*300$",
     banTime: 300,
     findTime: 600,
     maxMatches: 3,
-    watcherType: "file",
+    watcherType: WatcherType.FILE,
     ignoreIps: [],
   };
 
@@ -34,7 +35,7 @@ describe("ConfigsController", () => {
     banTime: 300,
     findTime: 600,
     maxMatches: 3,
-    watcherType: "file",
+    watcherType: WatcherType.FILE,
   };
 
   beforeEach(async () => {

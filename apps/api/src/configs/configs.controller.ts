@@ -17,7 +17,7 @@ import {
 import { Events } from "src/events/events.enum";
 import { ConfigsService } from "./configs.service";
 import { CreateConfigDto } from "./dto/create-config.dto";
-import { Config } from "./schemas/config.schema";
+import { ConfigSchema } from "./schemas/config.schema";
 
 @ApiTags("configs")
 @Controller("configs")
@@ -42,21 +42,21 @@ export class ConfigsController {
 
   @Get()
   @ApiOperation({ summary: "Get all configs" })
-  @ApiResponse({ type: [Config] })
-  async findAll(): Promise<Config[]> {
+  @ApiResponse({ type: [ConfigSchema] })
+  async findAll(): Promise<ConfigSchema[]> {
     return this.configService.findAll();
   }
 
   @Get(":id")
   @ApiOperation({ summary: "Get a config by id" })
-  @ApiResponse({ type: Config })
-  async findOne(@Param("id") id: string): Promise<Config> {
+  @ApiResponse({ type: ConfigSchema })
+  async findOne(@Param("id") id: string): Promise<ConfigSchema> {
     return this.configService.findOne(id);
   }
 
   @Delete(":id")
   @ApiOperation({ summary: "Delete a config by id" })
-  @ApiResponse({ type: Config })
+  @ApiResponse({ type: ConfigSchema })
   async delete(@Param("id") id: string) {
     const result = await this.configService.delete(id);
     this.eventEmitter.emit(
@@ -69,7 +69,7 @@ export class ConfigsController {
   @Put(":id")
   @ApiOperation({ summary: "Update a config by id" })
   @ApiBody({ type: CreateConfigDto })
-  @ApiResponse({ type: Config })
+  @ApiResponse({ type: ConfigSchema })
   async update(@Param("id") id: string, @Body() configDto: CreateConfigDto) {
     const result = await this.configService.update(id, configDto);
 

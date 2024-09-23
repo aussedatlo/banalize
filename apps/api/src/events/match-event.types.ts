@@ -1,9 +1,9 @@
-import { Config } from "src/configs/schemas/config.schema";
+import { ConfigSchema } from "src/configs/schemas/config.schema";
 
 export class MatchEvent {
   constructor(
     public readonly line: string,
     public readonly ip: string,
-    public readonly config: Config,
+    public readonly config: ConfigSchema,
   ) {}
 }

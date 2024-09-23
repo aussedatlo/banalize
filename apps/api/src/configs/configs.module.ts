@@ -2,11 +2,13 @@ import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigsController } from "./configs.controller";
 import { ConfigsService } from "./configs.service";
-import { Config, ConfigSchema } from "./schemas/config.schema";
+import { ConfigSchema, ConfigSchemaDefinition } from "./schemas/config.schema";
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Config.name, schema: ConfigSchema }]),
+    MongooseModule.forFeature([
+      { name: ConfigSchema.name, schema: ConfigSchemaDefinition },
+    ]),
   ],
   controllers: [ConfigsController],
   providers: [ConfigsService],
