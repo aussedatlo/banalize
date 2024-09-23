@@ -1,3 +1,5 @@
+import { ConfGraphPaper } from "../../../components/configs/ConfigGraphPaper";
+
 export const dynamic = "force-dynamic";
 
 import { Box, Button, Grid, GridCol, Group } from "@mantine/core";
@@ -16,11 +18,17 @@ import {
   fetchConfigById,
   fetchConfigs,
   fetchMatchesByConfigId,
+  fetchStatsByConfigId,
+  fetchStatsCount,
 } from "lib/api";
 import { formatEvents } from "lib/events";
 
 export async function generateStaticParams() {
   const configs = await fetchConfigs();
+  const stats = await fetchStatsCount();
+
+  console.log(configs);
+  console.log(stats);
 
   return configs.map((config) => ({
     configId: config._id,
@@ -43,7 +51,6 @@ export default async function ConfigPage({
   );
 
   const activeBans = await fetchActiveBans(configId);
-
   const events = formatEvents(matches, bans);
 
   return (
@@ -61,6 +68,9 @@ export default async function ConfigPage({
       </Group>
 
       <Grid>
+        <GridCol span={12}>
+          <ConfGraphPaper configId={configId} />
+        </GridCol>
         <GridCol span={4}>
           <ConfigInfoPaper config={config} />
         </GridCol>

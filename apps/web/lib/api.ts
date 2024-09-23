@@ -104,3 +104,12 @@ export const fetchWatcherStatus =
   async (): Promise<WatcherStatusRecordModel> => {
     return fetchFromApi("/watchers/status");
   };
+
+export const fetchStatsByConfigId = async (
+  id: string,
+  period?: string | null,
+): Promise<Stats> => {
+  return fetchFromApi(
+    `/stats/history?period=${period ?? "monthly"}&configId=${id}`,
+  );
+};
