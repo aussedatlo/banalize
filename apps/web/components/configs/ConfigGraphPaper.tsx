@@ -1,14 +1,14 @@
 "use client";
 
+import { StatsHistoryModel } from "@banalize/api";
 import { LineChart } from "@mantine/charts";
 import { Grid, GridCol, Group, Select, Text, ThemeIcon } from "@mantine/core";
 import { IconGraph } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/Paper";
 import { useState } from "react";
-import { Stats } from "types/Stats";
 
 type ConfigGraphPaperProps = {
-  [key: string]: Stats;
+  [key: string]: StatsHistoryModel;
 };
 
 type StatGraphProps = {
@@ -34,8 +34,8 @@ const StatGraph = ({ stats, timeSelected }: StatGraphProps) => {
     Bans: bans.data[date],
   }));
 
-  const maxBanValue = Math.max(...Object.values(bans.data));
-  const maxMatchValue = Math.max(...Object.values(matches.data));
+  const maxBanValue = Math.max(bans.data);
+  const maxMatchValue = Math.max(matches.data);
   const useTwoAxis =
     maxMatchValue !== 0 &&
     (maxBanValue / maxMatchValue > 2 || maxBanValue - maxMatchValue > 100);
