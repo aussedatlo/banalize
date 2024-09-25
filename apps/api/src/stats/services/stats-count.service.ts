@@ -1,13 +1,12 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { BansService } from "src/bans/bans.service";
 import { ConfigsService } from "src/configs/configs.service";
 import { MatchesService } from "src/matches/services/matches.service";
 import { StatsCountRecordModel } from "src/stats/models/stats-count-record.model";
 
 @Injectable()
-export class StatsCountService implements OnModuleInit {
-  private readonly logger = new Logger(StatsCountService.name);
-  private record: StatsCountRecordModel = { data: {} };
+export class StatsCountService {
+  private;
 
   constructor(
     private readonly matchesService: MatchesService,
@@ -15,19 +14,17 @@ export class StatsCountService implements OnModuleInit {
     private readonly configsService: ConfigsService,
   ) {}
 
-  getStats(): StatsCountRecordModel {
-    return this.record;
-  }
-
-  async onModuleInit(): Promise<void> {
-    this.logger.log("Computing stats on module init");
+  async getStats(): Promise<StatsCountRecordModel> {
+    const record: StatsCountRecordModel = { data: {} };
     const configs = await this.configsService.findAll();
     for (const config of configs) {
-      await this.computeStats(config._id);
+      record.data[config._id] = await this.computeStats(config._id);
     }
+
+    return record;
   }
 
-  async computeStats(configId: string): Promise<void> {
+  async computeStats(configId: string) {
     const config = await this.configsService.findOne(configId);
 
     const currentBans = await this.bansService.findAll(
@@ -49,7 +46,7 @@ export class StatsCountService implements OnModuleInit {
       configId ? { configId } : {},
     );
 
-    this.record.data[configId] = {
+    return {
       bansCount: allBans.length,
       matchesCount: allMatches.length,
       currentBansCount: currentBans.length,
