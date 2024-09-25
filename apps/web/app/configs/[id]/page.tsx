@@ -3,12 +3,14 @@ export const dynamic = "force-dynamic";
 import { Box, Button, Grid, GridCol, Group } from "@mantine/core";
 import { IconEyePause } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
+import { ConfigGraphPaper } from "components/configs/ConfigGraphPaper";
 import { ConfigInfoPaper } from "components/configs/ConfigInfoPaper";
 import { ConfigStatsPaper } from "components/configs/ConfigStatsPaper";
 import { DeleteConfigButton } from "components/configs/DeleteConfigButton";
 import { EditConfigButton } from "components/configs/EditConfigButton";
 import { TryRegexConfigButton } from "components/configs/TryRegexConfigButton";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
+
 import {
   fetchActiveBans,
   fetchActiveMatches,
@@ -16,6 +18,7 @@ import {
   fetchConfigById,
   fetchConfigs,
   fetchMatchesByConfigId,
+  fetchStatsByConfigId,
 } from "lib/api";
 import { formatEvents } from "lib/events";
 
@@ -36,6 +39,14 @@ export default async function ConfigPage({
   const matches = await fetchMatchesByConfigId(configId);
   const bans = await fetchBansByConfigId(configId);
   const config = await fetchConfigById(configId);
+  const statsMonthly = await fetchStatsByConfigId(configId, "monthly");
+  const statsWeekly = await fetchStatsByConfigId(configId, "weekly");
+  const statsDaily = await fetchStatsByConfigId(configId, "daily");
+  const stats = {
+    monthly: statsMonthly,
+    weekly: statsWeekly,
+    daily: statsDaily,
+  };
 
   const activeMatches = await fetchActiveMatches(
     configId,
@@ -43,7 +54,6 @@ export default async function ConfigPage({
   );
 
   const activeBans = await fetchActiveBans(configId);
-
   const events = formatEvents(matches, bans);
 
   return (
@@ -61,6 +71,9 @@ export default async function ConfigPage({
       </Group>
 
       <Grid>
+        <GridCol span={12}>
+          <ConfigGraphPaper {...stats} />
+        </GridCol>
         <GridCol span={4}>
           <ConfigInfoPaper config={config} />
         </GridCol>

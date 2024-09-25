@@ -3,6 +3,7 @@ import {
   ConfigSchema,
   MatchSchema,
   StatsCountRecordModel,
+  StatsHistoryModel,
   WatcherStatusRecordModel,
 } from "@banalize/api";
 
@@ -104,3 +105,10 @@ export const fetchWatcherStatus =
   async (): Promise<WatcherStatusRecordModel> => {
     return fetchFromApi("/watchers/status");
   };
+
+export const fetchStatsByConfigId = async (
+  id: string,
+  period: string,
+): Promise<StatsHistoryModel> => {
+  return fetchFromApi(`/stats/history?period=${period}&configId=${id}`);
+};

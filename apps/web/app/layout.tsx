@@ -1,3 +1,4 @@
+import "@mantine/charts/styles.css";
 import "@mantine/core/styles.css";
 import "./global.css";
 
