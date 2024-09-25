@@ -1,10 +1,9 @@
 export enum Events {
-  BAN_CREATE = "ban.create",
-  BAN_REMOVE = "ban.remove",
-  CONFIG_CREATED = "config.created",
-  CONFIG_UPDATED = "config.updated",
-  CONFIG_REMOVED = "config.removed",
-  MATCH_CREATE = "match.create",
+  BAN_CREATION_REQUESTED = "ban.creation.requested",
+  CONFIG_CREATION_DONE = "config.creation.done",
+  CONFIG_UPDATE_DONE = "config.update.done",
+  CONFIG_REMOVE_DONE = "config.remove.done",
+  MATCH_CREATION_REQUESTED = "match.creation.requested",
   FIREWALL_DENY = "firewall.deny",
   FIREWALL_ALLOW = "firewall.allow",
 }

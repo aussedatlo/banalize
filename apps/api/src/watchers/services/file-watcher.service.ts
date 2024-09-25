@@ -80,7 +80,7 @@ export class FileWatcherService implements Watcher {
           this.logger.debug("Matched line");
 
           await this.eventEmitter.emitAsync(
-            Events.MATCH_CREATE,
+            Events.MATCH_CREATION_REQUESTED,
             new MatchEvent(line, ip, this.config),
           );
         }

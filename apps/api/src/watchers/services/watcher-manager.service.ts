@@ -53,7 +53,7 @@ export class WatcherManagerService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  @OnEvent(Events.CONFIG_CREATED)
+  @OnEvent(Events.CONFIG_CREATION_DONE)
   handleConfigAdded(event: ConfigCreatedEvent) {
     this.logger.log(`Config added: ${event.config.param}`);
     const watcher = this.watcherFactory.createWatcher(event.config);
@@ -61,14 +61,14 @@ export class WatcherManagerService implements OnModuleInit, OnModuleDestroy {
     this.watchers.push(watcher);
   }
 
-  @OnEvent(Events.CONFIG_REMOVED)
+  @OnEvent(Events.CONFIG_REMOVE_DONE)
   handleConfigRemoved(event: ConfigRemovedEvent) {
     this.logger.log(`Config removed: ${event.configId}`);
     this.watchers.forEach((watcher) => watcher.stop());
     this.startWatchers();
   }
 
-  @OnEvent(Events.CONFIG_UPDATED)
+  @OnEvent(Events.CONFIG_UPDATE_DONE)
   handleConfigUpdated(event: ConfigUpdatedEvent) {
     this.logger.log(`Config updated: ${event.config.param}`);
     this.watchers.forEach((watcher) => watcher.stop());
