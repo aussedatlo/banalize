@@ -1,12 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { OnEvent } from "@nestjs/event-emitter";
 import { format, getISOWeek } from "date-fns";
 import { BansService } from "src/bans/bans.service";
 import { BanSchema } from "src/bans/schemas/ban.schema";
 import { ConfigsService } from "src/configs/configs.service";
-import { BanEvent } from "src/events/ban-event.types";
-import { Events } from "src/events/events.enum";
-import { MatchEvent } from "src/events/match-event.types";
 import { MatchSchema } from "src/matches/schemas/match.schema";
 import { MatchesService } from "src/matches/services/matches.service";
 import { FiltersStatsHistoryDto } from "src/stats/dto/filters-stats-history.dto";
@@ -43,13 +39,6 @@ export class StatsHistoryService implements OnModuleInit {
     for (const config of configs) {
       await this.computeStats(config._id);
     }
-  }
-
-  @OnEvent(Events.MATCH_CREATE)
-  @OnEvent(Events.BAN_CREATE)
-  async handleEvent(event: BanEvent | MatchEvent): Promise<void> {
-    this.computeStats(event.config._id);
-    this.computeStats();
   }
 
   async computeStats(configId?: string): Promise<void> {
