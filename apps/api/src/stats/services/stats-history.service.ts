@@ -1,9 +1,11 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { OnEvent } from "@nestjs/event-emitter";
 import { format, getISOWeek } from "date-fns";
 import { BansService } from "src/bans/bans.service";
 import { BanSchema } from "src/bans/schemas/ban.schema";
 import { ConfigsService } from "src/configs/configs.service";
 import { BanEvent } from "src/events/ban-event.types";
+import { Events } from "src/events/events.enum";
 import { MatchEvent } from "src/events/match-event.types";
 import { MatchSchema } from "src/matches/schemas/match.schema";
 import { MatchesService } from "src/matches/services/matches.service";
@@ -43,6 +45,8 @@ export class StatsHistoryService implements OnModuleInit {
     }
   }
 
+  @OnEvent(Events.BAN_CREATION_DONE)
+  @OnEvent(Events.MATCH_CREATION_DONE)
   addOneEvent(event: BanEvent | MatchEvent): void {
     const config = event.config;
     const date = new Date();

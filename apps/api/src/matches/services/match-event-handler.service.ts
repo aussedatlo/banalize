@@ -46,5 +46,7 @@ export class MatchEventHandlerService {
         new BanEvent(ip, config),
       );
     }
+
+    this.eventEmitter.emit(Events.MATCH_CREATION_DONE, event);
   }
 }

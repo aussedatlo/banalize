@@ -38,5 +38,6 @@ export class BanEventHandlerService {
     });
 
     this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
+    this.eventEmitter.emit(Events.BAN_CREATION_DONE, event);
   }
 }
