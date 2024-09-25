@@ -69,23 +69,23 @@ export class FileWatcherService implements Watcher {
     this.status = Status.STOPPED;
   };
 
-  onData = (chunk: Buffer) => {
-    chunk
-      .toString()
-      .split("\n")
-      .forEach((line: string) => {
-        if (line.length) {
-          this.processedLines++;
-          const ip = extractIp(this.config.regex, line);
-          if (ip && !this.config.ignoreIps.includes(ip)) {
-            this.logger.debug("Matched line");
-            this.eventEmitter.emit(
-              Events.MATCH_CREATE,
-              new MatchEvent(line, ip, this.config),
-            );
-          }
+  private onData = async (chunk: Buffer) => {
+    const lines = chunk.toString().split("\n");
+
+    for (const line of lines) {
+      if (line.length) {
+        this.processedLines++;
+        const ip = extractIp(this.config.regex, line);
+        if (ip && !this.config.ignoreIps.includes(ip)) {
+          this.logger.debug("Matched line");
+
+          await this.eventEmitter.emitAsync(
+            Events.MATCH_CREATE,
+            new MatchEvent(line, ip, this.config),
+          );
         }
-      });
+      }
+    }
   };
 
   private onError = (err: Error) => {
