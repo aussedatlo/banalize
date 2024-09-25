@@ -8,37 +8,41 @@ import { Paper } from "components/shared/Paper/Paper";
 import { useState } from "react";
 
 type ConfigGraphPaperProps = {
-  [key: string]: StatsHistoryModel;
+  monthly: StatsHistoryModel;
+  weekly: StatsHistoryModel;
+  daily: StatsHistoryModel;
 };
 
 type StatGraphProps = {
   stats: ConfigGraphPaperProps;
-  timeSelected: string;
+  period: periodString;
 };
 
-const StatGraph = ({ stats, timeSelected }: StatGraphProps) => {
-  if (
-    !stats[timeSelected] ||
-    !stats[timeSelected].bans ||
-    !stats[timeSelected].matches
-  ) {
+type periodString = "daily" | "weekly" | "monthly";
+const isPeriodString = (value: string | null): value is periodString =>
+  value !== null && ["daily", "weekly", "monthly"].includes(value);
+
+const StatGraph = ({ stats, period }: StatGraphProps) => {
+  if (!stats[period] || !stats[period].bans || !stats[period].matches) {
     return <div>No data</div>;
   }
 
-  const bans = stats[timeSelected].bans;
-  const matches = stats[timeSelected].matches;
+  const bans = stats[period].bans;
+  const matches = stats[period].matches;
+  console.log(bans, matches);
 
   const formatData = Object.keys(matches.data).map((date) => ({
     date,
     Matches: matches.data[date],
     Bans: bans.data[date],
   }));
+  console.log(formatData);
 
-  const maxBanValue = Math.max(bans.data);
-  const maxMatchValue = Math.max(matches.data);
+  const maxBanValue = Math.max(...(Object.values(bans.data) as number[]));
+  const maxMatchValue = Math.max(...(Object.values(matches.data) as number[]));
   const useTwoAxis =
     maxMatchValue !== 0 &&
-    (maxBanValue / maxMatchValue > 2 || maxBanValue - maxMatchValue > 100);
+    (maxMatchValue / maxBanValue > 2 || maxBanValue - maxMatchValue > 100);
 
   return (
     <LineChart
@@ -67,8 +71,8 @@ const StatGraph = ({ stats, timeSelected }: StatGraphProps) => {
   );
 };
 
-export const ConfGraphPaper = (stats: ConfigGraphPaperProps) => {
-  const [timeSelected, setTimeSelected] = useState("daily");
+export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
+  const [period, setPeriod] = useState<periodString>("daily");
 
   return (
     <Paper
@@ -80,8 +84,8 @@ export const ConfGraphPaper = (stats: ConfigGraphPaperProps) => {
           <Text fz="h3">Graph</Text>
           <Select
             ml="auto"
-            onChange={(value) => setTimeSelected(value ?? "daily")}
-            value={timeSelected}
+            onChange={(value) => isPeriodString(value) && setPeriod(value)}
+            value={period}
             placeholder="Select time"
             data={["daily", "weekly", "monthly"]}
           />
@@ -90,7 +94,7 @@ export const ConfGraphPaper = (stats: ConfigGraphPaperProps) => {
     >
       <Grid w="100%">
         <GridCol span={12}>
-          <StatGraph stats={stats} timeSelected={timeSelected} />
+          <StatGraph stats={stats} period={period} />
         </GridCol>
       </Grid>
     </Paper>

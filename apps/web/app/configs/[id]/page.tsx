@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { Box, Button, Grid, GridCol, Group } from "@mantine/core";
 import { IconEyePause } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
-import { ConfGraphPaper } from "components/configs/ConfigGraphPaper";
+import { ConfigGraphPaper } from "components/configs/ConfigGraphPaper";
 import { ConfigInfoPaper } from "components/configs/ConfigInfoPaper";
 import { ConfigStatsPaper } from "components/configs/ConfigStatsPaper";
 import { DeleteConfigButton } from "components/configs/DeleteConfigButton";
@@ -72,7 +72,7 @@ export default async function ConfigPage({
 
       <Grid>
         <GridCol span={12}>
-          <ConfGraphPaper {...stats} />
+          <ConfigGraphPaper {...stats} />
         </GridCol>
         <GridCol span={4}>
           <ConfigInfoPaper config={config} />

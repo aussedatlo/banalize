@@ -108,9 +108,7 @@ export const fetchWatcherStatus =
 
 export const fetchStatsByConfigId = async (
   id: string,
-  period?: string | null,
+  period: string,
 ): Promise<StatsHistoryModel> => {
-  return fetchFromApi(
-    `/stats/history?period=${period ?? "monthly"}&configId=${id}`,
-  );
+  return fetchFromApi(`/stats/history?period=${period}&configId=${id}`);
 };
