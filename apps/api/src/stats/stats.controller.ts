@@ -6,7 +6,7 @@ import {
   ApiTags,
   getSchemaPath,
 } from "@nestjs/swagger";
-import { FiltersStatsHistory } from "./interfaces/filters-stats-history.interface";
+import { FiltersStatsHistoryDto } from "./dto/filters-stats-history.dto";
 import { StatsHistory } from "./interfaces/stats-history.interface";
 import { StatsCountRecordModel } from "./models/stats-count-record.model";
 import { StatsCountModel } from "./models/stats-count.model";
@@ -35,7 +35,7 @@ export class StatsController {
     description: "An object containing the stats history.",
   })
   async getStatsHistory(
-    @Query() filters: FiltersStatsHistory,
+    @Query() filters: FiltersStatsHistoryDto,
   ): Promise<StatsHistory> {
     return await this.statsHistoryService.getStats(filters);
   }
