@@ -34,7 +34,7 @@ export class ConfigsController {
   async create(@Body() configDto: CreateConfigDto) {
     const result = await this.configService.create(configDto);
     this.eventEmitter.emit(
-      Events.CONFIG_CREATED,
+      Events.CONFIG_CREATION_DONE,
       new ConfigCreatedEvent(result),
     );
     return result;
@@ -60,7 +60,7 @@ export class ConfigsController {
   async delete(@Param("id") id: string) {
     const result = await this.configService.delete(id);
     this.eventEmitter.emit(
-      Events.CONFIG_REMOVED,
+      Events.CONFIG_REMOVE_DONE,
       new ConfigRemovedEvent(result._id),
     );
     return result;
@@ -74,7 +74,7 @@ export class ConfigsController {
     const result = await this.configService.update(id, configDto);
 
     this.eventEmitter.emit(
-      Events.CONFIG_UPDATED,
+      Events.CONFIG_UPDATE_DONE,
       new ConfigUpdatedEvent(result),
     );
 

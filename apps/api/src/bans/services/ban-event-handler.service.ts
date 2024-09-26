@@ -13,7 +13,7 @@ export class BanEventHandlerService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  @OnEvent(Events.BAN_CREATE)
+  @OnEvent(Events.BAN_CREATION_REQUESTED)
   async handleBan(event: BanEvent) {
     const { ip, config } = event;
     this.logger.log(`Ban ip: ${ip}, config: ${config.param}`);
@@ -38,5 +38,6 @@ export class BanEventHandlerService {
     });
 
     this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
+    this.eventEmitter.emit(Events.BAN_CREATION_DONE, event);
   }
 }

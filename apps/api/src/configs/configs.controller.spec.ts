@@ -75,7 +75,7 @@ describe("ConfigsController", () => {
       expect(result).toEqual(mockConfig);
       expect(configsService.create).toHaveBeenCalledWith(mockCreateConfigDto);
       expect(eventEmitter.emit).toHaveBeenCalledWith(
-        Events.CONFIG_CREATED,
+        Events.CONFIG_CREATION_DONE,
         new ConfigCreatedEvent(mockConfig),
       );
     });
@@ -109,7 +109,7 @@ describe("ConfigsController", () => {
         "66dca3ca17f21044b9dbcaf5",
       );
       expect(eventEmitter.emit).toHaveBeenCalledWith(
-        Events.CONFIG_REMOVED,
+        Events.CONFIG_REMOVE_DONE,
         new ConfigRemovedEvent(mockConfig._id),
       );
     });

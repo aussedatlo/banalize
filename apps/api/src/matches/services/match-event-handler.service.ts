@@ -14,7 +14,7 @@ export class MatchEventHandlerService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  @OnEvent(Events.MATCH_CREATE)
+  @OnEvent(Events.MATCH_CREATION_REQUESTED)
   async handleMatch(event: MatchEvent) {
     const { line, ip, config } = event;
     this.logger.log(
@@ -41,7 +41,12 @@ export class MatchEventHandlerService {
 
     if (matches.length >= config.maxMatches) {
       this.logger.log(`Matched ${matches.length} times, banning ${ip}`);
-      this.eventEmitter.emit(Events.BAN_CREATE, new BanEvent(ip, config));
+      this.eventEmitter.emit(
+        Events.BAN_CREATION_REQUESTED,
+        new BanEvent(ip, config),
+      );
     }
+
+    this.eventEmitter.emit(Events.MATCH_CREATION_DONE, event);
   }
 }

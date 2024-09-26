@@ -45,11 +45,28 @@ export class StatsHistoryService implements OnModuleInit {
     }
   }
 
-  @OnEvent(Events.MATCH_CREATE)
-  @OnEvent(Events.BAN_CREATE)
-  async handleEvent(event: BanEvent | MatchEvent): Promise<void> {
-    this.computeStats(event.config._id);
-    this.computeStats();
+  @OnEvent(Events.BAN_CREATION_DONE)
+  @OnEvent(Events.MATCH_CREATION_DONE)
+  addOneEvent(event: BanEvent | MatchEvent): void {
+    const config = event.config;
+    const date = new Date();
+    const dailyKey = this.getKey(config._id, "daily");
+    const weeklyKey = this.getKey(config._id, "weekly");
+    const monthlyKey = this.getKey(config._id, "monthly");
+
+    const dailyDate = this.getFormattedDate(date, "daily");
+    const weeklyDate = this.getFormattedDate(date, "weekly");
+    const monthlyDate = this.getFormattedDate(date, "monthly");
+
+    if (event instanceof BanEvent) {
+      this.record[dailyKey].bans.data[dailyDate] += 1;
+      this.record[weeklyKey].bans.data[weeklyDate] += 1;
+      this.record[monthlyKey].bans.data[monthlyDate] += 1;
+    } else {
+      this.record[dailyKey].matches.data[dailyDate] += 1;
+      this.record[weeklyKey].matches.data[weeklyDate] += 1;
+      this.record[monthlyKey].matches.data[monthlyDate] += 1;
+    }
   }
 
   async computeStats(configId?: string): Promise<void> {
@@ -85,16 +102,16 @@ export class StatsHistoryService implements OnModuleInit {
 
     const initialData = {};
     for (let i = 0; i <= SAMPLE_SIZE; i++) {
-      const day = format(
-        new Date(timestampDaysAgo + i * DAY_IN_MS),
-        "dd-MM-yyyy",
+      const day = this.getFormattedDate(
+        timestampDaysAgo + i * DAY_IN_MS,
+        "daily",
       );
       initialData[day] = 0;
     }
 
     stats.bans.data = bansAfterOneWeekAgo.reduce(
       (acc, ban) => {
-        const day = format(new Date(ban.timestamp), "dd-MM-yyyy");
+        const day = this.getFormattedDate(ban.timestamp, "daily");
         acc[day] = acc[day] + 1;
         return acc;
       },
@@ -103,14 +120,14 @@ export class StatsHistoryService implements OnModuleInit {
 
     stats.matches.data = matchesAfterOneWeekAgo.reduce(
       (acc, match) => {
-        const day = format(new Date(match.timestamp), "dd-MM-yyyy");
+        const day = this.getFormattedDate(match.timestamp, "daily");
         acc[day] = acc[day] + 1;
         return acc;
       },
       { ...initialData },
     );
 
-    const key = `stats:daily${configId ? `:${configId}` : ""}`;
+    const key = this.getKey(configId, "daily");
     this.record[key] = stats;
   }
 
@@ -135,13 +152,16 @@ export class StatsHistoryService implements OnModuleInit {
 
     const initialData = {};
     for (let i = 0; i <= SAMPLE_SIZE; i++) {
-      const week = getISOWeek(new Date(timestampWeeksAgo + i * WEEK_IN_MS));
+      const week = this.getFormattedDate(
+        timestampWeeksAgo + i * WEEK_IN_MS,
+        "weekly",
+      );
       initialData[week] = 0;
     }
 
     stats.bans.data = bansAfterOneWeekAgo.reduce(
       (acc, ban) => {
-        const week = getISOWeek(new Date(ban.timestamp));
+        const week = this.getFormattedDate(ban.timestamp, "weekly");
         acc[week] = acc[week] + 1;
         return acc;
       },
@@ -150,14 +170,14 @@ export class StatsHistoryService implements OnModuleInit {
 
     stats.matches.data = matchesAfterOneWeekAgo.reduce(
       (acc, match) => {
-        const week = getISOWeek(new Date(match.timestamp));
+        const week = this.getFormattedDate(match.timestamp, "weekly");
         acc[week] = acc[week] + 1;
         return acc;
       },
       { ...initialData },
     );
 
-    const key = `stats:weekly${configId ? `:${configId}` : ""}`;
+    const key = this.getKey(configId, "weekly");
     this.record[key] = stats;
   }
 
@@ -186,13 +206,16 @@ export class StatsHistoryService implements OnModuleInit {
     const initialData = {};
     for (let i = 0; i <= SAMPLE_SIZE; i++) {
       const date = new Date(timestamp);
-      const previousDate = new Date(date).setMonth(date.getMonth() - i);
-      initialData[format(previousDate, "MM-yyyy")] = 0;
+      const previousDate = this.getFormattedDate(
+        new Date(date).setMonth(date.getMonth() - i),
+        "monthly",
+      );
+      initialData[previousDate] = 0;
     }
 
     stats.bans.data = bansAfterMonthAgo.reduce(
       (acc, ban) => {
-        const month = format(new Date(ban.timestamp), "MM-yyyy");
+        const month = this.getFormattedDate(ban.timestamp, "monthly");
         acc[month] = acc[month] + 1;
         return acc;
       },
@@ -201,14 +224,35 @@ export class StatsHistoryService implements OnModuleInit {
 
     stats.matches.data = matchesAfterMonthAgo.reduce(
       (acc, match) => {
-        const month = format(new Date(match.timestamp), "MM-yyyy");
+        const month = this.getFormattedDate(match.timestamp, "monthly");
         acc[month] = acc[month] + 1;
         return acc;
       },
       { ...initialData },
     );
 
-    const key = `stats:monthly${configId ? `:${configId}` : ""}`;
+    const key = this.getKey(configId, "monthly");
     this.record[key] = stats;
+  }
+
+  private getFormattedDate(date: Date | number, formatType: string): string {
+    if (typeof date === "number") {
+      date = new Date(date);
+    }
+
+    switch (formatType) {
+      case "daily":
+        return format(date, "dd-MM-yyyy");
+      case "weekly":
+        return getISOWeek(date).toString();
+      case "monthly":
+        return format(date, "MM-yyyy");
+      default:
+        throw new Error("Invalid format type");
+    }
+  }
+
+  private getKey(configId: string, period: string): string {
+    return `stats:${period}:${configId}`;
   }
 }
