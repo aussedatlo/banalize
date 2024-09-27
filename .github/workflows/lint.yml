@@ -1,0 +1,24 @@
+name: Lint CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run linters
+        run: pnpm lint

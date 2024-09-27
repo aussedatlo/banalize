@@ -19,7 +19,7 @@ export class IptablesFirewallService implements Firewall {
       try {
         await this.execAsync(checkCommand);
         this.logger.log(`Rule for IP ${ip} already exists, not adding.`);
-      } catch (checkError) {
+      } catch (_err) {
         // Rule does not exist, so we can add it
         this.logger.log(`Adding rule for IP ${ip}: ${addCommand}`);
         await this.execAsync(addCommand);
