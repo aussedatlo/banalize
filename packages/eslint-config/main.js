@@ -16,4 +16,15 @@ module.exports = {
   ],
   plugins: ["@typescript-eslint", "prettier"],
   ignorePatterns: [".turbo", "node_modules", "dist", ".eslintrc.cjs"],
+  rules: {
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+      },
+    ],
+  },
 };
