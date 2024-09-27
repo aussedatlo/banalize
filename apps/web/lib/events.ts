@@ -1,7 +1,7 @@
-import { BanSchema, MatchSchema } from "@banalize/api";
+import { BanSchema, MatchSchema, UnbanSchema } from "@banalize/api";
 import { formatDistance } from "date-fns";
 
-type EventTypes = "match" | "ban";
+type EventTypes = "match" | "ban" | "unban";
 type Event = {
   timestamp: number;
   time: string;
@@ -13,6 +13,7 @@ type Event = {
 export const formatEvents = (
   matches: MatchSchema[],
   bans: BanSchema[],
+  unbans: UnbanSchema[],
 ): Event[] => {
   const events: Event[] = [];
 
@@ -36,6 +37,18 @@ export const formatEvents = (
       }),
       ip: ban.ip,
       type: "ban",
+      line: "",
+    });
+  });
+
+  unbans.forEach((unban) => {
+    events.push({
+      timestamp: unban.timestamp,
+      time: formatDistance(new Date(unban.timestamp), new Date(), {
+        addSuffix: true,
+      }),
+      ip: unban.ip,
+      type: "unban",
       line: "",
     });
   });
