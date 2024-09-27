@@ -1,14 +1,29 @@
 import { BanSchema, MatchSchema, UnbanSchema } from "@banalize/api";
+import { Box, DefaultMantineColor, rem, Text, ThemeIcon } from "@mantine/core";
+import { IconFlag, IconHandOff, IconHandStop } from "@tabler/icons-react";
+import { TruncatedText } from "components/shared/Text/TruncatedText";
 import { formatDistance } from "date-fns";
 
-type EventTypes = "match" | "ban" | "unban";
 type Event = {
   timestamp: number;
   time: string;
   ip: string;
-  type: EventTypes;
-  line: string;
+  type: React.ReactNode;
+  line: string | React.ReactElement;
 };
+
+const renderType = (
+  type: string,
+  icon: React.ReactElement,
+  color: DefaultMantineColor,
+): React.ReactNode => (
+  <Box style={{ display: "flex", alignItems: "center" }}>
+    <ThemeIcon color={color} size={rem(20)}>
+      {icon}
+    </ThemeIcon>
+    <Text ml="xs">{type}</Text>
+  </Box>
+);
 
 export const formatEvents = (
   matches: MatchSchema[],
@@ -24,8 +39,8 @@ export const formatEvents = (
         addSuffix: true,
       }),
       ip: match.ip,
-      type: "match",
-      line: match.line,
+      type: renderType("Match", <IconFlag />, "yellow"),
+      line: <TruncatedText>{match.line}</TruncatedText>,
     });
   });
 
@@ -36,7 +51,7 @@ export const formatEvents = (
         addSuffix: true,
       }),
       ip: ban.ip,
-      type: "ban",
+      type: renderType("Ban", <IconHandStop />, "red"),
       line: "",
     });
   });
@@ -48,7 +63,7 @@ export const formatEvents = (
         addSuffix: true,
       }),
       ip: unban.ip,
-      type: "unban",
+      type: renderType("Unban", <IconHandOff />, "green"),
       line: "",
     });
   });
