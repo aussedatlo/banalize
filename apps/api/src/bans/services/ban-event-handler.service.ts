@@ -3,6 +3,8 @@ import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { BansService } from "src/bans/bans.service";
 import { BanEvent } from "src/events/ban-event.types";
 import { Events } from "src/events/events.enum";
+import { QueuePriority } from "src/shared/enums/priority.enum";
+import { QueueService } from "src/shared/services/queue.service";
 
 @Injectable()
 export class BanEventHandlerService {
@@ -11,10 +13,19 @@ export class BanEventHandlerService {
   constructor(
     private bansService: BansService,
     private eventEmitter: EventEmitter2,
+    private queueService: QueueService,
   ) {}
 
   @OnEvent(Events.BAN_CREATION_REQUESTED)
-  async handleBan(event: BanEvent) {
+  handleBanCreationRequested(event: BanEvent) {
+    this.queueService.enqueue<BanEvent>(
+      event,
+      this.createBan,
+      QueuePriority.HIGH,
+    );
+  }
+
+  createBan = async (event: BanEvent) => {
     const { ip, config } = event;
     this.logger.log(`Ban ip: ${ip}, config: ${config.param}`);
 
@@ -39,5 +50,5 @@ export class BanEventHandlerService {
 
     this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
     this.eventEmitter.emit(Events.BAN_CREATION_DONE, event);
-  }
+  };
 }

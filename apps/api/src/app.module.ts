@@ -7,6 +7,7 @@ import { BansModule } from "./bans/bans.module";
 import { ConfigsModule } from "./configs/configs.module";
 import { FirewallModule } from "./firewall/firewall.module";
 import { MatchesModule } from "./matches/matches.module";
+import { SharedModule } from "./shared/shared.module";
 import { StatsModule } from "./stats/stats.module";
 import { UnbansModule } from "./unbans/unbans.module";
 import { WatchersModule } from "./watchers/watchers.module";
@@ -17,6 +18,7 @@ import { WatchersModule } from "./watchers/watchers.module";
     MongooseModule.forRoot(process.env.BANALIZE_API_MONGO_URI),
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
+    SharedModule,
     ConfigsModule,
     MatchesModule,
     WatchersModule,
