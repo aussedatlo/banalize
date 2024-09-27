@@ -29,14 +29,12 @@ const StatGraph = ({ stats, period }: StatGraphProps) => {
 
   const bans = stats[period].bans;
   const matches = stats[period].matches;
-  console.log(bans, matches);
 
   const formatData = Object.keys(matches.data).map((date) => ({
     date,
     Matches: matches.data[date],
     Bans: bans.data[date],
   }));
-  console.log(formatData);
 
   const maxBanValue = Math.max(...(Object.values(bans.data) as number[]));
   const maxMatchValue = Math.max(...(Object.values(matches.data) as number[]));
