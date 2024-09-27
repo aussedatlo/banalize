@@ -1,10 +1,9 @@
 export const dynamic = "force-dynamic";
 
 import { Box, Button, Grid, GridCol, Group } from "@mantine/core";
-import { IconEyePause } from "@tabler/icons-react";
+import { IconEyePause, IconFlag, IconHandStop } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
 import { ConfigGraphPaper } from "components/configs/ConfigGraphPaper";
-import { ConfigInfoPaper } from "components/configs/ConfigInfoPaper";
 import { ConfigStatsPaper } from "components/configs/ConfigStatsPaper";
 import { DeleteConfigButton } from "components/configs/DeleteConfigButton";
 import { EditConfigButton } from "components/configs/EditConfigButton";
@@ -13,11 +12,11 @@ import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBre
 
 import {
   fetchActiveBans,
-  fetchActiveMatches,
   fetchBansByConfigId,
   fetchConfigById,
   fetchConfigs,
   fetchMatchesByConfigId,
+  fetchRecentMatches,
   fetchStatsByConfigId,
   fetchUnbansByConfigId,
 } from "lib/api";
@@ -50,7 +49,7 @@ export default async function ConfigPage({
     daily: statsDaily,
   };
 
-  const activeMatches = await fetchActiveMatches(
+  const recentMatches = await fetchRecentMatches(
     configId,
     new Date().getTime() - config.findTime * 1000,
   );
@@ -76,16 +75,42 @@ export default async function ConfigPage({
         <GridCol span={12}>
           <ConfigGraphPaper {...stats} />
         </GridCol>
-        <GridCol span={4}>
-          <ConfigInfoPaper config={config} />
+
+        <GridCol span={6}>
+          <ConfigStatsPaper
+            items={[
+              {
+                text: "Total Matches",
+                value: matches.length.toString(),
+                help: "Total number of matches recorded since the start",
+              },
+              {
+                text: "Recent matches", // Replaced "Active matches" with "Recent matches"
+                value: recentMatches.length.toString(), // Changed variable name for clarity
+                help: "Matches that were created within the specified 'find time' threshold",
+              },
+            ]}
+            title={"Matches stats"}
+            icon={<IconFlag />}
+          />
         </GridCol>
 
-        <GridCol span={8}>
+        <GridCol span={6}>
           <ConfigStatsPaper
-            matches={matches}
-            bans={bans}
-            activeMatches={activeMatches}
-            activeBans={activeBans}
+            items={[
+              {
+                text: "Total Bans",
+                value: bans.length.toString(),
+                help: "Total number of bans issued since the beginning",
+              },
+              {
+                text: "Active bans",
+                value: activeBans.length.toString(),
+                help: "Currently active bans in effect",
+              },
+            ]}
+            title={"Bans stats"}
+            icon={<IconHandStop />}
           />
         </GridCol>
 
