@@ -26,6 +26,13 @@
     light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
 
+.linkIcon {
+  color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2));
+  margin-right: var(--mantine-spacing-sm);
+  width: rem(25px);
+  height: rem(25px);
+}
+
 .link {
   display: flex;
   align-items: center;
@@ -37,6 +44,7 @@
   font-weight: 700;
   text-transform: capitalize;
 
+  /* stylelint-disable-next-line at-rule-no-unknown */
   @mixin hover {
     background-color: light-dark(
       var(--mantine-color-gray-0),
@@ -60,11 +68,4 @@
       }
     }
   }
-}
-
-.linkIcon {
-  color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2));
-  margin-right: var(--mantine-spacing-sm);
-  width: rem(25px);
-  height: rem(25px);
 }
