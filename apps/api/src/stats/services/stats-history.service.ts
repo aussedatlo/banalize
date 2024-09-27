@@ -207,7 +207,7 @@ export class StatsHistoryService implements OnModuleInit {
     for (let i = 0; i <= SAMPLE_SIZE; i++) {
       const date = new Date(timestamp);
       const previousDate = this.getFormattedDate(
-        new Date(date).setMonth(date.getMonth() - i),
+        new Date(date).setMonth(date.getMonth() - SAMPLE_SIZE + i),
         "monthly",
       );
       initialData[previousDate] = 0;
