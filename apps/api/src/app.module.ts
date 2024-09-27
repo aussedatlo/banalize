@@ -8,6 +8,7 @@ import { ConfigsModule } from "./configs/configs.module";
 import { FirewallModule } from "./firewall/firewall.module";
 import { MatchesModule } from "./matches/matches.module";
 import { StatsModule } from "./stats/stats.module";
+import { UnbansModule } from "./unbans/unbans.module";
 import { WatchersModule } from "./watchers/watchers.module";
 
 @Module({
@@ -20,6 +21,7 @@ import { WatchersModule } from "./watchers/watchers.module";
     MatchesModule,
     WatchersModule,
     BansModule,
+    UnbansModule,
     FirewallModule,
     StatsModule,
   ],

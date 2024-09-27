@@ -6,6 +6,7 @@ export enum Events {
   CONFIG_REMOVE_DONE = "config.remove.done",
   MATCH_CREATION_REQUESTED = "match.creation.requested",
   MATCH_CREATION_DONE = "match.creation.done",
+  UNBAN_CREATE_REQUESTED = "unban.create.requested",
   FIREWALL_DENY = "firewall.deny",
   FIREWALL_ALLOW = "firewall.allow",
 }

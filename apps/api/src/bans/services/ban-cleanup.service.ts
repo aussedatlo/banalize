@@ -3,6 +3,7 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { BansService } from "src/bans/bans.service";
 import { Events } from "src/events/events.enum";
+import { UnbanEvent } from "src/events/unban-event.types";
 
 @Injectable()
 export class BanCleanupService implements OnModuleInit {
@@ -32,6 +33,11 @@ export class BanCleanupService implements OnModuleInit {
 
       this.logger.log(`Removing expired ban for IP: ${ban.ip}`);
       await this.bansService.update(ban._id, { active: false });
+
+      this.eventEmitter.emit(
+        Events.UNBAN_CREATE_REQUESTED,
+        new UnbanEvent(ban.ip, ban.configId, ban._id),
+      );
       this.eventEmitter.emit(Events.FIREWALL_ALLOW, { ip: ban.ip });
     }
   }

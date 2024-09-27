@@ -76,6 +76,13 @@ export const fetchBansByConfigId = async (
   return fetchFromApi(`/bans?${queryString}`);
 };
 
+export const fetchUnbansByConfigId = async (
+  configId: string,
+): Promise<BanSchema[]> => {
+  const queryString = createQueryString({ configId });
+  return fetchFromApi(`/unbans?${queryString}`);
+};
+
 export const fetchActiveMatches = async (
   configId: string,
   timestamp_gt: number,

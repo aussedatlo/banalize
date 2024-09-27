@@ -19,6 +19,7 @@ import {
   fetchConfigs,
   fetchMatchesByConfigId,
   fetchStatsByConfigId,
+  fetchUnbansByConfigId,
 } from "lib/api";
 import { formatEvents } from "lib/events";
 
@@ -38,6 +39,7 @@ export default async function ConfigPage({
   const configId = params.id;
   const matches = await fetchMatchesByConfigId(configId);
   const bans = await fetchBansByConfigId(configId);
+  const unbans = await fetchUnbansByConfigId(configId);
   const config = await fetchConfigById(configId);
   const statsMonthly = await fetchStatsByConfigId(configId, "monthly");
   const statsWeekly = await fetchStatsByConfigId(configId, "weekly");
@@ -54,7 +56,7 @@ export default async function ConfigPage({
   );
 
   const activeBans = await fetchActiveBans(configId);
-  const events = formatEvents(matches, bans);
+  const events = formatEvents(matches, bans, unbans);
 
   return (
     <Box mt={"xl"}>
