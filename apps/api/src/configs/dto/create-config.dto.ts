@@ -9,8 +9,9 @@ import {
   IsPositive,
   IsString,
 } from "class-validator";
+import { WatcherType } from "src/configs/enums/watcher-type";
 import { CreateConfig } from "src/configs/interfaces/create-config.interface";
-import { WatcherType } from "../enums/watcher-type";
+import { IsRegex } from "src/configs/utils/is-regex-validator";
 
 const watcherType = ["file", "docker"] as const;
 
@@ -26,6 +27,7 @@ export class CreateConfigDto implements CreateConfig {
   @IsString()
   @IsNotEmpty()
   @Contains("<IP>")
+  @IsRegex()
   @ApiProperty({
     example: "^test.*<IP>.*300$",
     description: "the regex to match",
