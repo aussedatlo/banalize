@@ -4,10 +4,15 @@ export function extractIp(pattern: string, input: string): string | undefined {
   const modifiedPattern = pattern.replace("<IP>", `(${ipRegex})`);
 
   // Create a RegExp object from the modified pattern
-  const regex = new RegExp(modifiedPattern);
+  try {
+    const regex = new RegExp(modifiedPattern);
 
-  // Search for the IP address in the input string
-  const match = input.match(regex);
+    // Search for the IP address in the input string
+    const match = input.match(regex);
 
-  return match?.[1];
+    return match?.[1];
+  } catch (e) {
+    console.error(e);
+    return undefined;
+  }
 }
