@@ -1,18 +1,10 @@
 import { Controller, Get } from "@nestjs/common";
-import {
-  ApiExtraModels,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-  getSchemaPath,
-} from "@nestjs/swagger";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
-import { WatcherStatusRecordModel } from "./models/watcher-status-record.model";
-import { WatcherStatusModel } from "./models/watcher-status.model";
+import { WatcherStatusesResponse } from "./models/watcher-statuses.response";
 import { WatcherManagerService } from "./services/watcher-manager.service";
 
 @ApiTags("watchers")
-@ApiExtraModels(WatcherStatusModel)
 @Controller("watchers")
 export class WatchersController {
   constructor(private readonly watcherManagerService: WatcherManagerService) {}
@@ -23,21 +15,10 @@ export class WatchersController {
     description: "Fetches the status of all watchers.",
   })
   @ApiResponse({
-    type: WatcherStatusRecordModel,
+    type: WatcherStatusesResponse,
     description: "An object containing the status of all watchers.",
-    schema: {
-      type: "object",
-      properties: {
-        data: {
-          type: "object",
-          additionalProperties: {
-            $ref: getSchemaPath(WatcherStatusModel),
-          },
-        },
-      },
-    },
   })
-  async getStatsHistory(): Promise<WatcherStatusRecordModel> {
+  async getStatsHistory(): Promise<WatcherStatusesResponse> {
     return this.watcherManagerService.getStatus();
   }
 }

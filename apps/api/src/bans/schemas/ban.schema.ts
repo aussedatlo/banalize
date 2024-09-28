@@ -1,7 +1,7 @@
+import { type BanSchema as Ban } from "@banalize/types";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
 import { HydratedDocument } from "mongoose";
-import { Ban } from "src/bans/interfaces/ban.interface";
 
 export type BanSchemaDocument = HydratedDocument<BanSchema>;
 

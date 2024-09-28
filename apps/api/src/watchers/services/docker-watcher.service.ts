@@ -1,11 +1,11 @@
 import { extractIp } from "@banalize/shared-utils";
+import { WatcherStatus } from "@banalize/types";
 import { Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import Docker from "dockerode";
 import { ConfigSchema } from "src/configs/schemas/config.schema";
 import { Events } from "src/events/events.enum";
 import { MatchEvent } from "src/events/match-event.types";
-import { Status } from "src/watchers/enums/status.enum";
 import { Watcher } from "src/watchers/interfaces/watcher.interface";
 
 const DOCKER_RETRY_INTERVAL = 5 * 1000;
@@ -16,7 +16,7 @@ export class DockerWatcherService implements Watcher {
   private stream: NodeJS.ReadableStream | null;
   private timeout: NodeJS.Timeout | null;
   processedLines: number;
-  status: Status;
+  status: WatcherStatus;
   error: Error | null;
 
   constructor(
@@ -27,7 +27,7 @@ export class DockerWatcherService implements Watcher {
     this.docker = new Docker({ socketPath: "/var/run/docker.sock" });
     this.stream = null;
     this.timeout = null;
-    this.status = Status.INIT;
+    this.status = WatcherStatus.INIT;
     this.error = null;
   }
 
@@ -44,7 +44,7 @@ export class DockerWatcherService implements Watcher {
       })
       .then((stream) => {
         this.stream = stream;
-        this.status = Status.RUNNING;
+        this.status = WatcherStatus.RUNNING;
         this.error = null;
 
         stream.on("data", this.onData);
@@ -58,7 +58,7 @@ export class DockerWatcherService implements Watcher {
     clearTimeout(this.timeout);
     this.stream?.removeAllListeners();
     this.stream = null;
-    this.status = Status.STOPPED;
+    this.status = WatcherStatus.STOPPED;
   };
 
   private onData = (chunk: Buffer) => {
@@ -84,7 +84,7 @@ export class DockerWatcherService implements Watcher {
     this.logger.error("Error tailing container logs");
     this.logger.error(err.message);
     this.retry();
-    this.status = Status.ERROR;
+    this.status = WatcherStatus.ERROR;
     this.error = err;
   };
 

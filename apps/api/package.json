@@ -4,11 +4,6 @@
   "description": "Banalize API",
   "license": "MIT",
   "author": "Louis Aussedat",
-  "exports": {
-    ".": {
-      "types": "./dist/types.d.ts"
-    }
-  },
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch",
@@ -27,6 +22,7 @@
   "dependencies": {
     "@banalize/eslint-config": "workspace:^",
     "@banalize/shared-utils": "workspace:*",
+    "@banalize/types": "workspace:*",
     "@banalize/typescript-config": "workspace:^",
     "@logdna/tail-file": "^4.0.2",
     "@nestjs/common": "^10.0.0",

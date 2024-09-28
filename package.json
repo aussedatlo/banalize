@@ -11,7 +11,8 @@
     "docker:mongodb": "docker compose up mongodb",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo lint",
-    "web": "pnpm --filter web"
+    "web": "pnpm --filter web",
+    "types": "pnpm --filter types"
   },
   "devDependencies": {
     "@banalize/eslint-config": "workspace:*",

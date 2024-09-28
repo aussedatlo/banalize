@@ -1,7 +1,7 @@
+import { type UnbanSchema as Unban } from "@banalize/types";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
 import { HydratedDocument } from "mongoose";
-import { Unban } from "src/unbans/interfaces/unban.interface";
 
 export type UnbanSchemaDocument = HydratedDocument<UnbanSchema>;
 

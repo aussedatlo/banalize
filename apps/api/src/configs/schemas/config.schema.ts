@@ -1,8 +1,7 @@
+import { type ConfigSchema as Config, WatcherType } from "@banalize/types";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
 import { HydratedDocument } from "mongoose";
-import { WatcherType } from "src/configs/enums/watcher-type";
-import { Config } from "src/configs/interfaces/config.interface";
 
 export type ConfigSchemaDocument = HydratedDocument<ConfigSchema>;
 

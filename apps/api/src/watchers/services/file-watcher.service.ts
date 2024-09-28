@@ -1,11 +1,11 @@
 import { extractIp } from "@banalize/shared-utils";
+import { WatcherStatus } from "@banalize/types";
 import TailFile from "@logdna/tail-file";
 import { Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { ConfigSchema } from "src/configs/schemas/config.schema";
 import { Events } from "src/events/events.enum";
 import { MatchEvent } from "src/events/match-event.types";
-import { Status } from "src/watchers/enums/status.enum";
 import { Watcher } from "src/watchers/interfaces/watcher.interface";
 
 const TAIL_RETRY_INTERVAL = 5 * 1000;
@@ -16,7 +16,7 @@ export class FileWatcherService implements Watcher {
   private tail: TailFile | null;
   private timeout: NodeJS.Timeout | null;
   processedLines: number;
-  status: Status;
+  status: WatcherStatus;
   error: Error | null;
 
   constructor(
@@ -26,7 +26,7 @@ export class FileWatcherService implements Watcher {
     this.tail = null;
     this.timeout = null;
     this.processedLines = 0;
-    this.status = Status.INIT;
+    this.status = WatcherStatus.INIT;
     this.error = null;
   }
 
@@ -45,7 +45,7 @@ export class FileWatcherService implements Watcher {
       this.tail
         .start()
         .then(() => {
-          this.status = Status.RUNNING;
+          this.status = WatcherStatus.RUNNING;
           this.error = null;
         })
         .catch(this.onError);
@@ -66,7 +66,7 @@ export class FileWatcherService implements Watcher {
       .catch((err) => {
         console.error(err.message);
       });
-    this.status = Status.STOPPED;
+    this.status = WatcherStatus.STOPPED;
   };
 
   private onData = (chunk: Buffer) => {
@@ -92,7 +92,7 @@ export class FileWatcherService implements Watcher {
     this.logger.error("Error tailing file");
     this.logger.error(err.message);
     this.retry();
-    this.status = Status.ERROR;
+    this.status = WatcherStatus.ERROR;
     this.error = err;
   };
 

@@ -38,6 +38,9 @@ importers:
       '@banalize/shared-utils':
         specifier: workspace:*
         version: link:../../packages/shared-utils
+      '@banalize/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@banalize/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config

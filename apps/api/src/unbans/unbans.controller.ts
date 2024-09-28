@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { CreateUnbanDto } from "./dto/create-unban.dto";
-import { FiltersUnbansDto } from "./dto/filters-ban.dto";
+import { UnbanCreationDto } from "./dtos/unban-creation.dto";
+import { UnbanFiltersDto } from "./dtos/unban-filters.dto";
 import { UnbanSchema } from "./schemas/unban.schema";
 import { UnbansService } from "./services/unbans.service";
 
@@ -13,7 +13,7 @@ export class UnbansController {
   @Get()
   @ApiOperation({ summary: "Get all unbans" })
   @ApiResponse({ type: [UnbanSchema] })
-  async findAll(@Query() filters: FiltersUnbansDto): Promise<UnbanSchema[]> {
+  async findAll(@Query() filters: UnbanFiltersDto): Promise<UnbanSchema[]> {
     return this.unbansService.findAll(filters);
   }
 
@@ -27,7 +27,7 @@ export class UnbansController {
   @Post()
   @ApiOperation({ summary: "Create an unban" })
   @ApiResponse({ type: UnbanSchema })
-  async create(@Body() createUnbanDto: CreateUnbanDto): Promise<UnbanSchema> {
+  async create(@Body() createUnbanDto: UnbanCreationDto): Promise<UnbanSchema> {
     return this.unbansService.create(createUnbanDto);
   }
 }
