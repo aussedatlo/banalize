@@ -76,6 +76,14 @@ export const fetchBansByConfigId = async (
   return fetchFromApi(`/bans?${queryString}`);
 };
 
+export const fetchBansByConfigIdAndIp = async (
+  configId: string,
+  ip: string,
+): Promise<BanSchema[]> => {
+  const queryString = createQueryString({ configId, ip });
+  return fetchFromApi(`/bans?${queryString}`);
+};
+
 export const fetchUnbansByConfigId = async (
   configId: string,
 ): Promise<BanSchema[]> => {
@@ -83,13 +91,24 @@ export const fetchUnbansByConfigId = async (
   return fetchFromApi(`/unbans?${queryString}`);
 };
 
-export const fetchRecentMatches = async (
+export const fetchActiveMatches = async (
   configId: string,
   timestamp_gt: number,
 ): Promise<MatchSchema[]> => {
   const queryString = createQueryString({
     configId,
     timestamp_gt: timestamp_gt.toString(),
+  });
+  return fetchFromApi(`/matches?${queryString}`);
+};
+
+export const fetchMatchesByConfigIdAndIp = async (
+  configId: string,
+  ip: string,
+): Promise<MatchSchema[]> => {
+  const queryString = createQueryString({
+    configId,
+    ip,
   });
   return fetchFromApi(`/matches?${queryString}`);
 };
