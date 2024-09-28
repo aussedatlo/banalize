@@ -22,7 +22,7 @@
     font-weight: 100;
     height: 100px;
 }
-.bottom {
+.bottom, .firstBottom{
     padding: 0px 40px;
     display: flex;
     justify-content: center;
@@ -51,30 +51,94 @@
     height: 25px;
     background-color: #e8eeff;
     border-radius: 25px;
-    border: 4px solid var(--mantine-color-blue-6);;
+    border: 4px solid var(--mantine-color-yellow-filled);
     position: absolute;
     top: -15px;
     left: calc(50% - 12px);
 }
+
+
 .firstBottom:before{
-    width: 50%;
+    width: 100%;
+    height: 4px;
+    content: '';
+    background: linear-gradient(to right, var(--mantine-color-yellow-filled), var(--mantine-color-red-6));
     top: -4px;
     left: 0;
     transition: all 200ms ease-in;
+    position: absolute;
     transform: translateX(50%);
 }
-.bottom:before{
+/* ... autres styles inchangés ... */
+
+.bottom:before {
     content: '';
     width: 100%;
     height: 4px;
-    background-color: #3e70ff;
     position: absolute;
     top: -4px;
-    left: 0;
+    right: 0;
+    transform: translateX(50%);
     transition: all 200ms ease-in;
+}
+
+.lastBottom:before {
+    width: 50%;
+}
+
+.noBar:before {
+    display: none;
+}
+
+.gradientMatchToBan:before {
+    background: linear-gradient(to right, var(--mantine-color-yellow-filled), var(--mantine-color-red-6));
+}
+
+.gradientBanToMatch:before {
+    background: linear-gradient(to right, var(--mantine-color-red-6), var(--mantine-color-yellow-filled));
+}
+
+.solidBan:before {
+    background-color: var(--mantine-color-red-6);
+}
+
+.solidMatch:before {
+    background-color: var(--mantine-color-yellow-filled);
 }
 .lastBottom:before{
     width: 50%;
+}
+
+.dottedLine:before {
+    background-image: linear-gradient(to right, var(--mantine-color-orange-6) 50%, transparent 50%);
+    background-size: 10px 4px;
+    background-repeat: repeat-x;
+}
+
+.eventDot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--mantine-color-orange-6);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.banDot {
+    background-color: var(--mantine-color-red-6);
+}
+
+.eventLabel {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.eventDate {
+    font-size: 0.8em;
+    color: var(--mantine-color-gray-6);
 }
 
 .swiper-control {
@@ -103,3 +167,4 @@
 .isBan.bottom div:before {
     border-color: var(--mantine-color-red-8);
 }
+

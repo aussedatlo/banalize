@@ -3,9 +3,13 @@ import { Box, Grid, GridCol, Group } from "@mantine/core";
 import { IconHistory } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/Paper";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
-import { fetchBansByConfigIdAndIp, fetchMatchesByConfigIdAndIp } from "lib/api";
 import {
-  EventComponent, Timeline,
+  fetchBansByConfigIdAndIp,
+  fetchMatchesByConfigIdAndIp,
+  fetchUnbansByConfigIdAndIp,
+} from "lib/api";
+import {
+  Timeline,
   TimelineEvent,
 } from "../../../../../components/shared/Timeline/Timeline";
 
@@ -26,6 +30,7 @@ function findLastDate<T extends { timestamp: number }>(data: T[]): Date | null {
 function generateTimelineEvents(
   matches: MatchSchema[],
   bans: BanSchema[],
+  unbans: BanSchema[],
 ): TimelineEvent[] {
   const matchEvents = matches.map((match) => ({
     date: new Date(match.timestamp),
@@ -39,7 +44,13 @@ function generateTimelineEvents(
     event: ban,
   }));
 
-  return [...matchEvents, ...banEvents].sort(
+  const unbanEvents = unbans.map((unban) => ({
+    date: new Date(unban.timestamp),
+    type: "unban" as const,
+    event: unban,
+  }));
+
+  return [...matchEvents, ...banEvents, ...unbanEvents].sort(
     (a, b) => a.date.getTime() - b.date.getTime(),
   );
 }
@@ -54,6 +65,7 @@ export default async function TimelinePage({
 
   const bansHistory = await fetchBansByConfigIdAndIp(configId, ip);
   const matchesHistory = await fetchMatchesByConfigIdAndIp(configId, ip);
+  const unbansHistory = await fetchUnbansByConfigIdAndIp(configId, ip);
   console.log("banHistory:", bansHistory.length);
   console.log("matchesHistory :", matchesHistory.length);
 
@@ -69,7 +81,12 @@ export default async function TimelinePage({
       : firstMatch || firstBan;
   console.log(firstEvent);
 
-  const timelineEvents = generateTimelineEvents(matchesHistory, bansHistory);
+  const timelineEvents = generateTimelineEvents(
+    matchesHistory,
+    bansHistory,
+    unbansHistory,
+  );
+  console.log("timelineEvents:", timelineEvents);
 
   return (
     <Box mt={"xl"}>
@@ -94,7 +111,7 @@ export default async function TimelinePage({
               //     type={timelineEvents[0].type}
               //   />
               // </Group>
-              <Timeline events={timelineEvents}/>
+              <Timeline events={timelineEvents} />
             ) : (
               <Group justify="space-between" w="100%">
                 No events
