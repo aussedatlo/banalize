@@ -281,6 +281,21 @@ importers:
         specifier: ^5.0.2
         version: 5.0.2(prettier@3.3.3)(stylelint@16.9.0(typescript@5.5.4))
 
+  packages/types:
+    devDependencies:
+      '@banalize/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@banalize/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.0
+      typescript:
+        specifier: 5.5.2
+        version: 5.5.2
+
   packages/typescript-config: {}
 
 packages:
