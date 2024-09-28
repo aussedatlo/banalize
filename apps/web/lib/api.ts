@@ -83,7 +83,7 @@ export const fetchUnbansByConfigId = async (
   return fetchFromApi(`/unbans?${queryString}`);
 };
 
-export const fetchActiveMatches = async (
+export const fetchRecentMatches = async (
   configId: string,
   timestamp_gt: number,
 ): Promise<MatchSchema[]> => {

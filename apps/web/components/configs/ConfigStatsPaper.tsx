@@ -1,6 +1,5 @@
-import { BanSchema, MatchSchema } from "@banalize/api";
-import { Grid, GridCol, Text } from "@mantine/core";
-import { IconChartArcs } from "@tabler/icons-react";
+import { Grid, GridCol, rem, Text, Tooltip } from "@mantine/core";
+import { IconInfoCircle } from "@tabler/icons-react";
 import { Card } from "components/shared/Card/Card";
 import { Paper } from "components/shared/Paper/Paper";
 import classes from "./ConfigStatsPaper.module.css";
@@ -8,11 +7,29 @@ import classes from "./ConfigStatsPaper.module.css";
 type StatCardProps = {
   text: string;
   value: string;
+  help?: string;
 };
 
-const StatCard = ({ text, value }: StatCardProps) => {
+const StatCard = ({ text, value, help }: StatCardProps) => {
   return (
-    <Card>
+    <Card style={{ position: "relative" }}>
+      <Tooltip
+        label={help}
+        withArrow
+        transitionProps={{ transition: "pop-bottom-right" }}
+      >
+        <Text
+          component="div"
+          c="dimmed"
+          style={{ cursor: "help" }}
+          className={classes.tooltip}
+        >
+          <IconInfoCircle
+            style={{ width: rem(22), height: rem(22) }}
+            stroke={1}
+          />
+        </Text>
+      </Tooltip>
       <Text className={classes.value} fz="h1" mt="xs">
         {value}
       </Text>
@@ -24,30 +41,21 @@ const StatCard = ({ text, value }: StatCardProps) => {
 };
 
 type ConfigStatsPaperProps = {
-  matches: MatchSchema[];
-  bans: BanSchema[];
-  activeMatches: MatchSchema[];
-  activeBans: BanSchema[];
+  items: StatCardProps[];
+  title: string;
+  icon: React.ReactNode;
 };
 
 export const ConfigStatsPaper = ({
-  matches,
-  bans,
-  activeMatches,
-  activeBans,
+  items,
+  title,
+  icon,
 }: ConfigStatsPaperProps) => {
-  const items: StatCardProps[] = [
-    { text: "Total matches", value: matches.length.toString() },
-    { text: "Total bans", value: bans.length.toString() },
-    { text: "Active matches", value: activeMatches.length.toString() },
-    { text: "Active bans", value: activeBans.length.toString() },
-  ];
-
   return (
-    <Paper title="Statistics" icon={<IconChartArcs />} h={265}>
+    <Paper title={title} icon={icon}>
       <Grid w="100%">
         {items.map((item, index) => (
-          <GridCol span={{ base: 12, xs: 3 }} key={`${index}-stat`}>
+          <GridCol span={{ base: 12 / items.length }} key={`${index}-stat`}>
             <StatCard {...item} />
           </GridCol>
         ))}
