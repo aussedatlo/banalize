@@ -4,10 +4,11 @@ import { Group, rem, Text, TextInput, ThemeIcon } from "@mantine/core";
 import { IconGraph, IconSearch, IconTimelineEvent } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/Paper";
 import { Table } from "components/shared/Table/Table";
+import { Event } from "lib/events";
 import { useState } from "react";
 
 type ConfigEventsPaperProps = {
-  events: { time: string; ip: string; type: React.ReactNode; line: string }[];
+  events: Event[];
 };
 
 export const ConfigEventsPaper = ({ events }: ConfigEventsPaperProps) => {

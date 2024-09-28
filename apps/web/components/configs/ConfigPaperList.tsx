@@ -1,23 +1,23 @@
 import {
   ConfigSchema,
-  StatsCountModel,
-  StatsCountRecordModel,
-  WatcherStatusRecordModel,
-} from "@banalize/api";
+  StatsSummary,
+  StatsSummaryResponse,
+  WatcherStatusesResponse,
+} from "@banalize/types";
 import { Grid, GridCol } from "@mantine/core";
 import { ConfigPaper } from "components/configs/ConfigPaper";
 
-const DEFAULT_VALUE: StatsCountModel = {
-  bansCount: 0,
-  matchesCount: 0,
-  currentBansCount: 0,
-  currentMatchesCount: 0,
+const DEFAULT_VALUE: StatsSummary = {
+  allBansCount: 0,
+  allMatchesCount: 0,
+  recentMatchesCount: 0,
+  activeBansCount: 0,
 };
 
 type ConfigPaperListProps = {
   configs: ConfigSchema[];
-  stats: StatsCountRecordModel;
-  status: WatcherStatusRecordModel;
+  stats: StatsSummaryResponse;
+  status: WatcherStatusesResponse;
 };
 
 export const ConfigPaperList = ({

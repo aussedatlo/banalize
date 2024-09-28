@@ -1,6 +1,6 @@
 "use client";
 
-import { StatsHistoryModel } from "@banalize/api";
+import { StatsTimelineResponse } from "@banalize/types";
 import { LineChart } from "@mantine/charts";
 import { Grid, GridCol, Group, Select, Text, ThemeIcon } from "@mantine/core";
 import { IconGraph } from "@tabler/icons-react";
@@ -8,9 +8,9 @@ import { Paper } from "components/shared/Paper/Paper";
 import { useState } from "react";
 
 type ConfigGraphPaperProps = {
-  monthly: StatsHistoryModel;
-  weekly: StatsHistoryModel;
-  daily: StatsHistoryModel;
+  monthly: StatsTimelineResponse;
+  weekly: StatsTimelineResponse;
+  daily: StatsTimelineResponse;
 };
 
 type StatGraphProps = {
