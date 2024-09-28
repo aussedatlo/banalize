@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { SharedModule } from "src/shared/shared.module";
 import { BansController } from "./bans.controller";
 import { BansService } from "./bans.service";
 import { BanSchema, BanSchemaDefinition } from "./schemas/ban.schema";
@@ -11,6 +12,7 @@ import { BanEventHandlerService } from "./services/ban-event-handler.service";
     MongooseModule.forFeature([
       { name: BanSchema.name, schema: BanSchemaDefinition },
     ]),
+    SharedModule,
   ],
   controllers: [BansController],
   providers: [BansService, BanEventHandlerService, BanCleanupService],

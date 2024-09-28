@@ -61,7 +61,7 @@ export class DockerWatcherService implements Watcher {
     this.status = Status.STOPPED;
   };
 
-  private onData = async (chunk: Buffer) => {
+  private onData = (chunk: Buffer) => {
     const lines = chunk.toString().split("\n");
 
     for (const line of lines) {
@@ -71,7 +71,7 @@ export class DockerWatcherService implements Watcher {
         if (ip && !this.config.ignoreIps.includes(ip)) {
           this.logger.debug("Matched line");
 
-          await this.eventEmitter.emitAsync(
+          this.eventEmitter.emit(
             Events.MATCH_CREATION_REQUESTED,
             new MatchEvent(line, ip, this.config),
           );
