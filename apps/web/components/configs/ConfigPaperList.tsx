@@ -17,13 +17,13 @@ const DEFAULT_VALUE: StatsSummary = {
 type ConfigPaperListProps = {
   configs: ConfigSchema[];
   stats: StatsSummaryResponse;
-  status: WatcherStatusesResponse;
+  statuses: WatcherStatusesResponse;
 };
 
 export const ConfigPaperList = ({
   configs,
   stats,
-  status,
+  statuses,
 }: ConfigPaperListProps) => {
   return (
     <Grid>
@@ -32,7 +32,7 @@ export const ConfigPaperList = ({
           <ConfigPaper
             config={config}
             stats={stats.data[config._id] ?? DEFAULT_VALUE}
-            status={status.data[config._id].status ?? "unknown"}
+            status={statuses.data[config._id].status ?? "unknown"}
           />
         </GridCol>
       ))}
