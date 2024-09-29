@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { CreateConfigDto } from "./dto/create-config.dto";
+import { ConfigCreationDto } from "./dtos/config-creation-dto";
 import { ConfigSchema } from "./schemas/config.schema";
 
 @Injectable()
@@ -11,7 +11,7 @@ export class ConfigsService {
     private readonly configModel: Model<ConfigSchema>,
   ) {}
 
-  async create(createConfigDto: CreateConfigDto): Promise<ConfigSchema> {
+  async create(createConfigDto: ConfigCreationDto): Promise<ConfigSchema> {
     const createdCat = await this.configModel.create({
       ...createConfigDto,
       ignoreIps: createConfigDto.ignoreIps || [],
@@ -36,7 +36,7 @@ export class ConfigsService {
 
   async update(
     id: string,
-    createConfigDto: CreateConfigDto,
+    createConfigDto: ConfigCreationDto,
   ): Promise<ConfigSchema> {
     const updatedConfig = await this.configModel
       .findByIdAndUpdate({ _id: id }, createConfigDto, { new: true })

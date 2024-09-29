@@ -5,13 +5,16 @@
   "scripts": {
     "api": "pnpm --filter api",
     "build": "turbo build",
+    "build:api": "turbo build --filter=@banalize/api --filter={./packages/*}",
+    "build:web": "turbo build --filter=@banalize/web --filter={./packages/*}",
     "clean": "turbo clean",
     "commit": "gitmoji -c",
     "dev": "turbo dev",
     "docker:mongodb": "docker compose up mongodb",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo lint",
-    "web": "pnpm --filter web"
+    "web": "pnpm --filter web",
+    "types": "pnpm --filter types"
   },
   "devDependencies": {
     "@banalize/eslint-config": "workspace:*",

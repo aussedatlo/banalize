@@ -1,69 +1,48 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import {
-  ApiExtraModels,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-  getSchemaPath,
-} from "@nestjs/swagger";
-import { FiltersStatsHistoryDto } from "./dto/filters-stats-history.dto";
-import { StatsHistory } from "./interfaces/stats-history.interface";
-import { StatsCountRecordModel } from "./models/stats-count-record.model";
-import { StatsCountModel } from "./models/stats-count.model";
-import { StatsHistoryRecordModel } from "./models/stats-history-record.model";
-import { StatsHistoryModel } from "./models/stats-history.model";
-import { StatsCountService } from "./services/stats-count.service";
-import { StatsHistoryService } from "./services/stats-history.service";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { StatsTimelineFiltersDto } from "./dtos/stats-timeline-filters.dto";
+import { StatsSummaryResponse } from "./responses/stats-summary.response";
+import { StatsTimelineResponse } from "./responses/stats-timeline.response";
+import { StatsSummaryService } from "./services/stats-summary.service";
+import { StatsTimelineService } from "./services/stats-timeline.service";
 
 @ApiTags("stats")
 @Controller("stats")
-@ApiExtraModels(StatsCountModel)
-@ApiExtraModels(StatsHistoryRecordModel)
 export class StatsController {
   constructor(
-    private readonly statsHistoryService: StatsHistoryService,
-    private readonly statsCountService: StatsCountService,
+    private readonly statsTimelineService: StatsTimelineService,
+    private readonly statsSummaryService: StatsSummaryService,
   ) {}
 
-  @Get("/history")
+  @Get("/timeline")
   @ApiOperation({
-    summary: "Retreive the stats history",
-    description: "Fetches all history stats.",
+    summary: "Retrieve statistics timeline data",
+    description:
+      "Fetches historical statistics data based on the provided filters. This endpoint allows clients to obtain a timeline view of various statistics over a specified period.",
   })
   @ApiResponse({
-    type: StatsHistoryModel,
-    description: "An object containing the stats history.",
+    type: StatsTimelineResponse,
+    description:
+      "Returns a response object containing the timeline statistics data.",
   })
   async getStatsHistory(
-    @Query() filters: FiltersStatsHistoryDto,
-  ): Promise<StatsHistory> {
-    return await this.statsHistoryService.getStats(filters);
+    @Query() filters: StatsTimelineFiltersDto,
+  ): Promise<StatsTimelineResponse> {
+    return await this.statsTimelineService.getStats(filters);
   }
 
-  @Get("/count")
+  @Get("/summary")
   @ApiOperation({
-    summary:
-      "Retrieve the current and total count of events, including bans and matches",
+    summary: "Retrieve summary statistics",
     description:
-      "Fetches the aggregated count of events such as bans and matches.",
+      "Fetches a summary of statistics regarding counts of various metrics. This endpoint provides a quick overview of the current statistics available in the system.",
   })
   @ApiResponse({
-    type: StatsCountRecordModel,
+    type: StatsSummaryResponse,
     description:
-      "An object containing the count of different event types (e.g., bans, matches) with their respective values.",
-    schema: {
-      type: "object",
-      properties: {
-        data: {
-          type: "object",
-          additionalProperties: {
-            $ref: getSchemaPath(StatsCountModel),
-          },
-        },
-      },
-    },
+      "Returns a response object containing the summary statistics data.",
   })
-  async getStatsCount(): Promise<StatsCountRecordModel> {
-    return this.statsCountService.getStats();
+  async getStatsCount(): Promise<StatsSummaryResponse> {
+    return this.statsSummaryService.getStats();
   }
 }

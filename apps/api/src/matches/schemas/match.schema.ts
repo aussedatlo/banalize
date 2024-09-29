@@ -1,7 +1,7 @@
+import { type MatchSchema as Match } from "@banalize/types";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
 import { HydratedDocument } from "mongoose";
-import { Match } from "src/matches/interfaces/match.interface";
 
 export type MatchSchemaDocument = HydratedDocument<MatchSchema>;
 

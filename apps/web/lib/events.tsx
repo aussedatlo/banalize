@@ -1,10 +1,10 @@
-import { BanSchema, MatchSchema, UnbanSchema } from "@banalize/api";
+import type { BanSchema, MatchSchema, UnbanSchema } from "@banalize/types";
 import { Box, DefaultMantineColor, rem, Text, ThemeIcon } from "@mantine/core";
 import { IconFlag, IconHandOff, IconHandStop } from "@tabler/icons-react";
 import { TruncatedText } from "components/shared/Text/TruncatedText";
 import { formatDistance } from "date-fns";
 
-type Event = {
+export type Event = {
   timestamp: number;
   time: string;
   ip: string;

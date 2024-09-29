@@ -1,11 +1,12 @@
-import {
+import type {
   BanSchema,
   ConfigSchema,
   MatchSchema,
-  StatsCountRecordModel,
-  StatsHistoryModel,
-  WatcherStatusRecordModel,
-} from "@banalize/api";
+  StatsSummaryResponse,
+  StatsTimelineResponse,
+  UnbanSchema,
+  WatcherStatusesResponse,
+} from "@banalize/types";
 
 const fetchFromApi = async (
   endpoint: string,
@@ -78,7 +79,7 @@ export const fetchBansByConfigId = async (
 
 export const fetchUnbansByConfigId = async (
   configId: string,
-): Promise<BanSchema[]> => {
+): Promise<UnbanSchema[]> => {
   const queryString = createQueryString({ configId });
   return fetchFromApi(`/unbans?${queryString}`);
 };
@@ -104,18 +105,18 @@ export const fetchActiveBans = async (
   return fetchFromApi(`/bans?${queryString}`);
 };
 
-export const fetchStatsCount = async (): Promise<StatsCountRecordModel> => {
-  return fetchFromApi("/stats/count");
+export const fetchStatsSummary = async (): Promise<StatsSummaryResponse> => {
+  return fetchFromApi("/stats/summary");
 };
 
 export const fetchWatcherStatus =
-  async (): Promise<WatcherStatusRecordModel> => {
+  async (): Promise<WatcherStatusesResponse> => {
     return fetchFromApi("/watchers/status");
   };
 
-export const fetchStatsByConfigId = async (
+export const fetchStatsTimelineByConfigId = async (
   id: string,
   period: string,
-): Promise<StatsHistoryModel> => {
-  return fetchFromApi(`/stats/history?period=${period}&configId=${id}`);
+): Promise<StatsTimelineResponse> => {
+  return fetchFromApi(`/stats/timeline?period=${period}&configId=${id}`);
 };

@@ -7,7 +7,7 @@ import {
 import { Events } from "src/events/events.enum";
 import { ConfigsController } from "./configs.controller";
 import { ConfigsService } from "./configs.service";
-import { CreateConfigDto } from "./dto/create-config.dto";
+import { ConfigCreationDto } from "./dtos/config-creation-dto";
 import { WatcherType } from "./enums/watcher-type";
 import { ConfigSchema } from "./schemas/config.schema";
 
@@ -29,7 +29,7 @@ describe("ConfigsController", () => {
 
   const mockConfigArray = [mockConfig];
 
-  const mockCreateConfigDto: CreateConfigDto = {
+  const mockCreateConfigDto: ConfigCreationDto = {
     param: "/path/file.log",
     regex: "^test.*<IP>.*300$",
     banTime: 300,

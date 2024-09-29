@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { CreateUnbanDto } from "src/unbans/dto/create-unban.dto";
-import { FiltersUnbansDto } from "src/unbans/dto/filters-ban.dto";
+import { UnbanCreationDto } from "src/unbans/dtos/unban-creation.dto";
+import { UnbanFiltersDto } from "src/unbans/dtos/unban-filters.dto";
 import { UnbanSchema } from "src/unbans/schemas/unban.schema";
 
 @Injectable()
@@ -12,11 +12,11 @@ export class UnbansService {
     private readonly unbanEventModel: Model<UnbanSchema>,
   ) {}
 
-  async create(createUnbanDto: CreateUnbanDto): Promise<UnbanSchema> {
+  async create(createUnbanDto: UnbanCreationDto): Promise<UnbanSchema> {
     return this.unbanEventModel.create(createUnbanDto);
   }
 
-  async findAll(filters: FiltersUnbansDto): Promise<UnbanSchema[]> {
+  async findAll(filters: UnbanFiltersDto): Promise<UnbanSchema[]> {
     return this.unbanEventModel.find({ ...filters }).exec();
   }
 

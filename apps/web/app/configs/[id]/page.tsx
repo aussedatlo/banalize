@@ -17,7 +17,7 @@ import {
   fetchConfigs,
   fetchMatchesByConfigId,
   fetchRecentMatches,
-  fetchStatsByConfigId,
+  fetchStatsTimelineByConfigId,
   fetchUnbansByConfigId,
 } from "lib/api";
 import { formatEvents } from "lib/events";
@@ -40,9 +40,9 @@ export default async function ConfigPage({
   const bans = await fetchBansByConfigId(configId);
   const unbans = await fetchUnbansByConfigId(configId);
   const config = await fetchConfigById(configId);
-  const statsMonthly = await fetchStatsByConfigId(configId, "monthly");
-  const statsWeekly = await fetchStatsByConfigId(configId, "weekly");
-  const statsDaily = await fetchStatsByConfigId(configId, "daily");
+  const statsMonthly = await fetchStatsTimelineByConfigId(configId, "monthly");
+  const statsWeekly = await fetchStatsTimelineByConfigId(configId, "weekly");
+  const statsDaily = await fetchStatsTimelineByConfigId(configId, "daily");
   const stats = {
     monthly: statsMonthly,
     weekly: statsWeekly,

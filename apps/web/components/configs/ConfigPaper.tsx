@@ -1,4 +1,4 @@
-import type { ConfigSchema, StatsCountModel } from "@banalize/api";
+import type { ConfigSchema, StatsSummary } from "@banalize/types";
 import { Badge, Group } from "@mantine/core";
 import { IconBrandDocker, IconFile } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/Paper";
@@ -6,7 +6,7 @@ import Link from "next/link";
 
 type ConfigPaperProps = {
   config: ConfigSchema;
-  stats: StatsCountModel;
+  stats: StatsSummary;
   status: string;
 };
 
@@ -34,14 +34,14 @@ export const ConfigPaper = ({ config, stats, status }: ConfigPaperProps) => {
           >
             {status}
           </Badge>
-          {stats.bansCount && (
+          {stats.recentMatchesCount && (
             <Badge size="sm" variant="dot" color="yellow">
-              {stats.bansCount} bans
+              {stats.recentMatchesCount} matches
             </Badge>
           )}
-          {stats.matchesCount && (
+          {stats.activeBansCount && (
             <Badge size="sm" variant="dot" color="yellow">
-              {stats.matchesCount} matches
+              {stats.activeBansCount} bans
             </Badge>
           )}
         </Group>

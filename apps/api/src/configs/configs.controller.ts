@@ -16,7 +16,7 @@ import {
 } from "src/events/config-event.types";
 import { Events } from "src/events/events.enum";
 import { ConfigsService } from "./configs.service";
-import { CreateConfigDto } from "./dto/create-config.dto";
+import { ConfigCreationDto } from "./dtos/config-creation-dto";
 import { ConfigSchema } from "./schemas/config.schema";
 
 @ApiTags("configs")
@@ -29,9 +29,9 @@ export class ConfigsController {
 
   @Post()
   @ApiOperation({ summary: "Create a config" })
-  @ApiBody({ type: CreateConfigDto })
+  @ApiBody({ type: ConfigCreationDto })
   @ApiResponse({ status: 400, description: "Bad Request" })
-  async create(@Body() configDto: CreateConfigDto) {
+  async create(@Body() configDto: ConfigCreationDto) {
     const result = await this.configService.create(configDto);
     this.eventEmitter.emit(
       Events.CONFIG_CREATION_DONE,
@@ -68,9 +68,9 @@ export class ConfigsController {
 
   @Put(":id")
   @ApiOperation({ summary: "Update a config by id" })
-  @ApiBody({ type: CreateConfigDto })
+  @ApiBody({ type: ConfigCreationDto })
   @ApiResponse({ type: ConfigSchema })
-  async update(@Param("id") id: string, @Body() configDto: CreateConfigDto) {
+  async update(@Param("id") id: string, @Body() configDto: ConfigCreationDto) {
     const result = await this.configService.update(id, configDto);
 
     this.eventEmitter.emit(

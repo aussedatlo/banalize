@@ -14,7 +14,7 @@ class IsRegexConstraint implements ValidatorConstraintInterface {
     try {
       new RegExp(value.replace(/<IP>/g, ""));
       return true;
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
   }

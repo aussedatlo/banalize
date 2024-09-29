@@ -1,6 +1,6 @@
 "use client";
 
-import { ConfigSchema } from "@banalize/api";
+import { type ConfigSchema } from "@banalize/types";
 import { Button, Group, Notification, Select, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";

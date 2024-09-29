@@ -1,6 +1,6 @@
 "use client";
 
-import { ConfigSchema } from "@banalize/api";
+import { type ConfigSchema } from "@banalize/types";
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconEdit } from "@tabler/icons-react";
@@ -53,7 +53,10 @@ export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
         <ConfigForm
           onSumbit={onConfigEdit}
           onDone={onDone}
-          initialConfig={{ ...config, ignoreIps: config.ignoreIps.join(",") }}
+          initialConfig={{
+            ...config,
+            ignoreIps: config.ignoreIps ? config.ignoreIps.join(",") : "",
+          }}
         />
       </Modal>
     </>

@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { FiltersMatchesDto } from "./dto/filters-match.dto";
+import { MatchFiltersDto } from "./dtos/match-filters.dto";
 import { MatchSchema } from "./schemas/match.schema";
 import { MatchesService } from "./services/matches.service";
 
@@ -12,7 +12,7 @@ export class MatchesController {
   @Get()
   @ApiOperation({ summary: "Get all matches" })
   @ApiResponse({ type: [MatchSchema] })
-  async findAll(@Query() filters: FiltersMatchesDto): Promise<MatchSchema[]> {
+  async findAll(@Query() filters: MatchFiltersDto): Promise<MatchSchema[]> {
     return this.matchesService.findAll(filters);
   }
 

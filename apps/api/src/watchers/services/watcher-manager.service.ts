@@ -1,3 +1,4 @@
+import { type WatcherStatusesResponse } from "@banalize/types";
 import {
   Injectable,
   Logger,
@@ -13,7 +14,6 @@ import {
 } from "src/events/config-event.types";
 import { Events } from "src/events/events.enum";
 import { Watcher } from "src/watchers/interfaces/watcher.interface";
-import { WatcherStatusRecordModel } from "src/watchers/models/watcher-status-record.model";
 import { WatcherFactory } from "src/watchers/watcher.factory";
 
 @Injectable()
@@ -34,7 +34,7 @@ export class WatcherManagerService implements OnModuleInit, OnModuleDestroy {
     this.watchers.forEach((watcher) => watcher.stop());
   }
 
-  getStatus(): WatcherStatusRecordModel {
+  getStatus(): WatcherStatusesResponse {
     return {
       data: this.watchers.reduce(
         (acc, watcher) => ({

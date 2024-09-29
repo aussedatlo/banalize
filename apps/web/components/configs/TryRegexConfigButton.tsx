@@ -1,7 +1,7 @@
 "use client";
 
-import { ConfigSchema } from "@banalize/api";
 import { extractIp } from "@banalize/shared-utils";
+import { type ConfigSchema } from "@banalize/types";
 import { Button, Group, Modal, Notification, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconRegex } from "@tabler/icons-react";

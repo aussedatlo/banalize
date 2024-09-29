@@ -4,7 +4,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Events } from "src/events/events.enum";
 import { UnbanEvent } from "src/events/unban-event.types";
 import { BansService } from "./bans.service";
-import { FiltersBansDto } from "./dto/filters-ban.dto";
+import { BanFiltersDto } from "./dtos/ban-filters.dto";
 import { BanSchema } from "./schemas/ban.schema";
 
 @ApiTags("bans")
@@ -18,7 +18,7 @@ export class BansController {
   @Get()
   @ApiOperation({ summary: "Get all bans" })
   @ApiResponse({ type: [BanSchema] })
-  async findAll(@Query() filters: FiltersBansDto): Promise<BanSchema[]> {
+  async findAll(@Query() filters: BanFiltersDto): Promise<BanSchema[]> {
     return this.bansService.findAll(filters);
   }
 
