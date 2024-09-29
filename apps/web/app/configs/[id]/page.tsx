@@ -61,7 +61,7 @@ export default async function ConfigPage({
 
   return (
     <Box mt={"xl"}>
-      <Group justify="space-between">
+      <Group justify="space-between" mb="lg">
         <RouterBreadcrumbs path={`/configs/${configId}`} />
         <Group>
           <TryRegexConfigButton config={config} />
