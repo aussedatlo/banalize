@@ -21,22 +21,26 @@ export function Timeline({ events }: TimelineProps) {
   const getGradientClass = (
     currentEvent: TimelineEvent,
     nextEvent: TimelineEvent | undefined,
-    hasIntermediateEvents: boolean = false,
   ) => {
     if (!nextEvent) return classes.solidMatch;
 
-    let baseClass = '';
+    let baseClass: string;
     if (currentEvent.type === "match" && nextEvent.type === "ban") {
       baseClass = classes.gradientMatchToBan;
     } else if (currentEvent.type === "ban" && nextEvent.type === "match") {
       baseClass = classes.gradientBanToMatch;
     } else if (currentEvent.type === "ban" && nextEvent.type === "ban") {
       baseClass = classes.solidBan;
+    } else if (currentEvent.type === "ban" && nextEvent.type === "unban") {
+      baseClass = classes.gradientBanToUnban;
+    } else if (currentEvent.type === "unban" && nextEvent.type === "ban") {
+      baseClass = classes.gradientUnbanToBan;
+    } else if (currentEvent.type === "unban" && nextEvent.type === "match") {
+      baseClass = classes.gradientUnbanToMatch;
     } else {
       baseClass = classes.solidMatch;
     }
-
-    return hasIntermediateEvents ? `${baseClass} ${classes.dottedLine}` : baseClass;
+    return baseClass;
   };
 
   const firstEvent = events[0];
@@ -46,6 +50,14 @@ export function Timeline({ events }: TimelineProps) {
     (event) => event !== undefined,
   );
 
+  // copy an event for a test
+  const copyEvent = { ...firstEvent };
+  copyEvent.type = "unban";
+
+  displayedEvents.push(firstEvent);
+  displayedEvents.push(lastEvent);
+  displayedEvents.push(copyEvent);
+  displayedEvents.push(lastEvent);
   displayedEvents.push(firstEvent);
 
   return (
@@ -55,7 +67,19 @@ export function Timeline({ events }: TimelineProps) {
           if (!item) return null;
           const isTop = index % 2 !== 0;
           const nextEvent = displayedEvents[index + 1];
-          const hasIntermediateEvents = nextEvent && events.findIndex(e => e === item) !== events.findIndex(e => e === nextEvent) - 1;
+          const hasIntermediateEvents =
+            nextEvent &&
+            events.findIndex((e) => e === item) !==
+              events.findIndex((e) => e === nextEvent) - 1;
+          const numberOfIntermediateEvents = events.filter(
+            (e) =>
+              e.date > item.date &&
+              e.date < nextEvent?.date &&
+              e !== item &&
+              e !== nextEvent,
+          ).length;
+
+          console.log('hasIntermediateEvents:', hasIntermediateEvents);
 
           const text = (
             <div>
@@ -74,6 +98,7 @@ export function Timeline({ events }: TimelineProps) {
           const concatClasses = cx([classes.bottom], {
             [classes.lastBottom]: index === displayedEvents.length - 1,
             [classes.isBan]: item.type === "ban",
+            [classes.isUnban]: item.type === "unban",
             [gradientClass]: true,
             [classes.noBar]: index === displayedEvents.length - 1,
           });
@@ -82,7 +107,16 @@ export function Timeline({ events }: TimelineProps) {
             <div key={index} className={cx(classes.swiperSlide)}>
               <div className={classes.top}>{isTop ? text : null}</div>
 
-              <div className={concatClasses}>{!isTop ? text : <div />}</div>
+              <div className={concatClasses}>
+                {!isTop ? text : <div />}
+                {hasIntermediateEvents ? (
+                  <div className={classes.intermediateEvents}>
+                    {numberOfIntermediateEvents}
+                  </div>
+                ) : (
+                  <div />
+                )}
+              </div>
             </div>
           );
         })}

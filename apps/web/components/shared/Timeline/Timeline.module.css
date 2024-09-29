@@ -32,7 +32,7 @@
 }
 
 
-.bottom div, .firstBottom div {
+.bottom div:first-child, .firstBottom div {
     font-weight: 600;
     padding-top: 20px;
     flex-direction: column;
@@ -45,7 +45,7 @@
     flex-direction: column-reverse;
     display: flex;
 }
-.bottom div:before, .firstBottom div:before {
+.bottom div:first-child:before, .firstBottom div:before {
     content: '';
     width: 25px;
     height: 25px;
@@ -73,7 +73,7 @@
 
 .bottom:before {
     content: '';
-    width: 100%;
+    width: 85%;
     height: 4px;
     position: absolute;
     top: -4px;
@@ -97,6 +97,19 @@
 .gradientBanToMatch:before {
     background: linear-gradient(to right, var(--mantine-color-red-6), var(--mantine-color-yellow-filled));
 }
+
+.gradientBanToUnban:before {
+    background: linear-gradient(to right, var(--mantine-color-red-6), var(--mantine-color-green-6));
+}
+
+.gradientUnbanToBan:before {
+    background: linear-gradient(to right, var(--mantine-color-green-6), var(--mantine-color-red-6));
+}
+
+.gradientUnbanToMatch:before {
+    background: linear-gradient(to right, var(--mantine-color-green-6), var(--mantine-color-yellow-filled));
+}
+
 
 .solidBan:before {
     background-color: var(--mantine-color-red-6);
@@ -167,4 +180,15 @@
 .isBan.bottom div:before {
     border-color: var(--mantine-color-red-8);
 }
+.isUnban.bottom div:before {
+    border-color: var(--mantine-color-green-8);
+}
 
+.intermediateEvents {
+    background:blue;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    transform: translateX(-50%);
+    display:none;
+}

@@ -96,7 +96,7 @@ export default async function TimelinePage({
 
       <Grid>
         <GridCol span={12}>
-          <Paper title="History" icon={<IconHistory />} h={265}>
+          <Paper title="History" icon={<IconHistory />} h={"100%"}>
             {/*{timelineEvents.map((event, index) => (*/}
             {/*  <Group justify="space-between" w="100%" key={`${index}-stat`}>*/}
             {/*    {event.type}:{event.date.toDateString()}*/}
