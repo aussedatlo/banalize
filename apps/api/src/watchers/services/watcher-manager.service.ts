@@ -1,4 +1,7 @@
-import { type WatcherStatusesResponse } from "@banalize/types";
+import {
+  WatcherStatusData,
+  type WatcherStatusesResponse,
+} from "@banalize/types";
 import {
   Injectable,
   Logger,
@@ -34,22 +37,33 @@ export class WatcherManagerService implements OnModuleInit, OnModuleDestroy {
     this.watchers.forEach((watcher) => watcher.stop());
   }
 
-  getStatus(): WatcherStatusesResponse {
+  getStatuses(): WatcherStatusesResponse {
     return {
       data: this.watchers.reduce(
-        (acc, watcher) => ({
+        (acc: Record<string, WatcherStatusData>, watcher: Watcher) => ({
           ...acc,
-          [watcher.config._id]: {
-            status: watcher.status,
-            processedLines: watcher.processedLines,
-            error:
-              watcher.error && "message" in watcher.error
-                ? watcher.error.message
-                : null,
-          },
+          [watcher.config._id]: this.getWatcherStatusData(watcher),
         }),
         {},
       ),
+    };
+  }
+
+  getStatus(configId: string): WatcherStatusesResponse {
+    const watcher = this.watchers.find(
+      (w) => w.config._id.toString() === configId,
+    );
+
+    if (!watcher) {
+      return {
+        data: {},
+      };
+    }
+
+    return {
+      data: {
+        [configId]: this.getWatcherStatusData(watcher),
+      },
     };
   }
 
@@ -84,5 +98,16 @@ export class WatcherManagerService implements OnModuleInit, OnModuleDestroy {
       watcher.start();
       this.watchers.push(watcher);
     });
+  }
+
+  private getWatcherStatusData(watcher: Watcher): WatcherStatusData {
+    return {
+      status: watcher.status,
+      processedLines: watcher.processedLines,
+      error:
+        watcher.error && "message" in watcher.error
+          ? watcher.error.message
+          : null,
+    };
   }
 }
