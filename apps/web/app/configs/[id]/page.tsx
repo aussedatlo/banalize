@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { Box, Button, Grid, GridCol, Group } from "@mantine/core";
+import { Box, Button, Grid, GridCol, Group, Notification } from "@mantine/core";
 import { IconEyePause, IconFlag, IconHandStop } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
 import { ConfigGraphPaper } from "components/configs/ConfigGraphPaper";
@@ -19,6 +19,7 @@ import {
   fetchRecentMatches,
   fetchStatsTimelineByConfigId,
   fetchUnbansByConfigId,
+  fetchWatcherStatus,
 } from "lib/api";
 import { formatEvents } from "lib/events";
 
@@ -48,6 +49,7 @@ export default async function ConfigPage({
     weekly: statsWeekly,
     daily: statsDaily,
   };
+  const status = (await fetchWatcherStatus(configId)).data[configId];
 
   const recentMatches = await fetchRecentMatches(
     configId,
@@ -69,6 +71,19 @@ export default async function ConfigPage({
           </Button>
           <DeleteConfigButton configId={configId} />
         </Group>
+      </Group>
+
+      <Group w={"100%"} mb="md">
+        {status.error && (
+          <Notification
+            title="Error"
+            color="red"
+            w={"100%"}
+            withCloseButton={false}
+          >
+            {status.error}
+          </Notification>
+        )}
       </Group>
 
       <Grid>

@@ -114,6 +114,12 @@ export const fetchWatcherStatuses =
     return fetchFromApi("/watchers/status");
   };
 
+export const fetchWatcherStatus = async (
+  configId: string,
+): Promise<WatcherStatusesResponse> => {
+  return fetchFromApi(`/watchers/status/${configId}`);
+};
+
 export const fetchStatsTimelineByConfigId = async (
   id: string,
   period: string,
