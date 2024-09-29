@@ -1,7 +1,12 @@
 export const dynamic = "force-dynamic";
 
 import { Box, Button, Grid, GridCol, Group, Notification } from "@mantine/core";
-import { IconEyePause, IconFlag, IconHandStop } from "@tabler/icons-react";
+import {
+  IconEyePause,
+  IconFlag,
+  IconHandStop,
+  IconLineScan,
+} from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
 import { ConfigGraphPaper } from "components/configs/ConfigGraphPaper";
 import { ConfigStatsPaper } from "components/configs/ConfigStatsPaper";
@@ -95,7 +100,7 @@ export default async function ConfigPage({
           <ConfigGraphPaper {...stats} />
         </GridCol>
 
-        <GridCol span={6}>
+        <GridCol span={5}>
           <ConfigStatsPaper
             items={[
               {
@@ -114,7 +119,7 @@ export default async function ConfigPage({
           />
         </GridCol>
 
-        <GridCol span={6}>
+        <GridCol span={5}>
           <ConfigStatsPaper
             items={[
               {
@@ -130,6 +135,20 @@ export default async function ConfigPage({
             ]}
             title={"Bans stats"}
             icon={<IconHandStop />}
+          />
+        </GridCol>
+
+        <GridCol span={2}>
+          <ConfigStatsPaper
+            items={[
+              {
+                text: "Processed lines",
+                value: status.processedLines.toString(),
+                help: "Total number of lines processed by the watcher since the start",
+              },
+            ]}
+            title={"Processing"}
+            icon={<IconLineScan />}
           />
         </GridCol>
 
