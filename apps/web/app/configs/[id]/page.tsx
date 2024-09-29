@@ -5,6 +5,7 @@ import { IconEyePause, IconFlag, IconHandStop } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
 import { ConfigGraphPaper } from "components/configs/ConfigGraphPaper";
 import { ConfigStatsPaper } from "components/configs/ConfigStatsPaper";
+import { ConfigStatusBadge } from "components/configs/ConfigStatusBadge";
 import { DeleteConfigButton } from "components/configs/DeleteConfigButton";
 import { EditConfigButton } from "components/configs/EditConfigButton";
 import { TryRegexConfigButton } from "components/configs/TryRegexConfigButton";
@@ -62,7 +63,10 @@ export default async function ConfigPage({
   return (
     <Box mt={"xl"}>
       <Group justify="space-between" mb="lg">
-        <RouterBreadcrumbs path={`/configs/${configId}`} />
+        <Group>
+          <RouterBreadcrumbs path={`/configs/${configId}`} />
+          <ConfigStatusBadge status={status.status} />
+        </Group>
         <Group>
           <TryRegexConfigButton config={config} />
           <EditConfigButton config={config} />

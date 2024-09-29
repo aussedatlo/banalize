@@ -1,13 +1,18 @@
-import type { ConfigSchema, StatsSummary } from "@banalize/types";
+import type {
+  ConfigSchema,
+  StatsSummary,
+  WatcherStatus,
+} from "@banalize/types";
 import { Badge, Group } from "@mantine/core";
 import { IconBrandDocker, IconFile } from "@tabler/icons-react";
 import { Paper } from "components/shared/Paper/Paper";
 import Link from "next/link";
+import { ConfigStatusBadge } from "./ConfigStatusBadge";
 
 type ConfigPaperProps = {
   config: ConfigSchema;
   stats: StatsSummary;
-  status: string;
+  status: WatcherStatus;
 };
 
 export const ConfigPaper = ({ config, stats, status }: ConfigPaperProps) => {
@@ -21,26 +26,14 @@ export const ConfigPaper = ({ config, stats, status }: ConfigPaperProps) => {
         }
       >
         <Group w="100%">
-          <Badge
-            size="sm"
-            variant="filled"
-            color={
-              status === "running"
-                ? "green"
-                : status === "error"
-                  ? "red"
-                  : "yellow"
-            }
-          >
-            {status}
-          </Badge>
+          <ConfigStatusBadge status={status} />
           {stats.recentMatchesCount && (
-            <Badge size="sm" variant="dot" color="yellow">
+            <Badge size="md" variant="dot" color="yellow">
               {stats.recentMatchesCount} matches
             </Badge>
           )}
           {stats.activeBansCount && (
-            <Badge size="sm" variant="dot" color="yellow">
+            <Badge size="md" variant="dot" color="yellow">
               {stats.activeBansCount} bans
             </Badge>
           )}
