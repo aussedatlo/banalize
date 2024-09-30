@@ -10,4 +10,5 @@ export type ConfigSchema = {
   maxMatches: number;
   watcherType: WatcherType;
   ignoreIps?: string[];
+  paused?: boolean;
 };

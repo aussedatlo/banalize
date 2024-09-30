@@ -1,13 +1,14 @@
 export const dynamic = "force-dynamic";
 
-import { Box, Button, Grid, GridCol, Group, Notification } from "@mantine/core";
-import { IconEyePause, IconFlag, IconHandStop } from "@tabler/icons-react";
+import { Box, Grid, GridCol, Group, Notification } from "@mantine/core";
+import { IconFlag, IconHandStop } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
 import { ConfigGraphPaper } from "components/configs/ConfigGraphPaper";
 import { ConfigStatsPaper } from "components/configs/ConfigStatsPaper";
 import { ConfigStatusBadge } from "components/configs/ConfigStatusBadge";
 import { DeleteConfigButton } from "components/configs/DeleteConfigButton";
 import { EditConfigButton } from "components/configs/EditConfigButton";
+import { PauseConfigButton } from "components/configs/PauseConfigButton";
 import { TryRegexConfigButton } from "components/configs/TryRegexConfigButton";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 
@@ -68,11 +69,9 @@ export default async function ConfigPage({
           <ConfigStatusBadge data={status} />
         </Group>
         <Group>
+          <PauseConfigButton config={config} />
           <TryRegexConfigButton config={config} />
           <EditConfigButton config={config} />
-          <Button leftSection={<IconEyePause size={18} />} color="yellow">
-            Disable
-          </Button>
           <DeleteConfigButton configId={configId} />
         </Group>
       </Group>

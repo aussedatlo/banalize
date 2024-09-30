@@ -31,6 +31,12 @@ export class FileWatcherService implements Watcher {
   }
 
   start = (): void => {
+    if (this.config.paused) {
+      this.logger.debug("Config is paused, not starting tail");
+      this.status = WatcherStatus.PAUSED;
+      return;
+    }
+
     try {
       this.tail = new TailFile(this.config.param, {
         encoding: "utf8",
