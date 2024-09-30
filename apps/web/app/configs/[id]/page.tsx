@@ -77,13 +77,14 @@ export default async function ConfigPage({
         </Group>
       </Group>
 
-      <Group w={"100%"} mb="md">
+      <Group w={"100%"}>
         {status.error && (
           <Notification
             title="Error"
             color="red"
             w={"100%"}
             withCloseButton={false}
+            mb="md"
           >
             {status.error}
           </Notification>
