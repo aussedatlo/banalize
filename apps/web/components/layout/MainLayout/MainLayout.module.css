@@ -3,6 +3,10 @@
   height: 100%;
 }
 
-.breadcrumb {
-  text-transform: capitalize;
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  overflow-y: scroll;
 }

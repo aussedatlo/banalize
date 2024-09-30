@@ -1,7 +1,7 @@
 import { WatcherStatus } from "../enums/watcher-status.enum";
 
 export interface WatcherStatusData {
-  linesProcessed: number;
+  processedLines: number;
   status: WatcherStatus;
   error: string | null;
 }

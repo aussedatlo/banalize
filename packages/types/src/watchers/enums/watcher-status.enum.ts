@@ -3,4 +3,5 @@ export enum WatcherStatus {
   RUNNING = "running",
   STOPPED = "stopped",
   ERROR = "error",
+  UNKNWOWN = "unknown",
 }

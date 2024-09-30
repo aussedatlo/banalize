@@ -46,9 +46,5 @@ export const RouterBreadcrumbs = ({ path }: RouterBreadcrumbsProps) => {
     ),
   );
 
-  return (
-    <Breadcrumbs style={{ height: 40 }} mb="xl">
-      {items}
-    </Breadcrumbs>
-  );
+  return <Breadcrumbs>{items}</Breadcrumbs>;
 };

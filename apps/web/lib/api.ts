@@ -109,10 +109,16 @@ export const fetchStatsSummary = async (): Promise<StatsSummaryResponse> => {
   return fetchFromApi("/stats/summary");
 };
 
-export const fetchWatcherStatus =
+export const fetchWatcherStatuses =
   async (): Promise<WatcherStatusesResponse> => {
     return fetchFromApi("/watchers/status");
   };
+
+export const fetchWatcherStatus = async (
+  configId: string,
+): Promise<WatcherStatusesResponse> => {
+  return fetchFromApi(`/watchers/status/${configId}`);
+};
 
 export const fetchStatsTimelineByConfigId = async (
   id: string,
