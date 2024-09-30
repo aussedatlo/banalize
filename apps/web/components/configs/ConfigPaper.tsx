@@ -20,7 +20,7 @@ export const ConfigPaper = ({ config, stats, status }: ConfigPaperProps) => {
     <Link href={`/configs/${config._id}`} legacyBehavior>
       <Paper
         style={{ cursor: "pointer" }}
-        title={config.param}
+        title={config.name}
         icon={
           config.watcherType === "docker" ? <IconBrandDocker /> : <IconFile />
         }

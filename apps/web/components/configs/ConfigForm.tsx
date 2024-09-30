@@ -7,6 +7,7 @@ import { useState } from "react";
 
 export type ConfigFormType = {
   _id?: string;
+  name: string;
   param: string;
   regex: string;
   banTime: number;
@@ -34,6 +35,7 @@ export const ConfigForm = ({
     mode: "uncontrolled",
     initialValues: {
       param: "",
+      name: "",
       regex: "",
       banTime: 3600,
       findTime: 3600,
@@ -47,6 +49,7 @@ export const ConfigForm = ({
   const onSubmitRequested = async (values: ConfigFormType) => {
     const config = {
       _id: values._id,
+      name: values.name,
       param: values.param,
       regex: values.regex,
       banTime: Number(values.banTime),
@@ -78,6 +81,14 @@ export const ConfigForm = ({
           {...form.getInputProps("_id")}
         />
       ) : null}
+      <TextInput
+        mt="md"
+        label="Name"
+        placeholder="Name"
+        key={form.key("name")}
+        {...form.getInputProps("name")}
+      />
+
       <TextInput
         mt="md"
         label="Parameter"

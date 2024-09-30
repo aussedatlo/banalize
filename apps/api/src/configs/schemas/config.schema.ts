@@ -19,6 +19,13 @@ export class ConfigSchema implements Config {
 
   @Prop()
   @ApiProperty({
+    example: "test",
+    description: "the name of the config",
+  })
+  name: string;
+
+  @Prop()
+  @ApiProperty({
     example: "/path/file.log",
     description: "the param of the watcher",
   })

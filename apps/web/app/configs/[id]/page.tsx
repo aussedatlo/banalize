@@ -64,7 +64,7 @@ export default async function ConfigPage({
     <Box mt={"xl"}>
       <Group justify="space-between" mb="lg">
         <Group>
-          <RouterBreadcrumbs path={`/configs/${configId}`} />
+          <RouterBreadcrumbs path={`/configs/${config.name}`} />
           <ConfigStatusBadge status={status.status} />
         </Group>
         <Group>
