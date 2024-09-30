@@ -61,7 +61,7 @@ export default async function ConfigPage({
   const events = formatEvents(matches, bans, unbans);
 
   return (
-    <Box mt={"xl"}>
+    <Box mt="xl" mb="xl">
       <Group justify="space-between" mb="lg">
         <Group>
           <RouterBreadcrumbs path={`/configs/${config.name}`} />

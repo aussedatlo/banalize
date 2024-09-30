@@ -10,7 +10,7 @@ export default async function ConfigsPage() {
   const statuses = await fetchWatcherStatuses();
 
   return (
-    <Box mt={"xl"}>
+    <Box mt="xl" mb="xl">
       <Group justify="space-between" mb="lg">
         <RouterBreadcrumbs path={"/configs"} />
         <CreateConfigButton />
