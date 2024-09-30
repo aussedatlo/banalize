@@ -2,7 +2,6 @@ import {
   ConfigSchema,
   StatsSummary,
   StatsSummaryResponse,
-  WatcherStatus,
   WatcherStatusesResponse,
 } from "@banalize/types";
 import { Grid, GridCol } from "@mantine/core";
@@ -33,7 +32,7 @@ export const ConfigPaperList = ({
           <ConfigPaper
             config={config}
             stats={stats.data[config._id] ?? DEFAULT_VALUE}
-            status={statuses.data[config._id].status ?? WatcherStatus.UNKNWOWN}
+            status={statuses.data[config._id]}
           />
         </GridCol>
       ))}

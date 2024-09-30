@@ -1,7 +1,7 @@
 import type {
   ConfigSchema,
   StatsSummary,
-  WatcherStatus,
+  WatcherStatusData,
 } from "@banalize/types";
 import { Badge, Group } from "@mantine/core";
 import { IconBrandDocker, IconFile } from "@tabler/icons-react";
@@ -12,7 +12,7 @@ import { ConfigStatusBadge } from "./ConfigStatusBadge";
 type ConfigPaperProps = {
   config: ConfigSchema;
   stats: StatsSummary;
-  status: WatcherStatus;
+  status: WatcherStatusData;
 };
 
 export const ConfigPaper = ({ config, stats, status }: ConfigPaperProps) => {
@@ -26,7 +26,7 @@ export const ConfigPaper = ({ config, stats, status }: ConfigPaperProps) => {
         }
       >
         <Group w="100%">
-          <ConfigStatusBadge status={status} />
+          <ConfigStatusBadge data={status} />
           {stats.recentMatchesCount && (
             <Badge size="md" variant="dot" color="yellow">
               {stats.recentMatchesCount} matches

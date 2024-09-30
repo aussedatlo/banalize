@@ -65,7 +65,7 @@ export default async function ConfigPage({
       <Group justify="space-between" mb="lg">
         <Group>
           <RouterBreadcrumbs path={`/configs/${config.name}`} />
-          <ConfigStatusBadge status={status.status} />
+          <ConfigStatusBadge data={status} />
         </Group>
         <Group>
           <TryRegexConfigButton config={config} />
