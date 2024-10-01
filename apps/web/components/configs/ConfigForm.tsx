@@ -15,6 +15,7 @@ export type ConfigFormType = {
   maxMatches: number;
   watcherType: string;
   ignoreIps: string;
+  paused: boolean;
 };
 
 type ConfigFormProps = {
@@ -43,6 +44,7 @@ export const ConfigForm = ({
       ...initialConfig,
       watcherType: initialConfig?.watcherType === "docker" ? "Docker" : "File",
       ignoreIps: initialConfig?.ignoreIps ?? "",
+      paused: initialConfig?.paused ?? false,
     },
   });
 
@@ -57,6 +59,7 @@ export const ConfigForm = ({
       maxMatches: Number(values.maxMatches),
       watcherType: values.watcherType.toLowerCase(),
       ignoreIps: values.ignoreIps,
+      paused: values.paused,
     };
 
     const result = await onSumbit(config);

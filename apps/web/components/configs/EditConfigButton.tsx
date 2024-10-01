@@ -56,6 +56,7 @@ export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
           initialConfig={{
             ...config,
             ignoreIps: config.ignoreIps ? config.ignoreIps.join(",") : "",
+            paused: config.paused ?? false,
           }}
         />
       </Modal>

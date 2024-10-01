@@ -4,4 +4,5 @@ export enum WatcherStatus {
   STOPPED = "stopped",
   ERROR = "error",
   UNKNWOWN = "unknown",
+  PAUSED = "paused",
 }

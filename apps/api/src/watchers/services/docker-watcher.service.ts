@@ -32,6 +32,12 @@ export class DockerWatcherService implements Watcher {
   }
 
   start = (): void => {
+    if (this.config.paused) {
+      this.logger.debug("Config is paused, not starting docker logs");
+      this.status = WatcherStatus.PAUSED;
+      return;
+    }
+
     this.logger.log(`Starting watcher for container ${this.config.param}`);
     const container = this.docker.getContainer(this.config.param);
 

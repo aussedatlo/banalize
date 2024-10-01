@@ -22,6 +22,7 @@ export const CreateConfigButton = () => {
           config.ignoreIps?.length > 0
             ? config.ignoreIps.split(",")
             : undefined,
+        paused: false,
       }),
     });
     return await res.json();

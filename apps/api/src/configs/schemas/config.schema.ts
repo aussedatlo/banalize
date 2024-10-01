@@ -72,6 +72,13 @@ export class ConfigSchema implements Config {
     description: "the ips to ignore",
   })
   ignoreIps: string[];
+
+  @Prop()
+  @ApiProperty({
+    example: false,
+    description: "the watcher paused status",
+  })
+  paused: boolean;
 }
 
 export const ConfigSchemaDefinition =
