@@ -61,11 +61,11 @@ export default async function ConfigPage({
   const events = formatEvents(matches, bans, unbans);
 
   return (
-    <Box mt={"xl"}>
+    <Box mt="xl" mb="xl">
       <Group justify="space-between" mb="lg">
         <Group>
-          <RouterBreadcrumbs path={`/configs/${configId}`} />
-          <ConfigStatusBadge status={status.status} />
+          <RouterBreadcrumbs path={`/configs/${config.name}`} />
+          <ConfigStatusBadge data={status} />
         </Group>
         <Group>
           <TryRegexConfigButton config={config} />
@@ -77,13 +77,14 @@ export default async function ConfigPage({
         </Group>
       </Group>
 
-      <Group w={"100%"} mb="md">
+      <Group w={"100%"}>
         {status.error && (
           <Notification
             title="Error"
             color="red"
             w={"100%"}
             withCloseButton={false}
+            mb="md"
           >
             {status.error}
           </Notification>

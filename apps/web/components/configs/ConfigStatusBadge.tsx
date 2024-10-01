@@ -1,7 +1,7 @@
 "use client";
 
-import { WatcherStatus } from "@banalize/types";
-import { Badge, rem } from "@mantine/core";
+import { WatcherStatus, WatcherStatusData } from "@banalize/types";
+import { Badge, rem, Tooltip } from "@mantine/core";
 import {
   IconExclamationCircle,
   IconLoader3,
@@ -9,7 +9,12 @@ import {
 } from "@tabler/icons-react";
 import { useMemo } from "react";
 
-export const ConfigStatusBadge = ({ status }: { status: WatcherStatus }) => {
+type ConfigStatusBadgeProps = {
+  data: WatcherStatusData;
+};
+
+export const ConfigStatusBadge = ({ data }: ConfigStatusBadgeProps) => {
+  const { status, processedLines } = data;
   const statusColor = useMemo(() => {
     switch (status) {
       case WatcherStatus.INIT:
@@ -24,6 +29,18 @@ export const ConfigStatusBadge = ({ status }: { status: WatcherStatus }) => {
         return "gray";
     }
   }, [status]);
+
+  const statusTooltip = useMemo(() => {
+    switch (status) {
+      case WatcherStatus.RUNNING:
+        return `${processedLines} lines processed`;
+      case WatcherStatus.INIT:
+      case WatcherStatus.STOPPED:
+      case WatcherStatus.ERROR:
+      default:
+        return null;
+    }
+  }, [status, processedLines]);
 
   const statusIcon = useMemo(() => {
     const style = { width: rem(14), height: rem(14) };
@@ -40,7 +57,7 @@ export const ConfigStatusBadge = ({ status }: { status: WatcherStatus }) => {
     }
   }, [status]);
 
-  return (
+  const StatusBadge = (
     <Badge
       color={statusColor}
       size="md"
@@ -49,5 +66,13 @@ export const ConfigStatusBadge = ({ status }: { status: WatcherStatus }) => {
     >
       {status}
     </Badge>
+  );
+
+  return statusTooltip ? (
+    <Tooltip label={statusTooltip} withArrow position="bottom">
+      {StatusBadge}
+    </Tooltip>
+  ) : (
+    StatusBadge
   );
 };

@@ -79,6 +79,7 @@ export class WatcherManagerService implements OnModuleInit, OnModuleDestroy {
   handleConfigRemoved(event: ConfigRemovedEvent) {
     this.logger.log(`Config removed: ${event.configId}`);
     this.watchers.forEach((watcher) => watcher.stop());
+    this.watchers = [];
     this.startWatchers();
   }
 
@@ -86,6 +87,7 @@ export class WatcherManagerService implements OnModuleInit, OnModuleDestroy {
   handleConfigUpdated(event: ConfigUpdatedEvent) {
     this.logger.log(`Config updated: ${event.config.param}`);
     this.watchers.forEach((watcher) => watcher.stop());
+    this.watchers = [];
     this.startWatchers();
   }
 

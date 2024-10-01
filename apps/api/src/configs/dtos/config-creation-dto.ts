@@ -19,6 +19,14 @@ export class ConfigCreationDto implements ConfigCreation {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
+    example: "test",
+    description: "the name of the config",
+  })
+  readonly name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
     example: "/path/file.log",
     description: "the param of the watcher",
   })
