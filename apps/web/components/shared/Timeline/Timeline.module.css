@@ -1,3 +1,13 @@
+.timelineContainer {
+    width: calc(100% - 120px); /* Ajustez selon la taille de vos boutons de navigation */
+    overflow-x: auto;
+    scrollbar-width: none; /* Pour Firefox */
+    -ms-overflow-style: none; /* Pour Internet Explorer et Edge */
+}
+
+.timelineContainer::-webkit-scrollbar {
+    display: none; /* Pour Chrome, Safari et Opera */
+}
 
 .timeline {
     display: flex;
@@ -5,9 +15,11 @@
     text-align: center;
     flex-wrap: nowrap;
     flex-direction: row;
-    justify-content: space-around;
-    width: 100%;
+    justify-content: flex-start;
+    width: max-content;
+    min-width: 100%;
 }
+
 .timeline li {
     transition: all 200ms ease-in;
 }
@@ -29,6 +41,7 @@
     position: relative;
     transition: all 200ms ease-in ;
     flex-direction: column;
+    height:100px;
 }
 
 
@@ -45,7 +58,7 @@
     flex-direction: column-reverse;
     display: flex;
 }
-.bottom div:first-child:before, .firstBottom div:before {
+.bottom > div:first-child:before {
     content: '';
     width: 25px;
     height: 25px;
@@ -55,79 +68,12 @@
     position: absolute;
     top: -15px;
     left: calc(50% - 12px);
-}
-
-
-.firstBottom:before{
-    width: 100%;
-    height: 4px;
-    content: '';
-    background: linear-gradient(to right, var(--mantine-color-yellow-filled), var(--mantine-color-red-6));
-    top: -4px;
-    left: 0;
-    transition: all 200ms ease-in;
-    position: absolute;
-    transform: translateX(50%);
-}
-/* ... autres styles inchangés ... */
-
-.bottom:before {
-    content: '';
-    width: 85%;
-    height: 4px;
-    position: absolute;
-    top: -4px;
-    right: 0;
-    transform: translateX(50%);
-    transition: all 200ms ease-in;
-}
-
-.lastBottom:before {
-    width: 50%;
+    z-index: 1;
 }
 
 .noBar:before {
     display: none;
 }
-
-.gradientMatchToBan:before {
-    background: linear-gradient(to right, var(--mantine-color-yellow-filled), var(--mantine-color-red-6));
-}
-
-.gradientBanToMatch:before {
-    background: linear-gradient(to right, var(--mantine-color-red-6), var(--mantine-color-yellow-filled));
-}
-
-.gradientBanToUnban:before {
-    background: linear-gradient(to right, var(--mantine-color-red-6), var(--mantine-color-green-6));
-}
-
-.gradientUnbanToBan:before {
-    background: linear-gradient(to right, var(--mantine-color-green-6), var(--mantine-color-red-6));
-}
-
-.gradientUnbanToMatch:before {
-    background: linear-gradient(to right, var(--mantine-color-green-6), var(--mantine-color-yellow-filled));
-}
-
-
-.solidBan:before {
-    background-color: var(--mantine-color-red-6);
-}
-
-.solidMatch:before {
-    background-color: var(--mantine-color-yellow-filled);
-}
-.lastBottom:before{
-    width: 50%;
-}
-
-.dottedLine:before {
-    background-image: linear-gradient(to right, var(--mantine-color-orange-6) 50%, transparent 50%);
-    background-size: 10px 4px;
-    background-repeat: repeat-x;
-}
-
 .eventDot {
     width: 16px;
     height: 16px;
@@ -184,11 +130,80 @@
     border-color: var(--mantine-color-green-8);
 }
 
-.intermediateEvents {
-    background:blue;
+.eventLink {
     position: absolute;
-    left: 100%;
+    height: 4px;
     top: 0;
+    transform: translateY(-100%);
+    width: 100%;
+    right: -50%;
+}
+.gotHover{
+    cursor: pointer;
+}
+.gotHover:hover {
+    height: 6px;
+    transform: translateY(calc(-100% + 1px));
+}
+
+.gradientMatchToBan {
+    background: linear-gradient(to right, var(--mantine-color-yellow-filled), var(--mantine-color-red-6));
+}
+
+.gradientBanToMatch {
+    background: linear-gradient(to right, var(--mantine-color-red-6), var(--mantine-color-yellow-filled));
+}
+
+.gradientBanToUnban {
+    background: linear-gradient(to right, var(--mantine-color-red-6), var(--mantine-color-green-6));
+}
+
+.gradientUnbanToBan {
+    background: linear-gradient(to right, var(--mantine-color-green-6), var(--mantine-color-red-6));
+}
+
+.gradientUnbanToMatch {
+    background: linear-gradient(to right, var(--mantine-color-green-6), var(--mantine-color-yellow-filled));
+}
+
+.solidBan {
+    background-color: var(--mantine-color-red-6);
+}
+
+.solidMatch {
+    background-color: var(--mantine-color-yellow-filled);
+}
+
+.intermediateEvents {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    top: -30px;
+    left: 50%;
     transform: translateX(-50%);
-    display:none;
+    white-space: nowrap;
+    z-index: 10;
+}
+.noHover{
+    cursor: default;
+}
+
+.navigationButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    color: var(--mantine-color-gray-6);
+    transition: color 0.3s ease;
+}
+
+.navigationButton:hover {
+    color: var(--mantine-color-blue-6);
+}
+
+.navigationButton:disabled {
+    color: var(--mantine-color-gray-4);
+    cursor: not-allowed;
 }
