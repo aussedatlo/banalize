@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { BansService } from "src/bans/bans.service";
+import { ConfigsService } from "src/configs/configs.service";
 import { Events } from "src/events/events.enum";
 import { UnbanEvent } from "src/events/unban-event.types";
 
@@ -11,6 +12,7 @@ export class BanCleanupService implements OnModuleInit {
 
   constructor(
     private readonly bansService: BansService,
+    private readonly configsService: ConfigsService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -27,7 +29,9 @@ export class BanCleanupService implements OnModuleInit {
     this.logger.debug(`Found ${activebans.length} active bans`);
 
     for (const ban of activebans) {
-      if (ban.timestamp + ban.banTime * 1000 > timestamp) {
+      const config = await this.configsService.findOne(ban.configId);
+
+      if (ban.timestamp + config.banTime * 1000 > timestamp) {
         continue;
       }
 

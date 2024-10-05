@@ -12,7 +12,6 @@ describe("BansController", () => {
     _id: "123",
     ip: "192.168.1.1",
     timestamp: 1633297200000,
-    banTime: 30,
     configId: "config123",
     active: true,
   };
@@ -22,7 +21,6 @@ describe("BansController", () => {
       _id: "123",
       ip: "192.168.1.1",
       timestamp: 1633297200000,
-      banTime: 30,
       configId: "config123",
       active: true,
     },
@@ -30,7 +28,6 @@ describe("BansController", () => {
       _id: "456",
       ip: "192.168.1.2",
       timestamp: 1633297200000,
-      banTime: 30,
       configId: "config456",
       active: false,
     },

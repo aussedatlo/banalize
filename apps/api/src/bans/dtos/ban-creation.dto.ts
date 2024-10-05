@@ -17,13 +17,6 @@ export class BanCreationDto implements BanCreation {
   })
   readonly timestamp: number;
 
-  @IsPositive()
-  @ApiProperty({
-    example: 30,
-    description: "the ban time duration in seconds",
-  })
-  readonly banTime: number;
-
   @IsString()
   @ApiProperty({
     example: "66dca3ca17f21044b9dbcaf5",
