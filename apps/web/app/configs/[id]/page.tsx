@@ -62,7 +62,7 @@ export default async function ConfigPage({
   const events = formatEvents(matches, bans, unbans);
 
   return (
-    <Box mt="xl" mb="xl">
+    <Box>
       <Group justify="space-between" mb="lg">
         <Group>
           <RouterBreadcrumbs path={`/configs/${config.name}`} />
@@ -95,7 +95,7 @@ export default async function ConfigPage({
           <ConfigGraphPaper {...stats} />
         </GridCol>
 
-        <GridCol span={6}>
+        <GridCol span={{ base: 12, sm: 12, md: 6 }}>
           <ConfigStatsPaper
             items={[
               {
@@ -114,7 +114,7 @@ export default async function ConfigPage({
           />
         </GridCol>
 
-        <GridCol span={6}>
+        <GridCol span={{ base: 12, sm: 12, md: 6 }}>
           <ConfigStatsPaper
             items={[
               {
