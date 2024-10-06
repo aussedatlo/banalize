@@ -25,7 +25,7 @@ export const DeleteConfigButton = ({ configId }: DeleteConfigButtonProps) => {
   return (
     <Button
       leftSection={<IconTrash size={18} />}
-      color="red"
+      color="pink"
       onClick={onDelete}
     >
       Delete

@@ -21,7 +21,7 @@ export const ConfigEventsPaper = ({ events }: ConfigEventsPaperProps) => {
       icon={<IconTimelineEvent />}
       override={
         <Group m="md">
-          <ThemeIcon color="yellow">
+          <ThemeIcon color="pink">
             <IconGraph />
           </ThemeIcon>
           <Text fz="h3">Events</Text>

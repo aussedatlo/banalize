@@ -79,7 +79,7 @@ export const Table = <T extends Record<string, ItemType>>({
           value={activePage}
           onChange={setPage}
           c="grey"
-          color="yellow"
+          color="cyan"
         />
       </Center>
     </>

@@ -6,7 +6,7 @@
 
 .value {
   margin-top: var(--mantine-spacing-lg);
-  color: var(--mantine-color-yellow-filled);
+  color: var(--mantine-color-cyan-filled);
   font-weight: 700;
 }
 

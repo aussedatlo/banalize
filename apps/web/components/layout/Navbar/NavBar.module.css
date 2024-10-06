@@ -38,7 +38,7 @@
   &[data-active] {
     &,
     &:hover {
-      background-color: var(--mantine-color-yellow-filled);
+      background-color: var(--mantine-color-cyan-filled);
       color: var(--mantine-color-default);
 
       .linkIcon {

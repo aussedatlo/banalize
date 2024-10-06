@@ -43,7 +43,7 @@ export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
     <>
       <Button
         leftSection={<IconEdit size={18} />}
-        color="blue"
+        color="pink"
         onClick={() => open()}
       >
         Edit

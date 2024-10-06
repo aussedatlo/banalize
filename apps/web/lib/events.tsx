@@ -61,7 +61,7 @@ export const formatEvents = (
       ip: match.ip,
       type: renderType("Match", <IconFlag />, "dark"),
       details: isRecent
-        ? renderBadge("recent", "yellow")
+        ? renderBadge("recent", "cyan")
         : renderBadge("stale", "dark"),
     });
   });
@@ -73,7 +73,7 @@ export const formatEvents = (
       ip: ban.ip,
       type: renderType("Ban", <IconHandStop />, "dark"),
       details: ban.active
-        ? renderBadge("active", "red")
+        ? renderBadge("active", "pink")
         : renderBadge("expired", "dark"),
     });
   });

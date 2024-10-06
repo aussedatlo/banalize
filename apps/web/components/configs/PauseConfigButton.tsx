@@ -46,7 +46,7 @@ export const PauseConfigButton = ({ config }: EditConfigButtonProps) => {
     return (
       <Button
         leftSection={<IconPlayerPlay size={18} />}
-        color="blue"
+        color="pink"
         onClick={onResume}
         w={em(140)}
       >
@@ -58,7 +58,7 @@ export const PauseConfigButton = ({ config }: EditConfigButtonProps) => {
   return (
     <Button
       leftSection={<IconPlayerPause size={18} />}
-      color="blue"
+      color="pink"
       onClick={onPause}
       w={em(140)}
     >

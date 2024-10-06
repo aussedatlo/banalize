@@ -62,10 +62,10 @@ const StatGraph = ({ stats, period }: StatGraphProps) => {
       withLegend
       legendProps={{ verticalAlign: "bottom" }}
       series={[
-        { name: "Matches", color: "yellow.6" },
+        { name: "Matches", color: "cyan.8" },
         {
           name: "Bans",
-          color: "red.6",
+          color: "pink.8",
           yAxisId: useTwoAxis ? "right" : "left",
         },
       ]}
@@ -89,7 +89,7 @@ export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
     <Paper
       override={
         <Group m="md">
-          <ThemeIcon color="yellow">
+          <ThemeIcon color="pink">
             <IconGraph />
           </ThemeIcon>
           <Text fz="h3">Graph</Text>
@@ -103,7 +103,7 @@ export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
                 icon: (
                   <IconCalendar
                     style={{ width: rem(16), height: rem(16) }}
-                    color={theme.colors.yellow[8]}
+                    color={theme.colors.pink[8]}
                   />
                 ),
                 value: "daily",
@@ -113,7 +113,7 @@ export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
                 icon: (
                   <IconCalendarWeek
                     style={{ width: rem(16), height: rem(16) }}
-                    color={theme.colors.yellow[8]}
+                    color={theme.colors.pink[8]}
                   />
                 ),
                 value: "weekly",
@@ -123,7 +123,7 @@ export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
                 icon: (
                   <IconCalendarMonth
                     style={{ width: rem(16), height: rem(16) }}
-                    color={theme.colors.yellow[8]}
+                    color={theme.colors.pink[8]}
                   />
                 ),
                 value: "monthly",

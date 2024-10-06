@@ -161,7 +161,7 @@ export const ConfigForm = ({
             icon: (
               <IconFile
                 style={{ width: rem(16), height: rem(16) }}
-                color={theme.colors.yellow[8]}
+                color={theme.colors.pink[8]}
               />
             ),
             value: WatcherType.FILE,
@@ -171,7 +171,7 @@ export const ConfigForm = ({
             icon: (
               <IconBrandDocker
                 style={{ width: rem(16), height: rem(16) }}
-                color={theme.colors.blue[8]}
+                color={theme.colors.cyan[8]}
               />
             ),
             value: WatcherType.DOCKER,

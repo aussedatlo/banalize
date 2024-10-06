@@ -54,7 +54,7 @@ export const NavBar = ({ children }: PropsWithChildren) => {
           mr="lg"
         />
         <Group>
-          <Text color="yellow" size="xl">
+          <Text color="cyan" size="xl">
             Banalize
           </Text>
           <Code fw={700}>v{process.env.NEXT_PUBLIC_BANALIZE_WEB_VERSION}</Code>

@@ -22,6 +22,7 @@ export const TryRegexConfigButton = ({ config }: TryRegexConfigButtonProps) => {
     <>
       <Button
         leftSection={<IconRegex size={18} />}
+        color="pink"
         onClick={() => {
           open();
         }}
@@ -55,7 +56,7 @@ export const TryRegexConfigButton = ({ config }: TryRegexConfigButtonProps) => {
         {(ip || error) && (
           <Notification
             mt="md"
-            color={error ? "red" : "green"}
+            color={error ? "pink" : "cyan"}
             title={error ? "Error" : "IP found"}
             onClose={() => {
               setIp(undefined);
@@ -68,7 +69,7 @@ export const TryRegexConfigButton = ({ config }: TryRegexConfigButtonProps) => {
 
         <Group mt="md" justify="end">
           <Button
-            color="blue"
+            color="pink"
             onClick={() => {
               const ip = extractIp(regex, test);
               if (ip) {
