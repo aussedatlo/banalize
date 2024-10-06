@@ -69,9 +69,9 @@ export default async function ConfigPage({
           <ConfigStatusBadge data={status} />
         </Group>
         <Group>
-          <PauseConfigButton config={config} />
           <TryRegexConfigButton config={config} />
           <EditConfigButton config={config} />
+          <PauseConfigButton config={config} />
           <DeleteConfigButton configId={configId} />
         </Group>
       </Group>

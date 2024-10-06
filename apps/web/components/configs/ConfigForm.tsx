@@ -203,7 +203,7 @@ export const ConfigForm = ({
       ) : null}
 
       <Group justify="flex-end" mt="md">
-        <Button type="submit">
+        <Button type="submit" color="pink">
           {initialConfig?._id ? "Update" : "Create"}
         </Button>
       </Group>

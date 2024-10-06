@@ -2,9 +2,18 @@
 
 import { extractIp } from "@banalize/shared-utils";
 import { type ConfigSchema } from "@banalize/types";
-import { Button, Group, Modal, Notification, TextInput } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Group,
+  Modal,
+  Notification,
+  rem,
+  TextInput,
+  Tooltip,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconRegex } from "@tabler/icons-react";
+import { IconTestPipe } from "@tabler/icons-react";
 import { useState } from "react";
 
 type TryRegexConfigButtonProps = {
@@ -20,15 +29,16 @@ export const TryRegexConfigButton = ({ config }: TryRegexConfigButtonProps) => {
 
   return (
     <>
-      <Button
-        leftSection={<IconRegex size={18} />}
-        color="pink"
-        onClick={() => {
-          open();
-        }}
-      >
-        Try Regex
-      </Button>
+      <Tooltip label="Try regex" withArrow>
+        <ActionIcon
+          onClick={() => open()}
+          variant="filled"
+          size="lg"
+          color="cyan"
+        >
+          <IconTestPipe style={{ width: rem(18), height: rem(18) }} />
+        </ActionIcon>
+      </Tooltip>
 
       <Modal
         opened={opened}
