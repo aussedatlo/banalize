@@ -44,7 +44,7 @@ const StatGraph = ({ stats, period }: StatGraphProps) => {
 
   return (
     <LineChart
-      h={300}
+      h={{ base: 200, md: 300 }}
       data={formatData}
       dataKey="date"
       withLegend
@@ -83,6 +83,7 @@ export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
           <Select
             ml="auto"
             onChange={(value) => isPeriodString(value) && setPeriod(value)}
+            w={{ base: "100%", md: "auto" }}
             value={period}
             placeholder="Select time"
             data={["daily", "weekly", "monthly"]}

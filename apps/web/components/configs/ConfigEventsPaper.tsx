@@ -27,6 +27,7 @@ export const ConfigEventsPaper = ({ events }: ConfigEventsPaperProps) => {
           <TextInput
             ml="auto"
             placeholder="Search by any field"
+            w={{ base: "100%", md: "auto" }}
             leftSection={
               <IconSearch
                 style={{ width: rem(16), height: rem(16) }}
