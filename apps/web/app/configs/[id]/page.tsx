@@ -59,7 +59,7 @@ export default async function ConfigPage({
   );
 
   const activeBans = await fetchActiveBans(configId);
-  const events = formatEvents(matches, bans, unbans);
+  const events = formatEvents(matches, bans, unbans, config);
 
   return (
     <Box>

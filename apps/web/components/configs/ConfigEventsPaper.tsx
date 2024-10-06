@@ -40,10 +40,14 @@ export const ConfigEventsPaper = ({ events }: ConfigEventsPaperProps) => {
       }
     >
       <Table
-        headers={["type", "time", "ip", "line"]}
+        headers={{
+          type: "Event Type",
+          time: "Timestamp",
+          ip: "IP Address",
+          details: "Details",
+        }}
         items={events}
         filter={search}
-        widths={[10, 15, 10, 65]}
       />
     </Paper>
   );

@@ -1,15 +1,25 @@
-import type { BanSchema, MatchSchema, UnbanSchema } from "@banalize/types";
-import { Box, DefaultMantineColor, rem, Text, ThemeIcon } from "@mantine/core";
+import type {
+  BanSchema,
+  ConfigSchema,
+  MatchSchema,
+  UnbanSchema,
+} from "@banalize/types";
+import {
+  Badge,
+  Box,
+  DefaultMantineColor,
+  rem,
+  Text,
+  ThemeIcon,
+} from "@mantine/core";
 import { IconFlag, IconHandOff, IconHandStop } from "@tabler/icons-react";
-import { TruncatedText } from "components/shared/Text/TruncatedText";
-import { formatDistance } from "date-fns";
 
 export type Event = {
   timestamp: number;
   time: string;
   ip: string;
   type: React.ReactNode;
-  line: string | React.ReactElement;
+  details: React.ReactNode;
 };
 
 const renderType = (
@@ -25,46 +35,56 @@ const renderType = (
   </Box>
 );
 
+const renderBadge = (
+  text: string,
+  color: DefaultMantineColor,
+): React.ReactNode => (
+  <Badge color={color} size="md" variant="filled">
+    {text}
+  </Badge>
+);
+
 export const formatEvents = (
   matches: MatchSchema[],
   bans: BanSchema[],
   unbans: UnbanSchema[],
+  config: ConfigSchema,
 ): Event[] => {
   const events: Event[] = [];
 
   matches.forEach((match) => {
+    const isRecent =
+      match.timestamp > new Date().getTime() - config.findTime * 1000;
     events.push({
       timestamp: match.timestamp,
-      time: formatDistance(new Date(match.timestamp), new Date(), {
-        addSuffix: true,
-      }),
+      time: new Date(match.timestamp).toLocaleString(),
       ip: match.ip,
-      type: renderType("Match", <IconFlag />, "yellow"),
-      line: <TruncatedText>{match.line}</TruncatedText>,
+      type: renderType("Match", <IconFlag />, "dark"),
+      details: isRecent
+        ? renderBadge("recent", "yellow")
+        : renderBadge("stale", "dark"),
     });
   });
 
   bans.forEach((ban) => {
     events.push({
       timestamp: ban.timestamp,
-      time: formatDistance(new Date(ban.timestamp), new Date(), {
-        addSuffix: true,
-      }),
+      time: new Date(ban.timestamp).toLocaleString(),
       ip: ban.ip,
-      type: renderType("Ban", <IconHandStop />, "red"),
-      line: "",
+      type: renderType("Ban", <IconHandStop />, "dark"),
+      details: ban.active
+        ? renderBadge("active", "red")
+        : renderBadge("expired", "dark"),
     });
   });
 
   unbans.forEach((unban) => {
     events.push({
       timestamp: unban.timestamp,
-      time: formatDistance(new Date(unban.timestamp), new Date(), {
-        addSuffix: true,
-      }),
+      time: new Date(unban.timestamp).toLocaleString(),
       ip: unban.ip,
-      type: renderType("Unban", <IconHandOff />, "green"),
-      line: "",
+      type: renderType("Unban", <IconHandOff />, "dark"),
+      details: renderBadge("unbanned", "dark"),
     });
   });
 
