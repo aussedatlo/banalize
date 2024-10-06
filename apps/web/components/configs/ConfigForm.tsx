@@ -1,8 +1,10 @@
 "use client";
 
-import { type ConfigSchema } from "@banalize/types";
-import { Button, Group, Notification, Select, TextInput } from "@mantine/core";
+import { WatcherType, type ConfigSchema } from "@banalize/types";
+import { Button, Group, Notification, Text, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { IconBrandDocker, IconFile } from "@tabler/icons-react";
+import { MenuIcon } from "components/shared/Menu/MenuIcon";
 import { useState } from "react";
 
 export type ConfigFormType = {
@@ -13,7 +15,7 @@ export type ConfigFormType = {
   banTime: number;
   findTime: number;
   maxMatches: number;
-  watcherType: string;
+  watcherType: WatcherType;
   ignoreIps: string;
   paused: boolean;
 };
@@ -33,7 +35,7 @@ export const ConfigForm = ({
 }: ConfigFormProps) => {
   const [message, setMessage] = useState<string | undefined>(undefined);
   const form = useForm<ConfigFormType>({
-    mode: "uncontrolled",
+    mode: "controlled",
     initialValues: {
       param: "",
       name: "",
@@ -42,7 +44,7 @@ export const ConfigForm = ({
       findTime: 3600,
       maxMatches: 3,
       ...initialConfig,
-      watcherType: initialConfig?.watcherType === "docker" ? "Docker" : "File",
+      watcherType: initialConfig?.watcherType ?? WatcherType.FILE,
       ignoreIps: initialConfig?.ignoreIps ?? "",
       paused: initialConfig?.paused ?? false,
     },
@@ -57,7 +59,7 @@ export const ConfigForm = ({
       banTime: Number(values.banTime),
       findTime: Number(values.findTime),
       maxMatches: Number(values.maxMatches),
-      watcherType: values.watcherType.toLowerCase(),
+      watcherType: values.watcherType,
       ignoreIps: values.ignoreIps,
       paused: values.paused,
     };
@@ -80,6 +82,7 @@ export const ConfigForm = ({
           label="Id"
           value={initialConfig._id}
           disabled
+          type="string"
           key={form.key("_id")}
           {...form.getInputProps("_id")}
         />
@@ -88,6 +91,7 @@ export const ConfigForm = ({
         mt="md"
         label="Name"
         placeholder="Name"
+        type="string"
         key={form.key("name")}
         {...form.getInputProps("name")}
       />
@@ -96,6 +100,7 @@ export const ConfigForm = ({
         mt="md"
         label="Parameter"
         placeholder="/path/to/the/file.log"
+        type="string"
         key={form.key("param")}
         {...form.getInputProps("param")}
       />
@@ -104,6 +109,7 @@ export const ConfigForm = ({
         mt="md"
         label="Regex"
         placeholder="^test.*<IP>.*300$"
+        type="string"
         key={form.key("regex")}
         {...form.getInputProps("regex")}
       />
@@ -135,14 +141,22 @@ export const ConfigForm = ({
         {...form.getInputProps("maxMatches")}
       />
 
-      <Select
-        mt="md"
-        comboboxProps={{ withinPortal: true }}
-        data={["File", "Docker"]}
-        placeholder="File or Docker"
-        label="Type of watcher"
+      <Text fz="sm" mt="md">
+        Watcher type
+      </Text>
+      <MenuIcon
+        w="100%"
+        data={[
+          { label: "File", icon: <IconFile />, value: WatcherType.FILE },
+          {
+            label: "Docker",
+            icon: <IconBrandDocker />,
+            value: WatcherType.DOCKER,
+          },
+        ]}
+        onValueChange={(value) => form.setFieldValue("watcherType", value)}
+        initialValue={initialConfig?.watcherType ?? WatcherType.FILE}
         key={form.key("watcherType")}
-        {...form.getInputProps("watcherType")}
       />
 
       <TextInput

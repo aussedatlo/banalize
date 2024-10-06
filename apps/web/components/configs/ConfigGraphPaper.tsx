@@ -2,8 +2,14 @@
 
 import { StatsTimelineResponse } from "@banalize/types";
 import { LineChart } from "@mantine/charts";
-import { Grid, GridCol, Group, Select, Text, ThemeIcon } from "@mantine/core";
-import { IconGraph } from "@tabler/icons-react";
+import { Grid, GridCol, Group, rem, Text, ThemeIcon } from "@mantine/core";
+import {
+  IconCalendar,
+  IconCalendarMonth,
+  IconCalendarWeek,
+  IconGraph,
+} from "@tabler/icons-react";
+import { MenuIcon } from "components/shared/Menu/MenuIcon";
 import { Paper } from "components/shared/Paper/Paper";
 import { useState } from "react";
 
@@ -15,12 +21,10 @@ type ConfigGraphPaperProps = {
 
 type StatGraphProps = {
   stats: ConfigGraphPaperProps;
-  period: periodString;
+  period: Period;
 };
 
-type periodString = "daily" | "weekly" | "monthly";
-const isPeriodString = (value: string | null): value is periodString =>
-  value !== null && ["daily", "weekly", "monthly"].includes(value);
+type Period = "daily" | "weekly" | "monthly";
 
 const StatGraph = ({ stats, period }: StatGraphProps) => {
   if (!stats[period] || !stats[period].bans || !stats[period].matches) {
@@ -70,7 +74,7 @@ const StatGraph = ({ stats, period }: StatGraphProps) => {
 };
 
 export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
-  const [period, setPeriod] = useState<periodString>("daily");
+  const [period, setPeriod] = useState<Period>("daily");
 
   return (
     <Paper
@@ -80,13 +84,27 @@ export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
             <IconGraph />
           </ThemeIcon>
           <Text fz="h3">Graph</Text>
-          <Select
+          <MenuIcon
             ml="auto"
-            onChange={(value) => isPeriodString(value) && setPeriod(value)}
-            w={{ base: "100%", md: "auto" }}
-            value={period}
-            placeholder="Select time"
-            data={["daily", "weekly", "monthly"]}
+            w={{ base: "100%", md: rem(200) }}
+            onValueChange={(value: Period) => setPeriod(value)}
+            data={[
+              {
+                label: "Daily",
+                icon: <IconCalendar />,
+                value: "daily",
+              },
+              {
+                label: "Weekly",
+                icon: <IconCalendarWeek />,
+                value: "weekly",
+              },
+              {
+                label: "Monthly",
+                icon: <IconCalendarMonth />,
+                value: "monthly",
+              },
+            ]}
           />
         </Group>
       }
