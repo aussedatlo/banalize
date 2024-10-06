@@ -1,7 +1,14 @@
 "use client";
 
 import { WatcherType, type ConfigSchema } from "@banalize/types";
-import { Button, Group, Notification, Text } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Notification,
+  rem,
+  Text,
+  useMantineTheme,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconBrandDocker, IconFile } from "@tabler/icons-react";
 import { TextInput } from "components/shared/Input/TextInput";
@@ -34,6 +41,7 @@ export const ConfigForm = ({
   onDone,
   initialConfig,
 }: ConfigFormProps) => {
+  const theme = useMantineTheme();
   const [message, setMessage] = useState<string | undefined>(undefined);
   const form = useForm<ConfigFormType>({
     mode: "controlled",
@@ -148,10 +156,24 @@ export const ConfigForm = ({
       <MenuIcon
         w="100%"
         data={[
-          { label: "File", icon: <IconFile />, value: WatcherType.FILE },
+          {
+            label: "File",
+            icon: (
+              <IconFile
+                style={{ width: rem(16), height: rem(16) }}
+                color={theme.colors.yellow[8]}
+              />
+            ),
+            value: WatcherType.FILE,
+          },
           {
             label: "Docker",
-            icon: <IconBrandDocker />,
+            icon: (
+              <IconBrandDocker
+                style={{ width: rem(16), height: rem(16) }}
+                color={theme.colors.blue[8]}
+              />
+            ),
             value: WatcherType.DOCKER,
           },
         ]}
