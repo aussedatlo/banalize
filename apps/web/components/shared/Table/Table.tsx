@@ -54,17 +54,23 @@ export const Table = <T extends Record<string, ItemType>>({
   ));
 
   return (
-    <Box w="100%" p="xs">
-      <MantineTable layout="fixed">
-        <MantineTable.Thead className={classes.header}>
-          <MantineTable.Tr>
-            {headerValues?.map((value) => (
-              <MantineTable.Th key={value}>{value}</MantineTable.Th>
-            ))}
-          </MantineTable.Tr>
-        </MantineTable.Thead>
-        <MantineTable.Tbody>{rows}</MantineTable.Tbody>
-      </MantineTable>
+    <>
+      <Box p="xs" className={classes.container}>
+        <MantineTable
+          layout="fixed"
+          className={classes.table}
+          w={{ base: "auto", md: "100%" }}
+        >
+          <MantineTable.Thead className={classes.header}>
+            <MantineTable.Tr>
+              {headerValues?.map((value) => (
+                <MantineTable.Th key={value}>{value}</MantineTable.Th>
+              ))}
+            </MantineTable.Tr>
+          </MantineTable.Thead>
+          <MantineTable.Tbody>{rows}</MantineTable.Tbody>
+        </MantineTable>
+      </Box>
 
       <Center>
         <Pagination
@@ -76,6 +82,6 @@ export const Table = <T extends Record<string, ItemType>>({
           color="yellow"
         />
       </Center>
-    </Box>
+    </>
   );
 };

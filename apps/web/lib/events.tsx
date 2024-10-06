@@ -39,7 +39,7 @@ const renderBadge = (
   text: string,
   color: DefaultMantineColor,
 ): React.ReactNode => (
-  <Badge color={color} size="md" variant="filled">
+  <Badge color={color} size="md" variant="filled" style={{ display: "block" }}>
     {text}
   </Badge>
 );
