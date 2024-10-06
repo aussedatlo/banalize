@@ -1,9 +1,10 @@
 "use client";
 
 import { WatcherType, type ConfigSchema } from "@banalize/types";
-import { Button, Group, Notification, Text, TextInput } from "@mantine/core";
+import { Button, Group, Notification, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconBrandDocker, IconFile } from "@tabler/icons-react";
+import { TextInput } from "components/shared/Input/TextInput";
 import { MenuIcon } from "components/shared/Menu/MenuIcon";
 import { useState } from "react";
 

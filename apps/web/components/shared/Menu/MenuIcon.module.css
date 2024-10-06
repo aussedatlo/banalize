@@ -1,4 +1,5 @@
 .control {
+  height: rem(40px);
   display: flex;
   justify-content: space-between;
   align-items: center;

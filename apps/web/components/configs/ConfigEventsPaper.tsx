@@ -1,7 +1,8 @@
 "use client";
 
-import { Group, rem, Text, TextInput, ThemeIcon } from "@mantine/core";
+import { Group, rem, Text, ThemeIcon } from "@mantine/core";
 import { IconGraph, IconSearch, IconTimelineEvent } from "@tabler/icons-react";
+import { TextInput } from "components/shared/Input/TextInput";
 import { Paper } from "components/shared/Paper/Paper";
 import { Table } from "components/shared/Table/Table";
 import { Event } from "lib/events";
