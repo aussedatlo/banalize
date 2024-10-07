@@ -15,11 +15,12 @@ import {
 import { IconFlag, IconHandOff, IconHandStop } from "@tabler/icons-react";
 
 export type Event = {
-  timestamp: number;
   time: string;
   ip: string;
   type: React.ReactNode;
   details: React.ReactNode;
+  _timestamp: number;
+  _type: string;
 };
 
 const renderType = (
@@ -28,7 +29,7 @@ const renderType = (
   color: DefaultMantineColor,
 ): React.ReactNode => (
   <Box style={{ display: "flex", alignItems: "center" }}>
-    <ThemeIcon color={color} size={rem(20)}>
+    <ThemeIcon color={color} size={rem(25)}>
       {icon}
     </ThemeIcon>
     <Text ml="xs">{type}</Text>
@@ -51,42 +52,46 @@ export const formatEvents = (
   config: ConfigSchema,
 ): Event[] => {
   const events: Event[] = [];
+  const iconProps = { style: { width: rem(16), height: rem(16) } };
 
   matches.forEach((match) => {
     const isRecent =
       match.timestamp > new Date().getTime() - config.findTime * 1000;
     events.push({
-      timestamp: match.timestamp,
+      _timestamp: match.timestamp,
       time: new Date(match.timestamp).toLocaleString(),
       ip: match.ip,
-      type: renderType("Match", <IconFlag />, "dark"),
+      type: renderType("Match", <IconFlag {...iconProps} />, "dark"),
       details: isRecent
         ? renderBadge("recent", "cyan")
         : renderBadge("stale", "dark"),
+      _type: "match",
     });
   });
 
   bans.forEach((ban) => {
     events.push({
-      timestamp: ban.timestamp,
+      _timestamp: ban.timestamp,
       time: new Date(ban.timestamp).toLocaleString(),
       ip: ban.ip,
-      type: renderType("Ban", <IconHandStop />, "dark"),
+      type: renderType("Ban", <IconHandStop {...iconProps} />, "dark"),
       details: ban.active
         ? renderBadge("active", "pink")
         : renderBadge("expired", "dark"),
+      _type: "ban",
     });
   });
 
   unbans.forEach((unban) => {
     events.push({
-      timestamp: unban.timestamp,
+      _timestamp: unban.timestamp,
       time: new Date(unban.timestamp).toLocaleString(),
       ip: unban.ip,
-      type: renderType("Unban", <IconHandOff />, "dark"),
+      type: renderType("Unban", <IconHandOff {...iconProps} />, "dark"),
       details: renderBadge("unbanned", "dark"),
+      _type: "unban",
     });
   });
 
-  return events.sort((a, b) => b.timestamp - a.timestamp);
+  return events.sort((a, b) => b._timestamp - a._timestamp);
 };

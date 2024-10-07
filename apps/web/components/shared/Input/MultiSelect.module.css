@@ -1,0 +1,37 @@
+.pill {
+  display: none;
+}
+
+.input {
+  height: rem(40px);
+  border-radius: var(--mantine-radius-sm);
+  border: rem(1px) solid var(--mantine-color-dark-5);
+  transition: background-color 150ms ease;
+  display: flex;
+  align-items: center;
+
+  @mixin hover {
+    background-color: var(--mantine-color-dark-5);
+  }
+
+  &:focus {
+    background-color: var(--mantine-color-dark-5);
+  }
+
+  &:disabled {
+    background-color: var(--mantine-color-dark-6);
+  }
+}
+
+.input[data-expanded="true"] {
+  background-color: var(--mantine-color-dark-5);
+}
+
+.option {
+  background-color: var(--mantine-color-dark-6);
+  border-radius: var(--mantine-radius-md);
+
+  &:hover {
+    background-color: var(--mantine-color-dark-4);
+  }
+}
