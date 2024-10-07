@@ -1,19 +1,19 @@
 "use client";
 
-import { extractIp } from "@banalize/shared-utils";
 import { type ConfigSchema } from "@banalize/types";
 import {
   ActionIcon,
-  Button,
-  Group,
+  Card,
   Modal,
   Notification,
   rem,
-  TextInput,
+  Text,
   Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTestPipe } from "@tabler/icons-react";
+import { TextInput } from "components/shared/Input/TextInput";
+import { HighlightedText } from "components/shared/Text/HightlightedText";
 import { useState } from "react";
 
 type TryRegexConfigButtonProps = {
@@ -63,6 +63,14 @@ export const TryRegexConfigButton = ({ config }: TryRegexConfigButtonProps) => {
           onChange={(e) => setTest(e.target.value)}
         />
 
+        <Text mt="md">Result of the regex:</Text>
+        <Card>
+          <HighlightedText
+            text={test.length ? test : "No test string provided"}
+            regex={regex}
+          />
+        </Card>
+
         {(ip || error) && (
           <Notification
             mt="md"
@@ -76,24 +84,6 @@ export const TryRegexConfigButton = ({ config }: TryRegexConfigButtonProps) => {
             {error ? error : ip}
           </Notification>
         )}
-
-        <Group mt="md" justify="end">
-          <Button
-            color="pink"
-            onClick={() => {
-              const ip = extractIp(regex, test)[2];
-              if (ip) {
-                setIp(ip);
-                setError(null);
-              } else {
-                setError("No IP found");
-                setIp(null);
-              }
-            }}
-          >
-            Test
-          </Button>
-        </Group>
       </Modal>
     </>
   );

@@ -1,46 +1,7 @@
-import { extractIp } from "@banalize/shared-utils";
 import { ConfigSchema } from "@banalize/types";
-import {
-  Box,
-  BoxProps,
-  Card,
-  Divider,
-  Group,
-  rem,
-  rgba,
-  Text,
-  useMantineTheme,
-} from "@mantine/core";
+import { Box, BoxProps, Card, Divider, Group, rem, Text } from "@mantine/core";
+import { HighlightedText } from "components/shared/Text/HightlightedText";
 import { Event } from "lib/events";
-
-type HighlightedTextProps = {
-  text: string;
-  regex: string;
-};
-
-const HighlightedText = ({ text, regex }: HighlightedTextProps) => {
-  const theme = useMantineTheme();
-  const result = extractIp(regex, text);
-
-  if (!result || result.length !== 5)
-    return <Text component="span">{text}</Text>;
-
-  return (
-    <Box display="inline">
-      <Text component="span">{result[0]}</Text>
-      <Text component="span" bg={rgba(theme.colors.cyan[6], 0.2)}>
-        {result[1]}
-      </Text>
-      <Text component="span" bg="cyan">
-        {result[2]}
-      </Text>
-      <Text component="span" bg={rgba(theme.colors.cyan[6], 0.2)}>
-        {result[3]}
-      </Text>
-      <Text component="span">{result[4]}</Text>
-    </Box>
-  );
-};
 
 type LineInformationProps = {
   label: string;
