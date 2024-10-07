@@ -2,15 +2,7 @@
 
 import { StatsTimelineResponse } from "@banalize/types";
 import { LineChart } from "@mantine/charts";
-import {
-  Grid,
-  GridCol,
-  Group,
-  rem,
-  Text,
-  ThemeIcon,
-  useMantineTheme,
-} from "@mantine/core";
+import { Grid, GridCol, Group, rem, Text, ThemeIcon } from "@mantine/core";
 import {
   IconCalendar,
   IconCalendarMonth,
@@ -83,7 +75,6 @@ const StatGraph = ({ stats, period }: StatGraphProps) => {
 
 export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
   const [period, setPeriod] = useState<Period>("daily");
-  const theme = useMantineTheme();
 
   return (
     <Paper
@@ -101,30 +92,31 @@ export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
               {
                 label: "Daily",
                 icon: (
-                  <IconCalendar
-                    style={{ width: rem(16), height: rem(16) }}
-                    color={theme.colors.pink[8]}
-                  />
+                  <ThemeIcon color="dark" size={rem(22)}>
+                    <IconCalendar style={{ width: rem(16), height: rem(16) }} />
+                  </ThemeIcon>
                 ),
                 value: "daily",
               },
               {
                 label: "Weekly",
                 icon: (
-                  <IconCalendarWeek
-                    style={{ width: rem(16), height: rem(16) }}
-                    color={theme.colors.pink[8]}
-                  />
+                  <ThemeIcon color="dark" size={rem(22)}>
+                    <IconCalendarWeek
+                      style={{ width: rem(16), height: rem(16) }}
+                    />
+                  </ThemeIcon>
                 ),
                 value: "weekly",
               },
               {
                 label: "Monthly",
                 icon: (
-                  <IconCalendarMonth
-                    style={{ width: rem(16), height: rem(16) }}
-                    color={theme.colors.pink[8]}
-                  />
+                  <ThemeIcon color="dark" size={rem(22)}>
+                    <IconCalendarMonth
+                      style={{ width: rem(16), height: rem(16) }}
+                    />
+                  </ThemeIcon>
                 ),
                 value: "monthly",
               },
