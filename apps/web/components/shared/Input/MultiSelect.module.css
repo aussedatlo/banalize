@@ -10,6 +10,7 @@
   display: flex;
   align-items: center;
 
+  /* stylelint-disable-next-line at-rule-no-unknown */
   @mixin hover {
     background-color: var(--mantine-color-dark-5);
   }

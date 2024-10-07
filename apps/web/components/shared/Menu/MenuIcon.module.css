@@ -13,6 +13,7 @@
     background-color: var(--mantine-color-dark-5);
   }
 
+  /* stylelint-disable-next-line at-rule-no-unknown */
   @mixin hover {
     background-color: var(--mantine-color-dark-5);
   }
