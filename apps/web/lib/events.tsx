@@ -21,6 +21,8 @@ export type Event = {
   details: React.ReactNode;
   _timestamp: number;
   _type: string;
+  _id: string;
+  _line?: string;
 };
 
 const renderType = (
@@ -32,7 +34,9 @@ const renderType = (
     <ThemeIcon color={color} size={rem(25)}>
       {icon}
     </ThemeIcon>
-    <Text ml="xs">{type}</Text>
+    <Text ml="xs" fz="sm">
+      {type}
+    </Text>
   </Box>
 );
 
@@ -66,6 +70,8 @@ export const formatEvents = (
         ? renderBadge("recent", "cyan")
         : renderBadge("stale", "dark"),
       _type: "match",
+      _id: match._id,
+      _line: match.line,
     });
   });
 
@@ -79,6 +85,7 @@ export const formatEvents = (
         ? renderBadge("active", "pink")
         : renderBadge("expired", "dark"),
       _type: "ban",
+      _id: ban._id,
     });
   });
 
@@ -90,6 +97,7 @@ export const formatEvents = (
       type: renderType("Unban", <IconHandOff {...iconProps} />, "dark"),
       details: renderBadge("unbanned", "dark"),
       _type: "unban",
+      _id: unban._id,
     });
   });
 

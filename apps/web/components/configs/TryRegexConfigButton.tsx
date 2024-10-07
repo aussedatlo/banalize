@@ -81,7 +81,7 @@ export const TryRegexConfigButton = ({ config }: TryRegexConfigButtonProps) => {
           <Button
             color="pink"
             onClick={() => {
-              const ip = extractIp(regex, test);
+              const ip = extractIp(regex, test)[2];
               if (ip) {
                 setIp(ip);
                 setError(null);

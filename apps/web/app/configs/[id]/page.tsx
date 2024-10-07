@@ -134,7 +134,7 @@ export default async function ConfigPage({
         </GridCol>
 
         <GridCol span={12}>
-          <ConfigEventsPaper events={events} />
+          <ConfigEventsPaper events={events} config={config} />
         </GridCol>
       </Grid>
     </Box>

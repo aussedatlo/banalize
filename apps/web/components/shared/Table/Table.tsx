@@ -12,12 +12,14 @@ type CustomTableProps<T extends Record<string, ItemType>> = {
   items: T[];
   headers: Record<string, string>;
   filter: string;
+  onRowClick?: (item: T) => void;
 };
 
 export const Table = <T extends Record<string, ItemType>>({
   items,
   headers,
   filter,
+  onRowClick,
 }: CustomTableProps<T>) => {
   const [activePage, setPage] = useState(1);
   const headerValues = Object.values(headers);
@@ -46,7 +48,12 @@ export const Table = <T extends Record<string, ItemType>>({
   );
 
   const rows = slicedItems.map((item, index) => (
-    <MantineTable.Tr key={index} className={classes.row}>
+    <MantineTable.Tr
+      key={index}
+      className={classes.row}
+      onClick={() => onRowClick && onRowClick(item)}
+      style={{ cursor: onRowClick ? "pointer" : "default" }}
+    >
       {headerKeys?.map((key) => (
         <MantineTable.Td key={key}>{item[key]}</MantineTable.Td>
       ))}

@@ -1,14 +1,17 @@
 "use client";
 
+import { ConfigSchema } from "@banalize/types";
 import {
   ComboboxItem,
   ComboboxLikeRenderOptionInput,
   Group,
+  Modal,
   rem,
   Text,
   ThemeIcon,
   useMantineTheme,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import {
   IconCheck,
   IconFilter,
@@ -26,14 +29,21 @@ import { Paper } from "components/shared/Paper/Paper";
 import { Table } from "components/shared/Table/Table";
 import { Event } from "lib/events";
 import { useMemo, useState } from "react";
+import { ConfigEventInformation } from "./ConfigEventInformation";
 
 type ConfigEventsPaperProps = {
+  config: ConfigSchema;
   events: Event[];
 };
 
-export const ConfigEventsPaper = ({ events }: ConfigEventsPaperProps) => {
+export const ConfigEventsPaper = ({
+  config,
+  events,
+}: ConfigEventsPaperProps) => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string[]>(["ban", "match", "unban"]);
+  const [opened, { open, close }] = useDisclosure(false);
+  const [focusedEvent, setFocusedEvent] = useState<Event>();
   const theme = useMantineTheme();
 
   const filteredEvents = useMemo(() => {
@@ -152,7 +162,20 @@ export const ConfigEventsPaper = ({ events }: ConfigEventsPaperProps) => {
         }}
         items={filteredEvents}
         filter={search}
+        onRowClick={(item) => {
+          setFocusedEvent(item);
+          open();
+        }}
       />
+
+      <Modal
+        opened={opened}
+        onClose={close}
+        title={`Event Information`}
+        centered
+      >
+        <ConfigEventInformation event={focusedEvent} config={config} />
+      </Modal>
     </Paper>
   );
 };
