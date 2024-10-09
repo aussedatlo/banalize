@@ -1,11 +1,24 @@
+"use client";
+
 import { ConfigSchema } from "@banalize/types";
-import { Box, BoxProps, Card, Divider, Group, rem, Text } from "@mantine/core";
+import {
+  Box,
+  BoxProps,
+  Card,
+  Divider,
+  Group,
+  rem,
+  Skeleton,
+  Text,
+} from "@mantine/core";
+import { useIpInfos } from "app/hooks/useIpInfos";
 import { HighlightedText } from "components/shared/Text/HightlightedText";
 import { Event } from "lib/events";
+import Image from "next/image";
 
 type LineInformationProps = {
   label: string;
-  value: string | number | React.ReactNode;
+  value: string | number | React.ReactNode | undefined;
 } & BoxProps;
 
 export const LineInformation = ({
@@ -18,20 +31,28 @@ export const LineInformation = ({
       <Text size="xs" fw="bold">
         {label}
       </Text>
-      <Box fz="sm">{value}</Box>
+      {value ? (
+        <Text fz="sm" h={22}>
+          {value}
+        </Text>
+      ) : (
+        <Skeleton width={100} height={22} />
+      )}
     </Group>
   );
 };
 
 type ConfigEventInformationProps = {
   config: ConfigSchema;
-  event?: Event;
+  event: Event;
 };
 
 export const ConfigEventInformation = ({
   config,
   event,
 }: ConfigEventInformationProps) => {
+  const ipInfos = useIpInfos(event?.ip || "");
+
   return (
     <>
       <Card radius="md">
@@ -49,6 +70,36 @@ export const ConfigEventInformation = ({
         <>
           <Card radius="md" mt="lg">
             <HighlightedText text={event._line} regex={config.regex} />
+          </Card>
+        </>
+      )}
+
+      {ipInfos && (
+        <>
+          <Card radius="md" mt="lg">
+            <LineInformation
+              label="Continent"
+              value={ipInfos.continent?.name}
+              mt={rem(0)}
+            />
+            <Divider />
+            <LineInformation
+              label="Country"
+              value={
+                ipInfos.country && (
+                  <Box display="flex" style={{ alignItems: "center" }}>
+                    <Image
+                      src={`https://raw.githubusercontent.com/lipis/flag-icons/refs/heads/main/flags/4x3/${ipInfos.country.iso_code.toLowerCase()}.svg`}
+                      alt={`${ipInfos.country.name} flag`}
+                      width={22}
+                      height={22}
+                      style={{ marginRight: 10 }}
+                    />
+                    {ipInfos.country.name}
+                  </Box>
+                )
+              }
+            />
           </Card>
         </>
       )}

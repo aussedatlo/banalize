@@ -43,7 +43,7 @@ export const ConfigEventsPaper = ({
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string[]>(["ban", "match", "unban"]);
   const [opened, { open, close }] = useDisclosure(false);
-  const [focusedEvent, setFocusedEvent] = useState<Event>();
+  const [focusedEvent, setFocusedEvent] = useState<Event>(events[0]);
   const theme = useMantineTheme();
 
   const filteredEvents = useMemo(() => {
