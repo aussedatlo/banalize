@@ -10,22 +10,21 @@ export const HighlightedText = ({ text, regex }: HighlightedTextProps) => {
   const theme = useMantineTheme();
   const result = extractIp(regex, text);
 
-  if (!result || result.length !== 5)
-    return <Text component="span">{text}</Text>;
+  if (!result || !result.match.ip) return <Text component="span">{text}</Text>;
 
   return (
     <Box display="inline">
-      <Text component="span">{result[0]}</Text>
+      <Text component="span">{result.context.beforeMatch}</Text>
       <Text component="span" bg={rgba(theme.colors.cyan[6], 0.2)}>
-        {result[1]}
+        {result.match.before}
       </Text>
       <Text component="span" bg="cyan">
-        {result[2]}
+        {result.match.ip}
       </Text>
       <Text component="span" bg={rgba(theme.colors.cyan[6], 0.2)}>
-        {result[3]}
+        {result.match.after}
       </Text>
-      <Text component="span">{result[4]}</Text>
+      <Text component="span">{result.context.afterMatch}</Text>
     </Box>
   );
 };
