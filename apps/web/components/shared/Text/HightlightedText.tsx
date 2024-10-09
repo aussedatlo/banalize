@@ -1,5 +1,11 @@
 import { extractIp } from "@banalize/shared-utils";
-import { Box, rgba, Text, useMantineTheme } from "@mantine/core";
+import { Box, rgba, Text, TextProps, useMantineTheme } from "@mantine/core";
+import { PropsWithChildren } from "react";
+import classes from "./HighlightedText.module.css";
+
+const SpanText = (props: TextProps & PropsWithChildren) => (
+  <Text component="span" {...props} />
+);
 
 type HighlightedTextProps = {
   text: string;
@@ -14,17 +20,15 @@ export const HighlightedText = ({ text, regex }: HighlightedTextProps) => {
 
   return (
     <Box display="inline">
-      <Text component="span">{result.context.beforeMatch}</Text>
-      <Text component="span" bg={rgba(theme.colors.cyan[6], 0.2)}>
+      <SpanText>{result.context.beforeMatch}</SpanText>
+      <SpanText className={classes.text} bg={rgba(theme.colors.cyan[6], 0.2)}>
         {result.match.before}
-      </Text>
-      <Text component="span" bg="cyan">
-        {result.match.ip}
-      </Text>
-      <Text component="span" bg={rgba(theme.colors.cyan[6], 0.2)}>
+        <SpanText className={classes.text} bg="cyan">
+          {result.match.ip}
+        </SpanText>
         {result.match.after}
-      </Text>
-      <Text component="span">{result.context.afterMatch}</Text>
+      </SpanText>
+      <SpanText>{result.context.afterMatch}</SpanText>
     </Box>
   );
 };

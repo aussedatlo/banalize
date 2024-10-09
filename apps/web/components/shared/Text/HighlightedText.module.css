@@ -1,0 +1,7 @@
+.text {
+  transition: background-color 300ms ease;
+  color: var(--mantine-color-primary);
+  border-radius: var(--mantine-radius-sm);
+  font-weight: 500;
+  padding: 0 3px;
+}
