@@ -1,7 +1,7 @@
 "use client";
 
 import { type ConfigSchema } from "@banalize/types";
-import { Button, em } from "@mantine/core";
+import { ActionIcon, rem, Tooltip } from "@mantine/core";
 import { IconPlayerPause, IconPlayerPlay } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 
@@ -44,25 +44,19 @@ export const PauseConfigButton = ({ config }: EditConfigButtonProps) => {
 
   if (config.paused) {
     return (
-      <Button
-        leftSection={<IconPlayerPlay size={18} />}
-        color="blue"
-        onClick={onResume}
-        w={em(140)}
-      >
-        Resume
-      </Button>
+      <Tooltip label="Resume watcher" withArrow>
+        <ActionIcon onClick={onResume} variant="filled" size="lg" color="pink">
+          <IconPlayerPlay style={{ width: rem(18), height: rem(18) }} />
+        </ActionIcon>
+      </Tooltip>
     );
   }
 
   return (
-    <Button
-      leftSection={<IconPlayerPause size={18} />}
-      color="blue"
-      onClick={onPause}
-      w={em(140)}
-    >
-      Pause
-    </Button>
+    <Tooltip label="Pause watcher" withArrow>
+      <ActionIcon onClick={onPause} variant="filled" size="lg" color="cyan">
+        <IconPlayerPause style={{ width: rem(18), height: rem(18) }} />
+      </ActionIcon>
+    </Tooltip>
   );
 };

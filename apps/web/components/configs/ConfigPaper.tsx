@@ -28,12 +28,12 @@ export const ConfigPaper = ({ config, stats, status }: ConfigPaperProps) => {
         <Group w="100%">
           <ConfigStatusBadge data={status} />
           {stats.recentMatchesCount && (
-            <Badge size="md" variant="dot" color="yellow">
+            <Badge size="md" variant="dot" color="cyan">
               {stats.recentMatchesCount} matches
             </Badge>
           )}
           {stats.activeBansCount && (
-            <Badge size="md" variant="dot" color="yellow">
+            <Badge size="md" variant="dot" color="pink">
               {stats.activeBansCount} bans
             </Badge>
           )}

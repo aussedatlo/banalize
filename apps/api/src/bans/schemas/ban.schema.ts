@@ -33,13 +33,6 @@ export class BanSchema implements Ban {
 
   @Prop()
   @ApiProperty({
-    example: "30",
-    description: "the ban time duration in seconds",
-  })
-  banTime: number;
-
-  @Prop()
-  @ApiProperty({
     example: "66dca3ca17f21044b9dbcaf5",
     description: "the id of the config",
   })

@@ -2,8 +2,14 @@
 
 import { StatsTimelineResponse } from "@banalize/types";
 import { LineChart } from "@mantine/charts";
-import { Grid, GridCol, Group, Select, Text, ThemeIcon } from "@mantine/core";
-import { IconGraph } from "@tabler/icons-react";
+import { Grid, GridCol, Group, rem, Text, ThemeIcon } from "@mantine/core";
+import {
+  IconCalendar,
+  IconCalendarMonth,
+  IconCalendarWeek,
+  IconGraph,
+} from "@tabler/icons-react";
+import { MenuIcon } from "components/shared/Menu/MenuIcon";
 import { Paper } from "components/shared/Paper/Paper";
 import { useState } from "react";
 
@@ -15,12 +21,10 @@ type ConfigGraphPaperProps = {
 
 type StatGraphProps = {
   stats: ConfigGraphPaperProps;
-  period: periodString;
+  period: Period;
 };
 
-type periodString = "daily" | "weekly" | "monthly";
-const isPeriodString = (value: string | null): value is periodString =>
-  value !== null && ["daily", "weekly", "monthly"].includes(value);
+type Period = "daily" | "weekly" | "monthly";
 
 const StatGraph = ({ stats, period }: StatGraphProps) => {
   if (!stats[period] || !stats[period].bans || !stats[period].matches) {
@@ -44,16 +48,16 @@ const StatGraph = ({ stats, period }: StatGraphProps) => {
 
   return (
     <LineChart
-      h={300}
+      h={{ base: 200, md: 300 }}
       data={formatData}
       dataKey="date"
       withLegend
       legendProps={{ verticalAlign: "bottom" }}
       series={[
-        { name: "Matches", color: "yellow.6" },
+        { name: "Matches", color: "cyan.8" },
         {
           name: "Bans",
-          color: "red.6",
+          color: "pink.8",
           yAxisId: useTwoAxis ? "right" : "left",
         },
       ]}
@@ -70,22 +74,53 @@ const StatGraph = ({ stats, period }: StatGraphProps) => {
 };
 
 export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
-  const [period, setPeriod] = useState<periodString>("daily");
+  const [period, setPeriod] = useState<Period>("daily");
 
   return (
     <Paper
       override={
         <Group m="md">
-          <ThemeIcon color="yellow">
+          <ThemeIcon color="pink">
             <IconGraph />
           </ThemeIcon>
           <Text fz="h3">Graph</Text>
-          <Select
+          <MenuIcon
             ml="auto"
-            onChange={(value) => isPeriodString(value) && setPeriod(value)}
-            value={period}
-            placeholder="Select time"
-            data={["daily", "weekly", "monthly"]}
+            w={{ base: "100%", md: rem(200) }}
+            onValueChange={(value: Period) => setPeriod(value)}
+            data={[
+              {
+                label: "Daily",
+                icon: (
+                  <ThemeIcon color="dark" size={rem(22)}>
+                    <IconCalendar style={{ width: rem(16), height: rem(16) }} />
+                  </ThemeIcon>
+                ),
+                value: "daily",
+              },
+              {
+                label: "Weekly",
+                icon: (
+                  <ThemeIcon color="dark" size={rem(22)}>
+                    <IconCalendarWeek
+                      style={{ width: rem(16), height: rem(16) }}
+                    />
+                  </ThemeIcon>
+                ),
+                value: "weekly",
+              },
+              {
+                label: "Monthly",
+                icon: (
+                  <ThemeIcon color="dark" size={rem(22)}>
+                    <IconCalendarMonth
+                      style={{ width: rem(16), height: rem(16) }}
+                    />
+                  </ThemeIcon>
+                ),
+                value: "monthly",
+              },
+            ]}
           />
         </Group>
       }

@@ -1,7 +1,7 @@
 "use client";
 
 import { type ConfigSchema } from "@banalize/types";
-import { Button, Modal } from "@mantine/core";
+import { ActionIcon, Modal, rem, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconEdit } from "@tabler/icons-react";
 import { ConfigForm, ConfigFormType } from "components/configs/ConfigForm";
@@ -41,13 +41,16 @@ export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
 
   return (
     <>
-      <Button
-        leftSection={<IconEdit size={18} />}
-        color="blue"
-        onClick={() => open()}
-      >
-        Edit
-      </Button>
+      <Tooltip label="Edit config" withArrow>
+        <ActionIcon
+          onClick={() => open()}
+          variant="filled"
+          size="lg"
+          color="cyan"
+        >
+          <IconEdit style={{ width: rem(18), height: rem(18) }} />
+        </ActionIcon>
+      </Tooltip>
 
       <Modal opened={opened} onClose={close} title="Edit config">
         <ConfigForm

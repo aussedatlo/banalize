@@ -35,7 +35,7 @@ export const Paper = ({
         override
       ) : (
         <Group m="md">
-          <ThemeIcon color="yellow">{icon}</ThemeIcon>
+          <ThemeIcon color="pink">{icon}</ThemeIcon>
           <Text fz="h3">{title}</Text>
         </Group>
       )}

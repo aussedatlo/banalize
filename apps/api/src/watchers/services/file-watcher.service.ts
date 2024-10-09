@@ -81,7 +81,7 @@ export class FileWatcherService implements Watcher {
     for (const line of lines) {
       if (line.length) {
         this.processedLines++;
-        const ip = extractIp(this.config.regex, line);
+        const ip = extractIp(this.config.regex, line)?.match.ip;
         if (ip && !this.config.ignoreIps.includes(ip)) {
           this.logger.debug("Matched line");
 

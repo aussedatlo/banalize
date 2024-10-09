@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@mantine/core";
+import { ActionIcon, rem, Tooltip } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 
@@ -23,12 +23,10 @@ export const DeleteConfigButton = ({ configId }: DeleteConfigButtonProps) => {
   };
 
   return (
-    <Button
-      leftSection={<IconTrash size={18} />}
-      color="red"
-      onClick={onDelete}
-    >
-      Delete
-    </Button>
+    <Tooltip label="Delete config" withArrow>
+      <ActionIcon onClick={onDelete} variant="filled" size="lg" color="pink">
+        <IconTrash style={{ width: rem(18), height: rem(18) }} />
+      </ActionIcon>
+    </Tooltip>
   );
 };

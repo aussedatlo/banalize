@@ -1,6 +1,7 @@
 import { StatsTimelineResponse } from "@banalize/types";
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import { format, getISOWeek } from "date-fns";
 import { BansService } from "src/bans/bans.service";
 import { BanSchema } from "src/bans/schemas/ban.schema";
@@ -39,12 +40,13 @@ export class StatsTimelineService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     this.logger.log("Computing stats on module init");
-    await this.computeStats();
+    this.computeAllStats();
+  }
 
-    const configs = await this.configsService.findAll();
-    for (const config of configs) {
-      await this.computeStats(config._id);
-    }
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async handleCron(): Promise<void> {
+    this.logger.log("Computing stats on cron job");
+    this.computeAllStats();
   }
 
   @OnEvent(Events.BAN_CREATION_DONE)
@@ -71,7 +73,16 @@ export class StatsTimelineService implements OnModuleInit {
     }
   }
 
-  async computeStats(configId?: string): Promise<void> {
+  private async computeAllStats(): Promise<void> {
+    await this.computeStats();
+
+    const configs = await this.configsService.findAll();
+    for (const config of configs) {
+      await this.computeStats(config._id);
+    }
+  }
+
+  private async computeStats(configId?: string): Promise<void> {
     const id = configId ?? "global";
     const bans = await this.bansService.findAll(configId ? { configId } : {});
     const matches = await this.matchesService.findAll(
@@ -83,7 +94,7 @@ export class StatsTimelineService implements OnModuleInit {
     this.computeMonthlyStats(matches, bans, id);
   }
 
-  async computeDailyStats(
+  private async computeDailyStats(
     matches: MatchSchema[],
     bans: BanSchema[],
     configId?: string,
@@ -133,7 +144,7 @@ export class StatsTimelineService implements OnModuleInit {
     this.record[key] = stats;
   }
 
-  async computeWeeklyStats(
+  private async computeWeeklyStats(
     matches: MatchSchema[],
     bans: BanSchema[],
     configId?: string,
@@ -183,7 +194,7 @@ export class StatsTimelineService implements OnModuleInit {
     this.record[key] = stats;
   }
 
-  async computeMonthlyStats(
+  private async computeMonthlyStats(
     matches: MatchSchema[],
     bans: BanSchema[],
     configId?: string,

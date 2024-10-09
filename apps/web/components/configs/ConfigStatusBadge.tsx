@@ -18,15 +18,15 @@ export const ConfigStatusBadge = ({ data }: ConfigStatusBadgeProps) => {
   const statusColor = useMemo(() => {
     switch (status) {
       case WatcherStatus.INIT:
-        return "blue";
+        return "dark";
       case WatcherStatus.RUNNING:
-        return "green";
+        return "cyan";
       case WatcherStatus.STOPPED:
-        return "gray";
+        return "pink";
       case WatcherStatus.ERROR:
-        return "red";
+        return "pink";
       default:
-        return "gray";
+        return "cyan";
     }
   }, [status]);
 

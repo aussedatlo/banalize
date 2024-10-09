@@ -59,19 +59,19 @@ export default async function ConfigPage({
   );
 
   const activeBans = await fetchActiveBans(configId);
-  const events = formatEvents(matches, bans, unbans);
+  const events = formatEvents(matches, bans, unbans, config);
 
   return (
-    <Box mt="xl" mb="xl">
+    <Box>
       <Group justify="space-between" mb="lg">
         <Group>
           <RouterBreadcrumbs path={`/configs/${config.name}`} />
           <ConfigStatusBadge data={status} />
         </Group>
         <Group>
-          <PauseConfigButton config={config} />
           <TryRegexConfigButton config={config} />
           <EditConfigButton config={config} />
+          <PauseConfigButton config={config} />
           <DeleteConfigButton configId={configId} />
         </Group>
       </Group>
@@ -95,7 +95,7 @@ export default async function ConfigPage({
           <ConfigGraphPaper {...stats} />
         </GridCol>
 
-        <GridCol span={6}>
+        <GridCol span={{ base: 12, sm: 12, md: 6 }}>
           <ConfigStatsPaper
             items={[
               {
@@ -114,7 +114,7 @@ export default async function ConfigPage({
           />
         </GridCol>
 
-        <GridCol span={6}>
+        <GridCol span={{ base: 12, sm: 12, md: 6 }}>
           <ConfigStatsPaper
             items={[
               {
@@ -134,7 +134,7 @@ export default async function ConfigPage({
         </GridCol>
 
         <GridCol span={12}>
-          <ConfigEventsPaper events={events} />
+          <ConfigEventsPaper events={events} config={config} />
         </GridCol>
       </Grid>
     </Box>

@@ -37,7 +37,7 @@ export const CreateConfigButton = () => {
     <>
       <Button
         leftSection={<IconPlus size={18} />}
-        color="yellow"
+        color="pink"
         onClick={() => open()}
       >
         Create Config
