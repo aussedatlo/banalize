@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { useIpInfos } from "app/hooks/useIpInfos";
 import { HighlightedText } from "components/shared/Text/HightlightedText";
-import { Event } from "lib/events";
+import { type Event } from "lib/events";
 import Image from "next/image";
 
 type LineInformationProps = {
@@ -51,25 +51,26 @@ export const ConfigEventInformation = ({
   config,
   event,
 }: ConfigEventInformationProps) => {
-  const ipInfos = useIpInfos(event?.ip || "");
+  const ipInfos = useIpInfos(event.event.ip);
+  const line = "line" in event.event ? event.event.line : undefined;
 
   return (
     <>
       <Card radius="md">
-        <LineInformation label="Id" value={event?._id} mt={rem(0)} />
+        <LineInformation label="Id" value={event.event._id} mt={rem(0)} />
         <Divider />
-        <LineInformation label="Type" value={event?.type} />
+        <LineInformation label="Type" value={event.type} />
         <Divider />
-        <LineInformation label="Time" value={event?.time} />
+        <LineInformation label="Time" value={event.timestamp} />
         <Divider />
-        <LineInformation label="IP" value={event?.ip} />
+        <LineInformation label="IP" value={event.event.ip} />
         <Divider />
-        <LineInformation label="Status" value={event?.details} />
+        <LineInformation label="Status" value={event.details} />
       </Card>
-      {event?._line && (
+      {line && (
         <>
           <Card radius="md" mt="lg">
-            <HighlightedText text={event._line} regex={config.regex} />
+            <HighlightedText text={line} regex={config.regex} />
           </Card>
         </>
       )}

@@ -1,3 +1,5 @@
+"use client";
+
 import { IpInfosResponse } from "@banalize/types";
 import { useEffect, useState } from "react";
 
