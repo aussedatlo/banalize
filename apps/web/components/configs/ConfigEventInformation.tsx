@@ -2,7 +2,6 @@
 
 import { ConfigSchema } from "@banalize/types";
 import {
-  Box,
   BoxProps,
   Card,
   Divider,
@@ -14,7 +13,6 @@ import {
 import { useIpInfos } from "app/hooks/useIpInfos";
 import { HighlightedText } from "components/shared/Text/HightlightedText";
 import { type Event } from "lib/events";
-import Image from "next/image";
 
 type LineInformationProps = {
   label: string;
@@ -51,19 +49,17 @@ export const ConfigEventInformation = ({
   config,
   event,
 }: ConfigEventInformationProps) => {
-  const ipInfos = useIpInfos(event.event.ip);
-  const line = "line" in event.event ? event.event.line : undefined;
+  const ipInfos = useIpInfos(event.ip);
+  const line = "line" in event ? event.line : undefined;
 
   return (
     <>
       <Card radius="md">
-        <LineInformation label="Id" value={event.event._id} mt={rem(0)} />
-        <Divider />
         <LineInformation label="Type" value={event.type} />
         <Divider />
         <LineInformation label="Time" value={event.timestamp} />
         <Divider />
-        <LineInformation label="IP" value={event.event.ip} />
+        <LineInformation label="IP" value={event.ip} />
         <Divider />
         <LineInformation label="Status" value={event.details} />
       </Card>
@@ -88,16 +84,10 @@ export const ConfigEventInformation = ({
               label="Country"
               value={
                 ipInfos.country && (
-                  <Box display="flex" style={{ alignItems: "center" }}>
-                    <Image
-                      src={`https://raw.githubusercontent.com/lipis/flag-icons/refs/heads/main/flags/4x3/${ipInfos.country.iso_code.toLowerCase()}.svg`}
-                      alt={`${ipInfos.country.name} flag`}
-                      width={22}
-                      height={22}
-                      style={{ marginRight: 10 }}
-                    />
-                    {ipInfos.country.name}
-                  </Box>
+                  <Group gap="xs">
+                    <Text>{ipInfos.country.flag}</Text>
+                    <Text fz="sm">{ipInfos.country.name}</Text>
+                  </Group>
                 )
               }
             />

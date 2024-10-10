@@ -29,6 +29,7 @@ import { MultiSelect } from "components/shared/Input/MultiSelect";
 import { TextInput } from "components/shared/Input/TextInput";
 import { Paper } from "components/shared/Paper/Paper";
 import { Table } from "components/shared/Table/Table";
+import { CountryText } from "components/shared/Text/CountryText";
 import { IconText } from "components/shared/Text/IconText";
 import { formatDistance } from "date-fns";
 import { type Event } from "lib/events";
@@ -74,7 +75,10 @@ export const ConfigEventsPaper = ({
   }, []);
 
   const renderRow = useCallback(
-    (event: Event, key: string) => {
+    (
+      event: Event,
+      key: "type" | "timestamp" | "ip" | "details" | "location",
+    ) => {
       const badgeColor =
         event.details === "active"
           ? "pink"
@@ -90,7 +94,7 @@ export const ConfigEventsPaper = ({
               textProps={{ style: { textTransform: "capitalize" } }}
             />
           );
-        case "time":
+        case "timestamp":
           return (
             <Tooltip
               label={new Date(event.timestamp).toLocaleString()}
@@ -104,9 +108,9 @@ export const ConfigEventsPaper = ({
             </Tooltip>
           );
         case "ip":
-          return <>{event.event.ip}</>;
+          return <>{event.ip}</>;
         case "location":
-          return <>{"location"}</>;
+          return <CountryText ip={event.ip} />;
         case "details":
           return (
             <Badge
@@ -217,8 +221,9 @@ export const ConfigEventsPaper = ({
       <Table
         headers={{
           type: "Event Type",
-          time: "Timestamp",
+          timestamp: "Timestamp",
           ip: "IP Address",
+          location: "Location",
           details: "Details",
         }}
         items={filteredEvents}

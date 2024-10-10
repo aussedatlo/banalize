@@ -8,8 +8,9 @@ import {
 export type Event = {
   type: "match" | "ban" | "unban";
   timestamp: number;
+  ip: string;
   details: "stale" | "recent" | "active" | "expired" | "unbanned";
-  event: BanSchema | MatchSchema | UnbanSchema;
+  line?: string;
 };
 
 type FormatEventArgs = {
@@ -41,8 +42,8 @@ const mapBanstoEvent = (bans: BanSchema[]): Event[] =>
     return {
       type: "ban",
       timestamp: ban.timestamp,
+      ip: ban.ip,
       details: isActive ? "active" : "expired",
-      event: ban,
     };
   });
 
@@ -56,8 +57,8 @@ const mapMatchestoEvent = (
     return {
       type: "match",
       timestamp: match.timestamp,
+      ip: match.ip,
       details: isRecent ? "recent" : "stale",
-      event: match,
     };
   });
 
@@ -65,6 +66,6 @@ const mapUnbanstoEvent = (unbans: UnbanSchema[]): Event[] =>
   unbans.map((unban) => ({
     type: "unban",
     timestamp: unban.timestamp,
+    ip: unban.ip,
     details: "unbanned",
-    event: unban,
   }));

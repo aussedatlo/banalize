@@ -6,22 +6,22 @@ import classes from "./Table.module.css";
 
 const MAX_ITEMS = 10;
 
-type CustomTableProps<T> = {
+type CustomTableProps<T, K extends string> = {
   items: T[];
-  headers: Record<string, string>;
-  renderRow: (item: T, key: string) => React.ReactNode;
+  headers: Record<K, string>;
+  renderRow: (item: T, key: K) => React.ReactNode;
   onRowClick?: (item: T) => void;
 };
 
-export const Table = <T extends object>({
+export const Table = <T extends object, K extends string>({
   items,
   headers,
   renderRow,
   onRowClick,
-}: CustomTableProps<T>) => {
+}: CustomTableProps<T, K>) => {
   const [activePage, setPage] = useState(1);
-  const headerValues = Object.values(headers);
-  const headerKeys = Object.keys(headers);
+  const headerValues: string[] = Object.values(headers);
+  const headerKeys: K[] = Object.keys(headers) as K[]; // Safely cast to K[]
 
   const slicedItems = useMemo(
     () => items.slice((activePage - 1) * MAX_ITEMS, activePage * MAX_ITEMS),
@@ -35,8 +35,10 @@ export const Table = <T extends object>({
       onClick={() => onRowClick && onRowClick(item)}
       style={{ cursor: onRowClick ? "pointer" : "default" }}
     >
-      {headerKeys?.map((key) => (
-        <MantineTable.Td key={key}>{renderRow(item, key)}</MantineTable.Td>
+      {headerKeys?.map((key: K) => (
+        <MantineTable.Td key={String(key)}>
+          {renderRow(item, key)}
+        </MantineTable.Td>
       ))}
     </MantineTable.Tr>
   ));
