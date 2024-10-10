@@ -23,7 +23,7 @@ import {
   fetchUnbansByConfigId,
   fetchWatcherStatus,
 } from "lib/api";
-import { formatEvents } from "lib/events";
+import { getEvents } from "lib/events";
 
 export async function generateStaticParams() {
   const configs = await fetchConfigs();
@@ -59,7 +59,7 @@ export default async function ConfigPage({
   );
 
   const activeBans = await fetchActiveBans(configId);
-  const events = formatEvents(matches, bans, unbans, config);
+  const events = getEvents({ matches, bans, unbans, config });
 
   return (
     <Box>

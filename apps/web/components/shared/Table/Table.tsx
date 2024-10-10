@@ -1,50 +1,31 @@
 "use client";
 
 import { Box, Center, Table as MantineTable, Pagination } from "@mantine/core";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import classes from "./Table.module.css";
 
 const MAX_ITEMS = 10;
 
-type ItemType = string | number | React.ReactElement | React.ReactNode;
-
-type CustomTableProps<T extends Record<string, ItemType>> = {
+type CustomTableProps<T, K extends string> = {
   items: T[];
-  headers: Record<string, string>;
-  filter: string;
+  headers: Record<K, string>;
+  renderRow: (item: T, key: K) => React.ReactNode;
   onRowClick?: (item: T) => void;
 };
 
-export const Table = <T extends Record<string, ItemType>>({
+export const Table = <T extends object, K extends string>({
   items,
   headers,
-  filter,
+  renderRow,
   onRowClick,
-}: CustomTableProps<T>) => {
+}: CustomTableProps<T, K>) => {
   const [activePage, setPage] = useState(1);
-  const headerValues = Object.values(headers);
-  const headerKeys = Object.keys(headers);
-
-  useEffect(() => {
-    setPage(1);
-  }, [filter]);
-
-  const filteredItems = useMemo(() => {
-    const searchLower = filter.toLowerCase();
-    return items.filter((item) =>
-      headerKeys.some(
-        (key) =>
-          item &&
-          item[key] &&
-          JSON.stringify(item[key]).toLowerCase().includes(searchLower),
-      ),
-    );
-  }, [items, headerKeys, filter]);
+  const headerValues: string[] = Object.values(headers);
+  const headerKeys: K[] = Object.keys(headers) as K[]; // Safely cast to K[]
 
   const slicedItems = useMemo(
-    () =>
-      filteredItems.slice((activePage - 1) * MAX_ITEMS, activePage * MAX_ITEMS),
-    [filteredItems, activePage],
+    () => items.slice((activePage - 1) * MAX_ITEMS, activePage * MAX_ITEMS),
+    [items, activePage],
   );
 
   const rows = slicedItems.map((item, index) => (
@@ -54,8 +35,10 @@ export const Table = <T extends Record<string, ItemType>>({
       onClick={() => onRowClick && onRowClick(item)}
       style={{ cursor: onRowClick ? "pointer" : "default" }}
     >
-      {headerKeys?.map((key) => (
-        <MantineTable.Td key={key}>{item[key]}</MantineTable.Td>
+      {headerKeys?.map((key: K) => (
+        <MantineTable.Td key={String(key)}>
+          {renderRow(item, key)}
+        </MantineTable.Td>
       ))}
     </MantineTable.Tr>
   ));
@@ -82,7 +65,7 @@ export const Table = <T extends Record<string, ItemType>>({
       <Center>
         <Pagination
           mt="lg"
-          total={Math.ceil(filteredItems.length / MAX_ITEMS)}
+          total={Math.ceil(items.length / MAX_ITEMS)}
           value={activePage}
           onChange={setPage}
           c="grey"

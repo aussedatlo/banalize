@@ -2,6 +2,7 @@
 
 import { ConfigSchema } from "@banalize/types";
 import {
+  Badge,
   ComboboxItem,
   ComboboxLikeRenderOptionInput,
   Group,
@@ -9,6 +10,7 @@ import {
   rem,
   Text,
   ThemeIcon,
+  Tooltip,
   useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -27,8 +29,11 @@ import { MultiSelect } from "components/shared/Input/MultiSelect";
 import { TextInput } from "components/shared/Input/TextInput";
 import { Paper } from "components/shared/Paper/Paper";
 import { Table } from "components/shared/Table/Table";
-import { Event } from "lib/events";
-import { useMemo, useState } from "react";
+import { CountryText } from "components/shared/Text/CountryText";
+import { IconText } from "components/shared/Text/IconText";
+import { formatDistance } from "date-fns";
+import { type Event } from "lib/events";
+import { useCallback, useMemo, useState } from "react";
 import { ConfigEventInformation } from "./ConfigEventInformation";
 
 type ConfigEventsPaperProps = {
@@ -43,35 +48,95 @@ export const ConfigEventsPaper = ({
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string[]>(["ban", "match", "unban"]);
   const [opened, { open, close }] = useDisclosure(false);
-  const [focusedEvent, setFocusedEvent] = useState<Event>();
+  const [focusedEvent, setFocusedEvent] = useState<Event>(events[0]);
   const theme = useMantineTheme();
 
-  const filteredEvents = useMemo(() => {
-    return events.filter((event) => filter.includes(event._type));
-  }, [events, filter]);
+  const filteredEvents: Event[] = useMemo(() => {
+    return events
+      .filter((event) => filter.includes(event.type))
+      .filter((event) => {
+        if (search === "") return true;
+        return JSON.stringify(event).includes(search);
+      });
+  }, [events, filter, search]);
+
+  const renderIcon = useCallback((type: string) => {
+    const iconProps = { style: { width: rem(16), height: rem(16) } };
+    switch (type) {
+      case "ban":
+        return <IconHandStop {...iconProps} />;
+      case "match":
+        return <IconFlag {...iconProps} />;
+      case "unban":
+        return <IconHandOff {...iconProps} />;
+      default:
+        return null;
+    }
+  }, []);
+
+  const renderRow = useCallback(
+    (
+      event: Event,
+      key: "type" | "timestamp" | "ip" | "details" | "location",
+    ) => {
+      const badgeColor =
+        event.details === "active"
+          ? "pink"
+          : event.details === "recent"
+            ? "cyan"
+            : "dark";
+      switch (key) {
+        case "type":
+          return (
+            <IconText
+              text={event.type}
+              icon={renderIcon(event.type)}
+              textProps={{ style: { textTransform: "capitalize" } }}
+            />
+          );
+        case "timestamp":
+          return (
+            <Tooltip
+              label={new Date(event.timestamp).toLocaleString()}
+              withArrow
+            >
+              <Text fz="sm">
+                {formatDistance(new Date(event.timestamp), new Date(), {
+                  addSuffix: true,
+                })}
+              </Text>
+            </Tooltip>
+          );
+        case "ip":
+          return <>{event.ip}</>;
+        case "location":
+          return <CountryText ip={event.ip} />;
+        case "details":
+          return (
+            <Badge
+              color={badgeColor}
+              size="md"
+              variant="filled"
+              style={{ display: "block" }}
+            >
+              {event.details}
+            </Badge>
+          );
+        default:
+          break;
+      }
+    },
+    [renderIcon],
+  );
 
   const renderOption = (item: ComboboxLikeRenderOptionInput<ComboboxItem>) => (
     <Group justify="space-between" w="100%">
       <Group>
-        <ThemeIcon color="dark" size={rem(22)}>
-          {(() => {
-            switch (item.option.value) {
-              case "ban":
-                return (
-                  <IconHandStop style={{ width: rem(16), height: rem(16) }} />
-                );
-              case "match":
-                return <IconFlag style={{ width: rem(16), height: rem(16) }} />;
-              case "unban":
-                return (
-                  <IconHandOff style={{ width: rem(16), height: rem(16) }} />
-                );
-              default:
-                return null;
-            }
-          })()}
-        </ThemeIcon>
-        <Text fz="sm">{item.option.label}</Text>
+        <IconText
+          text={item.option.value}
+          icon={renderIcon(item.option.value)}
+          textProps={{ style: { textTransform: "capitalize" } }}
+        />
       </Group>
 
       {item.checked && (
@@ -156,16 +221,17 @@ export const ConfigEventsPaper = ({
       <Table
         headers={{
           type: "Event Type",
-          time: "Timestamp",
+          timestamp: "Timestamp",
           ip: "IP Address",
+          location: "Location",
           details: "Details",
         }}
         items={filteredEvents}
-        filter={search}
         onRowClick={(item) => {
           setFocusedEvent(item);
           open();
         }}
+        renderRow={renderRow}
       />
 
       <Modal

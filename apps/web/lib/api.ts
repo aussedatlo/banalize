@@ -1,6 +1,7 @@
 import type {
   BanSchema,
   ConfigSchema,
+  IpInfosResponse,
   MatchSchema,
   StatsSummaryResponse,
   StatsTimelineResponse,
@@ -125,4 +126,10 @@ export const fetchStatsTimelineByConfigId = async (
   period: string,
 ): Promise<StatsTimelineResponse> => {
   return fetchFromApi(`/stats/timeline?period=${period}&configId=${id}`);
+};
+
+export const fetchIpInfos = async (
+  ip: string,
+): Promise<Partial<IpInfosResponse>> => {
+  return fetchFromApi(`/ip-infos/${ip}`);
 };
