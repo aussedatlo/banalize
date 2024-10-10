@@ -14,7 +14,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo lint",
     "web": "pnpm --filter web",
-    "types": "pnpm --filter types"
+    "types": "pnpm --filter types",
+    "packages": "pnpm --filter={./packages/*}"
   },
   "devDependencies": {
     "@banalize/eslint-config": "workspace:*",
