@@ -18,6 +18,7 @@ export class IpInfosResponse implements Partial<IpInfos> {
     example: {
       iso_code: "US",
       name: "United States",
+      flag: "🇺🇸",
     },
   })
   readonly country?: IpInfos["country"];

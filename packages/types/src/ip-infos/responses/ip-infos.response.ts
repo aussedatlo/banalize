@@ -6,6 +6,7 @@ export type IpInfosResponse = {
   country: {
     iso_code: string;
     name: string;
+    flag: string;
   };
   location: {
     accuracy_radius: number;

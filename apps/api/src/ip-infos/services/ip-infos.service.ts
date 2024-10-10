@@ -49,6 +49,7 @@ export class IpInfosService implements OnModuleInit {
         ("country" in response && {
           iso_code: response.country.iso_code,
           name: response.country.names.en,
+          flag: this.getFlagEmoji(response.country.iso_code),
         }) ||
         undefined,
       location:
@@ -59,6 +60,14 @@ export class IpInfosService implements OnModuleInit {
         }) ||
         undefined,
     };
+  }
+
+  private getFlagEmoji(countryCode: string): string {
+    const codePoints = countryCode
+      .toUpperCase()
+      .split("")
+      .map((char) => 127397 + char.charCodeAt(0));
+    return String.fromCodePoint(...codePoints);
   }
 
   private async downloadDatabase(url: string, dest: string): Promise<void> {
