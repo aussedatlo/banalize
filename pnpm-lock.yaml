@@ -74,9 +74,6 @@ importers:
       axios:
         specifier: ^1.7.7
         version: 1.7.7
-      class-transformer:
-        specifier: ^0.5.1
-        version: 0.5.1
       class-validator:
         specifier: ^0.14.1
         version: 0.14.1
@@ -6904,7 +6901,8 @@ snapshots:
 
   cjs-module-lexer@1.4.0: {}
 
-  class-transformer@0.5.1: {}
+  class-transformer@0.5.1:
+    optional: true
 
   class-validator@0.14.1:
     dependencies:
