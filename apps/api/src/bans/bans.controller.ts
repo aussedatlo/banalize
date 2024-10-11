@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Patch, Query } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Events } from "src/events/events.enum";
-import { UnbanEvent } from "src/events/unban-event.types";
+import { Events } from "src/shared/enums/events.enum";
+import { UnbanEvent } from "src/unbans/types/unban-event.types";
 import { BansService } from "./bans.service";
 import { BanFiltersDto } from "./dtos/ban-filters.dto";
 import { BanSchema } from "./schemas/ban.schema";

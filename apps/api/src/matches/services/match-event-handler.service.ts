@@ -1,8 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
-import { BanEvent } from "src/events/ban-event.types";
-import { Events } from "src/events/events.enum";
-import { MatchEvent } from "src/events/match-event.types";
+import { BanEvent } from "src/bans/types/ban-event.types";
+import { MatchEvent } from "src/matches/types/match-event.types";
+import { Events } from "src/shared/enums/events.enum";
 import { QueuePriority } from "src/shared/enums/priority.enum";
 import { QueueService } from "src/shared/services/queue.service";
 import { MatchesService } from "./matches.service";

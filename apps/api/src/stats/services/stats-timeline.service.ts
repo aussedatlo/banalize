@@ -5,12 +5,12 @@ import { Cron, CronExpression } from "@nestjs/schedule";
 import { format, getISOWeek } from "date-fns";
 import { BansService } from "src/bans/bans.service";
 import { BanSchema } from "src/bans/schemas/ban.schema";
+import { BanEvent } from "src/bans/types/ban-event.types";
 import { ConfigsService } from "src/configs/configs.service";
-import { BanEvent } from "src/events/ban-event.types";
-import { Events } from "src/events/events.enum";
-import { MatchEvent } from "src/events/match-event.types";
 import { MatchSchema } from "src/matches/schemas/match.schema";
 import { MatchesService } from "src/matches/services/matches.service";
+import { MatchEvent } from "src/matches/types/match-event.types";
+import { Events } from "src/shared/enums/events.enum";
 import { StatsTimelineFiltersDto } from "src/stats/dtos/stats-timeline-filters.dto";
 
 const SAMPLE_SIZE = 10;

@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { Events } from "src/events/events.enum";
+import { Events } from "src/shared/enums/events.enum";
 import { Firewall } from "./firewall.interface";
 import { FIREWALL_SERVICE } from "./firewall.provider";
 

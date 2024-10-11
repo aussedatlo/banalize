@@ -3,8 +3,8 @@ import { Test, TestingModule } from "@nestjs/testing";
 import {
   ConfigCreatedEvent,
   ConfigRemovedEvent,
-} from "src/events/config-event.types";
-import { Events } from "src/events/events.enum";
+} from "src/configs/types/config-event.types";
+import { Events } from "src/shared/enums/events.enum";
 import { ConfigsController } from "./configs.controller";
 import { ConfigsService } from "./configs.service";
 import { ConfigCreationDto } from "./dtos/config-creation-dto";

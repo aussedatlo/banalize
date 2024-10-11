@@ -1,5 +1,4 @@
-import { WatcherStatus } from "@banalize/types";
-import { ConfigSchema } from "src/configs/schemas/config.schema";
+import { ConfigSchema, WatcherStatus } from "@banalize/types";
 
 export interface Watcher {
   readonly config: ConfigSchema;

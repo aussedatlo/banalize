@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { Events } from "src/events/events.enum";
-import { UnbanEvent } from "src/events/unban-event.types";
+import { Events } from "src/shared/enums/events.enum";
+import { UnbanEvent } from "src/unbans/types/unban-event.types";
 import { UnbansService } from "./unbans.service";
 
 @Injectable()

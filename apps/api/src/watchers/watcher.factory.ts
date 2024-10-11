@@ -1,6 +1,6 @@
+import { ConfigSchema } from "@banalize/types";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { ConfigSchema } from "src/configs/schemas/config.schema";
 import { Watcher } from "./interfaces/watcher.interface";
 import { DockerWatcherService } from "./services/docker-watcher.service";
 import { FileWatcherService } from "./services/file-watcher.service";

@@ -13,8 +13,8 @@ import {
   ConfigCreatedEvent,
   ConfigRemovedEvent,
   ConfigUpdatedEvent,
-} from "src/events/config-event.types";
-import { Events } from "src/events/events.enum";
+} from "src/configs/types/config-event.types";
+import { Events } from "src/shared/enums/events.enum";
 import { ConfigsService } from "./configs.service";
 import { ConfigCreationDto } from "./dtos/config-creation-dto";
 import { ConfigSchema } from "./schemas/config.schema";

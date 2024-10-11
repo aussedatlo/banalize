@@ -1,8 +1,8 @@
 import { Inject, Injectable, Logger, OnModuleDestroy } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { Events } from "src/events/events.enum";
 import { Firewall } from "src/firewall/firewall.interface";
 import { FIREWALL_SERVICE } from "src/firewall/firewall.provider";
+import { Events } from "src/shared/enums/events.enum";
 
 @Injectable()
 export class FirewallCleanupService implements OnModuleDestroy {

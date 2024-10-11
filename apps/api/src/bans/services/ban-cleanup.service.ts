@@ -3,8 +3,8 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { BansService } from "src/bans/bans.service";
 import { ConfigsService } from "src/configs/configs.service";
-import { Events } from "src/events/events.enum";
-import { UnbanEvent } from "src/events/unban-event.types";
+import { Events } from "src/shared/enums/events.enum";
+import { UnbanEvent } from "src/unbans/types/unban-event.types";
 
 @Injectable()
 export class BanCleanupService implements OnModuleInit {
