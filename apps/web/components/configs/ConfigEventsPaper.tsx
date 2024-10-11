@@ -1,12 +1,14 @@
 "use client";
 
-import { ConfigSchema } from "@banalize/types";
+import { ConfigSchema, EventResponse } from "@banalize/types";
 import {
   Badge,
+  Center,
   ComboboxItem,
   ComboboxLikeRenderOptionInput,
   Group,
   Modal,
+  Pagination,
   rem,
   Text,
   ThemeIcon,
@@ -29,36 +31,44 @@ import { MultiSelect } from "components/shared/Input/MultiSelect";
 import { TextInput } from "components/shared/Input/TextInput";
 import { Paper } from "components/shared/Paper/Paper";
 import { Table } from "components/shared/Table/Table";
-import { CountryText } from "components/shared/Text/CountryText";
 import { IconText } from "components/shared/Text/IconText";
 import { formatDistance } from "date-fns";
-import { type Event } from "lib/events";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { ConfigEventInformation } from "./ConfigEventInformation";
+
+const MAX_ITEMS = 10;
 
 type ConfigEventsPaperProps = {
   config: ConfigSchema;
-  events: Event[];
+  events: EventResponse[];
+  totalCount: number;
 };
 
 export const ConfigEventsPaper = ({
   config,
-  events,
+  events: initEvents,
+  totalCount: initTotalCount,
 }: ConfigEventsPaperProps) => {
+  const [activePage, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string[]>(["ban", "match", "unban"]);
   const [opened, { open, close }] = useDisclosure(false);
-  const [focusedEvent, setFocusedEvent] = useState<Event>(events[0]);
+  const [events, setEvents] = useState<EventResponse[]>(initEvents);
+  const [totalCount, setTotalCount] = useState(initTotalCount);
+  const [focusedEvent, setFocusedEvent] = useState<EventResponse>(events[0]);
   const theme = useMantineTheme();
 
-  const filteredEvents: Event[] = useMemo(() => {
-    return events
-      .filter((event) => filter.includes(event.type))
-      .filter((event) => {
-        if (search === "") return true;
-        return JSON.stringify(event).includes(search);
+  const onPageChange = (page: number) => {
+    setPage(page);
+
+    fetch(`/api/events?configId=${config._id}&page=${page}&limit=${MAX_ITEMS}`)
+      .then((res) => res.json())
+      .then((res) => {
+        setTotalCount(res.totalCount);
+        setEvents(res.data);
+        setFocusedEvent(res.data[0]);
       });
-  }, [events, filter, search]);
+  };
 
   const renderIcon = useCallback((type: string) => {
     const iconProps = { style: { width: rem(16), height: rem(16) } };
@@ -75,14 +85,11 @@ export const ConfigEventsPaper = ({
   }, []);
 
   const renderRow = useCallback(
-    (
-      event: Event,
-      key: "type" | "timestamp" | "ip" | "details" | "location",
-    ) => {
+    (event: EventResponse, key: "type" | "timestamp" | "ip" | "status") => {
       const badgeColor =
-        event.details === "active"
+        event.status === "active"
           ? "pink"
-          : event.details === "recent"
+          : event.status === "recent"
             ? "cyan"
             : "dark";
       switch (key) {
@@ -109,9 +116,9 @@ export const ConfigEventsPaper = ({
           );
         case "ip":
           return <>{event.ip}</>;
-        case "location":
-          return <CountryText ip={event.ip} />;
-        case "details":
+        // case "location":
+        //   return <CountryText ip={event.ip} />;
+        case "status":
           return (
             <Badge
               color={badgeColor}
@@ -119,7 +126,7 @@ export const ConfigEventsPaper = ({
               variant="filled"
               style={{ display: "block" }}
             >
-              {event.details}
+              {event.status}
             </Badge>
           );
         default:
@@ -223,16 +230,26 @@ export const ConfigEventsPaper = ({
           type: "Event Type",
           timestamp: "Timestamp",
           ip: "IP Address",
-          location: "Location",
-          details: "Details",
+          status: "Status",
         }}
-        items={filteredEvents}
+        items={events}
         onRowClick={(item) => {
           setFocusedEvent(item);
           open();
         }}
         renderRow={renderRow}
       />
+
+      <Center>
+        <Pagination
+          mt="lg"
+          total={Math.ceil(totalCount / MAX_ITEMS)}
+          value={activePage}
+          onChange={onPageChange}
+          c="grey"
+          color="cyan"
+        />
+      </Center>
 
       <Modal
         opened={opened}

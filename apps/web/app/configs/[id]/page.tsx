@@ -17,13 +17,12 @@ import {
   fetchBansByConfigId,
   fetchConfigById,
   fetchConfigs,
+  fetchEvents,
   fetchMatchesByConfigId,
   fetchRecentMatches,
   fetchStatsTimelineByConfigId,
-  fetchUnbansByConfigId,
   fetchWatcherStatus,
 } from "lib/api";
-import { getEvents } from "lib/events";
 
 export async function generateStaticParams() {
   const configs = await fetchConfigs();
@@ -41,7 +40,6 @@ export default async function ConfigPage({
   const configId = params.id;
   const matches = await fetchMatchesByConfigId(configId);
   const bans = await fetchBansByConfigId(configId);
-  const unbans = await fetchUnbansByConfigId(configId);
   const config = await fetchConfigById(configId);
   const statsMonthly = await fetchStatsTimelineByConfigId(configId, "monthly");
   const statsWeekly = await fetchStatsTimelineByConfigId(configId, "weekly");
@@ -59,7 +57,7 @@ export default async function ConfigPage({
   );
 
   const activeBans = await fetchActiveBans(configId);
-  const events = getEvents({ matches, bans, unbans, config });
+  const { data: events, totalCount } = await fetchEvents({ configId });
 
   return (
     <Box>
@@ -134,7 +132,11 @@ export default async function ConfigPage({
         </GridCol>
 
         <GridCol span={12}>
-          <ConfigEventsPaper events={events} config={config} />
+          <ConfigEventsPaper
+            events={events}
+            totalCount={totalCount}
+            config={config}
+          />
         </GridCol>
       </Grid>
     </Box>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ConfigSchema } from "@banalize/types";
+import { ConfigSchema, EventResponse } from "@banalize/types";
 import {
   BoxProps,
   Card,
@@ -12,7 +12,6 @@ import {
 } from "@mantine/core";
 import { useIpInfos } from "app/hooks/useIpInfos";
 import { HighlightedText } from "components/shared/Text/HightlightedText";
-import { type Event } from "lib/events";
 
 type LineInformationProps = {
   label: string;
@@ -42,7 +41,7 @@ export const LineInformation = ({
 
 type ConfigEventInformationProps = {
   config: ConfigSchema;
-  event: Event;
+  event: EventResponse;
 };
 
 export const ConfigEventInformation = ({
@@ -61,8 +60,9 @@ export const ConfigEventInformation = ({
         <Divider />
         <LineInformation label="IP" value={event.ip} />
         <Divider />
-        <LineInformation label="Status" value={event.details} />
+        <LineInformation label="Status" value={event.status} />
       </Card>
+
       {line && (
         <>
           <Card radius="md" mt="lg">

@@ -1,10 +1,7 @@
 "use client";
 
-import { Box, Center, Table as MantineTable, Pagination } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { Box, Table as MantineTable } from "@mantine/core";
 import classes from "./Table.module.css";
-
-const MAX_ITEMS = 10;
 
 type CustomTableProps<T, K extends string> = {
   items: T[];
@@ -19,16 +16,10 @@ export const Table = <T extends object, K extends string>({
   renderRow,
   onRowClick,
 }: CustomTableProps<T, K>) => {
-  const [activePage, setPage] = useState(1);
   const headerValues: string[] = Object.values(headers);
   const headerKeys: K[] = Object.keys(headers) as K[]; // Safely cast to K[]
 
-  const slicedItems = useMemo(
-    () => items.slice((activePage - 1) * MAX_ITEMS, activePage * MAX_ITEMS),
-    [items, activePage],
-  );
-
-  const rows = slicedItems.map((item, index) => (
+  const rows = items.map((item, index) => (
     <MantineTable.Tr
       key={index}
       className={classes.row}
@@ -44,34 +35,21 @@ export const Table = <T extends object, K extends string>({
   ));
 
   return (
-    <>
-      <Box p="xs" className={classes.container}>
-        <MantineTable
-          layout="fixed"
-          className={classes.table}
-          w={{ base: "auto", md: "100%" }}
-        >
-          <MantineTable.Thead className={classes.header}>
-            <MantineTable.Tr>
-              {headerValues?.map((value) => (
-                <MantineTable.Th key={value}>{value}</MantineTable.Th>
-              ))}
-            </MantineTable.Tr>
-          </MantineTable.Thead>
-          <MantineTable.Tbody>{rows}</MantineTable.Tbody>
-        </MantineTable>
-      </Box>
-
-      <Center>
-        <Pagination
-          mt="lg"
-          total={Math.ceil(items.length / MAX_ITEMS)}
-          value={activePage}
-          onChange={setPage}
-          c="grey"
-          color="cyan"
-        />
-      </Center>
-    </>
+    <Box p="xs" className={classes.container}>
+      <MantineTable
+        layout="fixed"
+        className={classes.table}
+        w={{ base: "auto", md: "100%" }}
+      >
+        <MantineTable.Thead className={classes.header}>
+          <MantineTable.Tr>
+            {headerValues?.map((value) => (
+              <MantineTable.Th key={value}>{value}</MantineTable.Th>
+            ))}
+          </MantineTable.Tr>
+        </MantineTable.Thead>
+        <MantineTable.Tbody>{rows}</MantineTable.Tbody>
+      </MantineTable>
+    </Box>
   );
 };
