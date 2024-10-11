@@ -164,6 +164,16 @@ export const fetchIpInfos = async (
   return data;
 };
 
+export const fetchIpInfosForMultipleIps = async (
+  ips: string[],
+): Promise<Record<string, Partial<IpInfosResponse>>> => {
+  const queryString = createQueryStringFromObject({ ips });
+  const [data] = await fetchFromApi<Record<string, Partial<IpInfosResponse>>>(
+    `/ip-infos?${queryString}`,
+  );
+  return data;
+};
+
 type QueryParams = {
   [key: string]: string | number | string[] | undefined;
 };

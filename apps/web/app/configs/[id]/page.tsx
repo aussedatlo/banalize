@@ -18,6 +18,7 @@ import {
   fetchConfigById,
   fetchConfigs,
   fetchEvents,
+  fetchIpInfosForMultipleIps,
   fetchMatchesByConfigId,
   fetchRecentMatches,
   fetchStatsTimelineByConfigId,
@@ -58,6 +59,8 @@ export default async function ConfigPage({
 
   const activeBans = await fetchActiveBans(configId);
   const { data: events, totalCount } = await fetchEvents({ configId });
+  const ipList = Array.from(new Set(events.map((event) => event.ip)));
+  const IpInfos = await fetchIpInfosForMultipleIps(ipList);
 
   return (
     <Box>
@@ -136,6 +139,7 @@ export default async function ConfigPage({
             events={events}
             totalCount={totalCount}
             config={config}
+            ipInfos={IpInfos}
           />
         </GridCol>
       </Grid>

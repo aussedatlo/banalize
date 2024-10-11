@@ -1,6 +1,6 @@
 "use client";
 
-import { ConfigSchema, EventResponse } from "@banalize/types";
+import { ConfigSchema, EventResponse, IpInfosResponse } from "@banalize/types";
 import {
   Badge,
   Center,
@@ -42,18 +42,22 @@ type ConfigEventsPaperProps = {
   config: ConfigSchema;
   events: EventResponse[];
   totalCount: number;
+  ipInfos: Record<string, Partial<IpInfosResponse>>;
 };
 
 export const ConfigEventsPaper = ({
   config,
   events: initEvents,
   totalCount: initTotalCount,
+  ipInfos: initIpInfos,
 }: ConfigEventsPaperProps) => {
   const [activePage, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string[]>(["ban", "match", "unban"]);
   const [opened, { open, close }] = useDisclosure(false);
   const [events, setEvents] = useState<EventResponse[]>(initEvents);
+  const [ipInfos, setIpInfos] =
+    useState<Record<string, Partial<IpInfosResponse>>>(initIpInfos);
   const [totalCount, setTotalCount] = useState(initTotalCount);
   const [focusedEvent, setFocusedEvent] = useState<EventResponse>(events[0]);
   const theme = useMantineTheme();
@@ -63,10 +67,20 @@ export const ConfigEventsPaper = ({
 
     fetch(`/api/events?configId=${config._id}&page=${page}&limit=${MAX_ITEMS}`)
       .then((res) => res.json())
-      .then((res) => {
-        setTotalCount(res.totalCount);
-        setEvents(res.data);
-        setFocusedEvent(res.data[0]);
+      .then(({ data, totalCount }) => {
+        const ipList = Array.from(
+          new Set(data.map((event: EventResponse) => event.ip)),
+        );
+
+        fetch(`/api/ip-infos?ips=${ipList.join(",")}`)
+          .then((res) => res.json())
+          .then((res) => {
+            console.log(res);
+            setIpInfos((prev) => ({ ...prev, ...res }));
+            setEvents(data);
+            setTotalCount(totalCount);
+            setFocusedEvent(data[0]);
+          });
       });
   };
 
@@ -85,7 +99,10 @@ export const ConfigEventsPaper = ({
   }, []);
 
   const renderRow = useCallback(
-    (event: EventResponse, key: "type" | "timestamp" | "ip" | "status") => {
+    (
+      event: EventResponse,
+      key: "type" | "timestamp" | "ip" | "status" | "location",
+    ) => {
       const badgeColor =
         event.status === "active"
           ? "pink"
@@ -116,8 +133,13 @@ export const ConfigEventsPaper = ({
           );
         case "ip":
           return <>{event.ip}</>;
-        // case "location":
-        //   return <CountryText ip={event.ip} />;
+        case "location":
+          return (
+            <Group gap="xs">
+              <Text>{ipInfos[event.ip]?.country?.flag}</Text>
+              <Text>{ipInfos[event.ip]?.country?.name}</Text>
+            </Group>
+          );
         case "status":
           return (
             <Badge
@@ -133,7 +155,7 @@ export const ConfigEventsPaper = ({
           break;
       }
     },
-    [renderIcon],
+    [ipInfos, renderIcon],
   );
 
   const renderOption = (item: ComboboxLikeRenderOptionInput<ComboboxItem>) => (
@@ -230,6 +252,7 @@ export const ConfigEventsPaper = ({
           type: "Event Type",
           timestamp: "Timestamp",
           ip: "IP Address",
+          location: "Location",
           status: "Status",
         }}
         items={events}

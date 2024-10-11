@@ -5,6 +5,7 @@ import axios from "axios";
 import * as fs from "fs";
 import { open, Response } from "maxmind";
 import * as path from "path";
+import { IpInfosFiltersDto } from "../dtos/ip-infos-filters.dto";
 
 @Injectable()
 export class IpInfosService implements OnModuleInit {
@@ -27,7 +28,27 @@ export class IpInfosService implements OnModuleInit {
     this.downloadDatabase(this.dbUrl, this.dbPath);
   }
 
+  async findMany({
+    ips,
+  }: IpInfosFiltersDto): Promise<Record<string, Partial<IpInfosResponse>>> {
+    const results = await Promise.all(
+      ips.map(async (ip) => {
+        const info = await this.findOne(ip);
+        return { ip, info };
+      }),
+    );
+
+    return results.reduce(
+      (acc: Record<string, Partial<IpInfosResponse>>, { ip, info }) => {
+        acc[ip] = info;
+        return acc;
+      },
+      {},
+    );
+  }
+
   async findOne(ip: string): Promise<Partial<IpInfosResponse>> {
+    console.log(ip);
     try {
       const lookup = await open(this.dbPath);
       return this.mapToIpInfos(lookup.get(ip));
