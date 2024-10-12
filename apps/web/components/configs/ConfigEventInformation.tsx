@@ -25,11 +25,11 @@ export const LineInformation = ({
 }: LineInformationProps) => {
   return (
     <Group justify="space-between" mt="xs" p="xs" {...props}>
-      <Text size="xs" fw="bold">
+      <Text size="xs" fw="bold" component="span">
         {label}
       </Text>
       {value ? (
-        <Text fz="sm" h={22}>
+        <Text fz="sm" h={22} component="span">
           {value}
         </Text>
       ) : (
