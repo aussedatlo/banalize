@@ -3,13 +3,13 @@
 import {
   ConfigSchema,
   EventResponse,
+  EventStatus,
   EventType,
   IpInfosResponse,
 } from "@banalize/types";
 import {
+  Box,
   Center,
-  ComboboxItem,
-  ComboboxLikeRenderOptionInput,
   Group,
   Modal,
   Pagination,
@@ -21,7 +21,6 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
-  IconCheck,
   IconFilter,
   IconFilterOff,
   IconGraph,
@@ -36,7 +35,8 @@ import { Paper } from "components/shared/Paper/Paper";
 import { Table } from "components/shared/Table/Table";
 import { IconText } from "components/shared/Text/IconText";
 import { formatDistance } from "date-fns";
-import { useCallback, useState } from "react";
+import { fetchEvents, fetchIpInfos } from "lib/api";
+import { useCallback, useEffect, useState } from "react";
 import { ConfigEventInformation } from "./ConfigEventInformation";
 
 const MAX_ITEMS = 10;
@@ -55,36 +55,49 @@ export const ConfigEventsPaper = ({
   ipInfos: initIpInfos,
 }: ConfigEventsPaperProps) => {
   const [activePage, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<string[]>(["ban", "match", "unban"]);
+  const [ipFilter, setIpFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState<EventType[]>([
+    EventType.BAN,
+    EventType.MATCH,
+    EventType.UNBAN,
+  ]);
+  const [statusFilter, setStatusFilter] = useState<EventStatus[]>([
+    EventStatus.RECENT,
+    EventStatus.STALE,
+    EventStatus.ACTIVE,
+    EventStatus.EXPIRED,
+    EventStatus.UNBANNED,
+  ]);
   const [opened, { open, close }] = useDisclosure(false);
-  const [events, setEvents] = useState<EventResponse[]>(initEvents);
-  const [ipInfos, setIpInfos] =
-    useState<Record<string, Partial<IpInfosResponse>>>(initIpInfos);
-  const [totalCount, setTotalCount] = useState(initTotalCount);
-  const [focusedEvent, setFocusedEvent] = useState<EventResponse>(events[0]);
+  const [state, setState] = useState({
+    events: initEvents,
+    totalCount: initTotalCount,
+    ipInfos: initIpInfos,
+  });
+  const [focusedEvent, setFocusedEvent] = useState<EventResponse>(
+    state.events[0],
+  );
   const theme = useMantineTheme();
 
-  const onPageChange = (page: number) => {
-    setPage(page);
+  const updateEvents = useCallback(async () => {
+    const { data, totalCount } = await fetchEvents({
+      configId: config._id,
+      page: activePage,
+      limit: MAX_ITEMS,
+      type: typeFilter,
+      status: statusFilter,
+      ip: ipFilter,
+    });
 
-    fetch(`/api/events?configId=${config._id}&page=${page}&limit=${MAX_ITEMS}`)
-      .then((res) => res.json())
-      .then(({ data, totalCount }) => {
-        const ipList = Array.from(
-          new Set(data.map((event: EventResponse) => event.ip)),
-        );
+    const ipList = Array.from(new Set(data.map((event) => event.ip)));
+    const ipInfos = await fetchIpInfos({ ips: ipList });
 
-        fetch(`/api/ip-infos?ips=${ipList.join(",")}`)
-          .then((res) => res.json())
-          .then((res) => {
-            setIpInfos((prev) => ({ ...prev, ...res }));
-            setEvents(data);
-            setTotalCount(totalCount);
-            setFocusedEvent(data[0]);
-          });
-      });
-  };
+    setState({ events: data, totalCount, ipInfos });
+  }, [config._id, activePage, typeFilter, statusFilter, ipFilter]);
+
+  useEffect(() => {
+    updateEvents();
+  }, [updateEvents]);
 
   const renderRow = useCallback(
     (
@@ -117,10 +130,10 @@ export const ConfigEventsPaper = ({
           return <>{event.ip}</>;
         case "location":
           return (
-            <Group gap="xs">
-              <Text>{ipInfos[event.ip]?.country?.flag}</Text>
-              <Text>{ipInfos[event.ip]?.country?.name}</Text>
-            </Group>
+            <Text fz="sm">
+              {state.ipInfos[event.ip]?.country?.flag}{" "}
+              {state.ipInfos[event.ip]?.country?.name}
+            </Text>
           );
         case "status":
           return <StatusBadge status={event.status} />;
@@ -128,28 +141,7 @@ export const ConfigEventsPaper = ({
           break;
       }
     },
-    [ipInfos],
-  );
-
-  const renderOption = (item: ComboboxLikeRenderOptionInput<ComboboxItem>) => (
-    <Group justify="space-between" w="100%">
-      <Group>
-        <IconText
-          text={item.option.value}
-          icon={<EventIcon type={item.option.value as EventType} />}
-          textProps={{ style: { textTransform: "capitalize" } }}
-        />
-      </Group>
-
-      {item.checked && (
-        <IconCheck
-          style={{
-            width: rem(16),
-            height: rem(16),
-          }}
-        />
-      )}
-    </Group>
+    [state.ipInfos],
   );
 
   return (
@@ -168,20 +160,63 @@ export const ConfigEventsPaper = ({
           <Group>
             <MultiSelect
               data={[
-                { value: "ban", label: "Bans" },
+                { value: EventType.BAN, label: "Bans" },
                 {
-                  value: "match",
+                  value: EventType.MATCH,
                   label: "Matches",
                 },
-                { value: "unban", label: "Unbans" },
+                { value: EventType.UNBAN, label: "Unbans" },
               ]}
-              value={filter}
-              onChange={(e) => setFilter(e)}
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e as EventType[])}
               w={{ base: "100%", md: rem(200) }}
               placeholder="Event Type"
-              renderOption={renderOption}
+              renderOption={(item) => (
+                <IconText
+                  text={item.option.value}
+                  icon={<EventIcon type={item.option.value as EventType} />}
+                  textProps={{ style: { textTransform: "capitalize" } }}
+                />
+              )}
               leftSection={
-                filter.length === 3 ? (
+                typeFilter.length === 3 ? (
+                  <IconFilterOff
+                    style={{
+                      width: rem(16),
+                      height: rem(16),
+                      color: theme.colors.pink[8],
+                    }}
+                  />
+                ) : (
+                  <IconFilter
+                    style={{
+                      width: rem(16),
+                      height: rem(16),
+                      color: theme.colors.pink[8],
+                    }}
+                  />
+                )
+              }
+            />
+            <MultiSelect
+              data={[
+                { value: EventStatus.ACTIVE, label: "Active" },
+                { value: EventStatus.EXPIRED, label: "Expired" },
+                { value: EventStatus.RECENT, label: "Recent" },
+                { value: EventStatus.STALE, label: "Stale" },
+                { value: EventStatus.UNBANNED, label: "Unbanned" },
+              ]}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e as EventStatus[])}
+              w={{ base: "100%", md: rem(200) }}
+              placeholder="Event Status"
+              renderOption={(item) => (
+                <Box>
+                  <StatusBadge status={item.option.value as EventStatus} />
+                </Box>
+              )}
+              leftSection={
+                typeFilter.length === 3 ? (
                   <IconFilterOff
                     style={{
                       width: rem(16),
@@ -202,7 +237,7 @@ export const ConfigEventsPaper = ({
             />
             <TextInput
               ml="auto"
-              placeholder="Search by any field"
+              placeholder="Search by IP"
               w={{ base: "100%", md: "auto" }}
               leftSection={
                 <IconSearch
@@ -213,8 +248,8 @@ export const ConfigEventsPaper = ({
                   }}
                 />
               }
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={ipFilter}
+              onChange={(e) => setIpFilter(e.target.value)}
             />
           </Group>
         </Group>
@@ -228,7 +263,7 @@ export const ConfigEventsPaper = ({
           location: "Location",
           status: "Status",
         }}
-        items={events}
+        items={state.events}
         onRowClick={(item) => {
           setFocusedEvent(item);
           open();
@@ -239,9 +274,12 @@ export const ConfigEventsPaper = ({
       <Center>
         <Pagination
           mt="lg"
-          total={Math.ceil(totalCount / MAX_ITEMS)}
+          total={Math.ceil(state.totalCount / MAX_ITEMS)}
           value={activePage}
-          onChange={onPageChange}
+          onChange={(value) => {
+            setPage(value);
+            updateEvents();
+          }}
           c="grey"
           color="cyan"
         />
@@ -256,7 +294,7 @@ export const ConfigEventsPaper = ({
         <ConfigEventInformation
           event={focusedEvent}
           config={config}
-          ipInfos={ipInfos[focusedEvent.ip]}
+          ipInfos={state.ipInfos[focusedEvent.ip]}
         />
       </Modal>
     </Paper>

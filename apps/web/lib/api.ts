@@ -15,9 +15,10 @@ import type {
   WatcherStatusesResponse,
 } from "@banalize/types";
 
-const API_BASE_URL = process.env.BANALIZE_WEB_API_SERVER_URL;
+const API_BASE_URL_SERVER = process.env.BANALIZE_WEB_API_SERVER_URL;
+const API_BASE_URL_CLIENT = `http://localhost:${process.env.BANALIZE_WEB_PORT}/api`;
 
-if (!API_BASE_URL) {
+if (!API_BASE_URL_SERVER) {
   throw new Error("BANALIZE_WEB_API_SERVER_URL is not defined");
 }
 
@@ -32,23 +33,25 @@ export const fetchFromApi = async <T extends object>(
   endpoint: string,
   options: RequestInit = {},
   defaultValue: object = {},
-): Promise<[T, number]> => {
-  console.log("API request to", API_BASE_URL + endpoint);
+): Promise<{ data: T; totalCount: number }> => {
+  const isServer = typeof window === "undefined";
+  const url = isServer ? API_BASE_URL_SERVER : API_BASE_URL_CLIENT;
+  console.log("API request to", url + endpoint);
   try {
-    const res = await fetch(API_BASE_URL + endpoint, {
+    const res = await fetch(url + endpoint, {
       cache: "no-store",
       ...options,
     });
     if (!res.ok) {
       throw new Error(`API error: ${res.status} ${res.statusText}`);
     }
-    return [
-      (await res.json()) as T,
-      Number(res.headers.get("x-total-count")) || 0,
-    ];
+    return {
+      data: (await res.json()) as T,
+      totalCount: Number(res.headers.get("x-total-count")) || 0,
+    };
   } catch (error) {
     console.error("Fetch error:", error);
-    return [defaultValue as T, 0];
+    return { data: defaultValue as T, totalCount: 0 };
   }
 };
 
@@ -72,19 +75,23 @@ const createQueryString = (params: QueryParams): string => {
 
 // Fetch Functions
 export const fetchConfigs = async (): Promise<ConfigSchema[]> => {
-  const [data] = await fetchFromApi<ConfigSchema[]>("/configs", undefined, []);
+  const { data } = await fetchFromApi<ConfigSchema[]>(
+    "/configs",
+    undefined,
+    [],
+  );
   return data;
 };
 
 export const fetchConfigById = async (id: string): Promise<ConfigSchema> => {
-  const [data] = await fetchFromApi<ConfigSchema>(`/configs/${id}`);
+  const { data } = await fetchFromApi<ConfigSchema>(`/configs/${id}`);
   return data;
 };
 
 export const createConfig = async (
   config: Omit<ConfigSchema, "_id">,
 ): Promise<ConfigSchema> => {
-  const [data] = await fetchFromApi<ConfigSchema>("/configs", {
+  const { data } = await fetchFromApi<ConfigSchema>("/configs", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(config),
@@ -95,7 +102,7 @@ export const createConfig = async (
 export const updateConfig = async (
   config: ConfigSchema,
 ): Promise<ConfigSchema> => {
-  const [data] = await fetchFromApi<ConfigSchema>(`/configs/${config._id}`, {
+  const { data } = await fetchFromApi<ConfigSchema>(`/configs/${config._id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(config),
@@ -104,7 +111,7 @@ export const updateConfig = async (
 };
 
 export const deleteConfig = async (id: string): Promise<ConfigSchema> => {
-  const [data] = await fetchFromApi<ConfigSchema>(`/configs/${id}`, {
+  const { data } = await fetchFromApi<ConfigSchema>(`/configs/${id}`, {
     method: "DELETE",
   });
   return data;
@@ -115,7 +122,7 @@ const fetchByConfigId = async <T>(
   resource: string,
 ): Promise<T[]> => {
   const queryString = createQueryString({ configId });
-  const [data] = await fetchFromApi<T[]>(`/${resource}?${queryString}`);
+  const { data } = await fetchFromApi<T[]>(`/${resource}?${queryString}`);
   return data;
 };
 
@@ -132,7 +139,7 @@ export const fetchMatches = async (
   filters: MatchFiltersDto,
 ): Promise<MatchSchema[]> => {
   const queryString = createQueryString(filters);
-  const [data] = await fetchFromApi<MatchSchema[]>(`/matches?${queryString}`);
+  const { data } = await fetchFromApi<MatchSchema[]>(`/matches?${queryString}`);
   return data;
 };
 
@@ -140,18 +147,18 @@ export const fetchBans = async (
   filters: BanFiltersDto,
 ): Promise<BanSchema[]> => {
   const queryString = createQueryString(filters);
-  const [data] = await fetchFromApi<BanSchema[]>(`/bans?${queryString}`);
+  const { data } = await fetchFromApi<BanSchema[]>(`/bans?${queryString}`);
   return data;
 };
 
 export const fetchStatsSummary = async (): Promise<StatsSummaryResponse> => {
-  const [data] = await fetchFromApi<StatsSummaryResponse>("/stats/summary");
+  const { data } = await fetchFromApi<StatsSummaryResponse>("/stats/summary");
   return data;
 };
 
 export const fetchWatcherStatuses =
   async (): Promise<WatcherStatusesResponse> => {
-    const [data] =
+    const { data } =
       await fetchFromApi<WatcherStatusesResponse>("/watchers/status");
     return data;
   };
@@ -159,7 +166,7 @@ export const fetchWatcherStatuses =
 export const fetchWatcherStatus = async (
   configId: string,
 ): Promise<WatcherStatusesResponse> => {
-  const [data] = await fetchFromApi<WatcherStatusesResponse>(
+  const { data } = await fetchFromApi<WatcherStatusesResponse>(
     `/watchers/status/${configId}`,
   );
   return data;
@@ -169,7 +176,7 @@ export const fetchStatsTimeline = async (
   filters: StatsTimelineFiltersDto,
 ): Promise<StatsTimelineResponse> => {
   const queryString = createQueryString(filters);
-  const [data] = await fetchFromApi<StatsTimelineResponse>(
+  const { data } = await fetchFromApi<StatsTimelineResponse>(
     `/stats/timeline?${queryString}`,
   );
   return data;
@@ -179,7 +186,7 @@ export const fetchIpInfos = async (
   filters: IpInfosFiltersDto,
 ): Promise<Record<string, Partial<IpInfosResponse>>> => {
   const queryString = createQueryString(filters);
-  const [data] = await fetchFromApi<Record<string, Partial<IpInfosResponse>>>(
+  const { data } = await fetchFromApi<Record<string, Partial<IpInfosResponse>>>(
     `/ip-infos?${queryString}`,
   );
   return data;
@@ -189,7 +196,7 @@ export const fetchEvents = async (
   filters: EventFiltersDto,
 ): Promise<{ data: EventResponse[]; totalCount: number }> => {
   const queryString = createQueryString(filters);
-  const [data, totalCount] = await fetchFromApi<EventResponse[]>(
+  const { data, totalCount } = await fetchFromApi<EventResponse[]>(
     `/events?${queryString}`,
   );
   return { data, totalCount };
