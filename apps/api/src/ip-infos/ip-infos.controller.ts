@@ -22,7 +22,6 @@ export class IpInfosController {
   async findMany(
     @Query() filters: IpInfosFiltersDto,
   ): Promise<Record<string, Partial<IpInfosResponse>>> {
-    console.log("filters", filters);
     return this.ipInfosService.findMany(filters);
   }
 }

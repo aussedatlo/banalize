@@ -8,7 +8,6 @@ import {
 @Injectable()
 export class ParseArrayPipe implements PipeTransform {
   transform(value, _metadata: ArgumentMetadata) {
-    console.log(value);
     if (typeof value === "string") {
       return value.split(",").map((ip: string) => ip.trim());
     }

@@ -13,15 +13,15 @@ import { TryRegexConfigButton } from "components/configs/TryRegexConfigButton";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 
 import {
-  fetchActiveBans,
+  fetchBans,
   fetchBansByConfigId,
   fetchConfigById,
   fetchConfigs,
   fetchEvents,
-  fetchIpInfosForMultipleIps,
+  fetchIpInfos,
+  fetchMatches,
   fetchMatchesByConfigId,
-  fetchRecentMatches,
-  fetchStatsTimelineByConfigId,
+  fetchStatsTimeline,
   fetchWatcherStatus,
 } from "lib/api";
 
@@ -42,9 +42,18 @@ export default async function ConfigPage({
   const matches = await fetchMatchesByConfigId(configId);
   const bans = await fetchBansByConfigId(configId);
   const config = await fetchConfigById(configId);
-  const statsMonthly = await fetchStatsTimelineByConfigId(configId, "monthly");
-  const statsWeekly = await fetchStatsTimelineByConfigId(configId, "weekly");
-  const statsDaily = await fetchStatsTimelineByConfigId(configId, "daily");
+  const statsMonthly = await fetchStatsTimeline({
+    configId,
+    period: "monthly",
+  });
+  const statsWeekly = await fetchStatsTimeline({
+    configId,
+    period: "weekly",
+  });
+  const statsDaily = await fetchStatsTimeline({
+    configId,
+    period: "daily",
+  });
   const stats = {
     monthly: statsMonthly,
     weekly: statsWeekly,
@@ -52,15 +61,18 @@ export default async function ConfigPage({
   };
   const status = (await fetchWatcherStatus(configId)).data[configId];
 
-  const recentMatches = await fetchRecentMatches(
+  const recentMatches = await fetchMatches({
     configId,
-    new Date().getTime() - config.findTime * 1000,
-  );
+    timestamp_gt: new Date().getTime() - config.findTime * 1000,
+  });
 
-  const activeBans = await fetchActiveBans(configId);
-  const { data: events, totalCount } = await fetchEvents({ configId });
+  const activeBans = await fetchBans({ configId, active: true });
+  const { data: events, totalCount } = (await fetchEvents({ configId })) ?? {
+    events: [],
+    totalCount: 0,
+  };
   const ipList = Array.from(new Set(events.map((event) => event.ip)));
-  const IpInfos = await fetchIpInfosForMultipleIps(ipList);
+  const IpInfos = await fetchIpInfos({ ips: ipList });
 
   return (
     <Box>

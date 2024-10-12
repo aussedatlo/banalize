@@ -48,7 +48,6 @@ export class IpInfosService implements OnModuleInit {
   }
 
   async findOne(ip: string): Promise<Partial<IpInfosResponse>> {
-    console.log(ip);
     try {
       const lookup = await open(this.dbPath);
       return this.mapToIpInfos(lookup.get(ip));

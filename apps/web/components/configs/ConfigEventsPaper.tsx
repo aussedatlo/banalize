@@ -75,7 +75,6 @@ export const ConfigEventsPaper = ({
         fetch(`/api/ip-infos?ips=${ipList.join(",")}`)
           .then((res) => res.json())
           .then((res) => {
-            console.log(res);
             setIpInfos((prev) => ({ ...prev, ...res }));
             setEvents(data);
             setTotalCount(totalCount);

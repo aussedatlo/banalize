@@ -146,7 +146,7 @@ export class EventsService {
       .count("totalCount")
       .exec();
 
-    const [events, [{ totalCount }]] = await Promise.all([
+    const [events, [{ totalCount = 0 } = {}]] = await Promise.all([
       eventsPipeline,
       totalCountPipeline,
     ]);
