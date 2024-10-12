@@ -16,7 +16,7 @@ import type {
 } from "@banalize/types";
 
 const API_BASE_URL_SERVER = process.env.BANALIZE_WEB_API_SERVER_URL;
-const API_BASE_URL_CLIENT = `http://localhost:${process.env.BANALIZE_WEB_PORT}/api`;
+const API_BASE_URL_CLIENT = `${process.env.BANALIZE_WEB_BASE_URL}/api`;
 
 if (!API_BASE_URL_SERVER) {
   throw new Error("BANALIZE_WEB_API_SERVER_URL is not defined");
