@@ -59,6 +59,9 @@ export class IpInfosService implements OnModuleInit {
   }
 
   private mapToIpInfos(response: Response): Partial<IpInfosResponse> {
+    if (!response) {
+      return {};
+    }
     return {
       continent:
         ("continent" in response && {
