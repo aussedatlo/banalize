@@ -1,8 +1,12 @@
 "use client";
 
-import { ConfigSchema, EventResponse, IpInfosResponse } from "@banalize/types";
 import {
-  Badge,
+  ConfigSchema,
+  EventResponse,
+  EventType,
+  IpInfosResponse,
+} from "@banalize/types";
+import {
   Center,
   ComboboxItem,
   ComboboxLikeRenderOptionInput,
@@ -20,13 +24,12 @@ import {
   IconCheck,
   IconFilter,
   IconFilterOff,
-  IconFlag,
   IconGraph,
-  IconHandOff,
-  IconHandStop,
   IconSearch,
   IconTimelineEvent,
 } from "@tabler/icons-react";
+import { StatusBadge } from "components/shared/Badge/StatusBadge";
+import { EventIcon } from "components/shared/Icon/EventIcon";
 import { MultiSelect } from "components/shared/Input/MultiSelect";
 import { TextInput } from "components/shared/Input/TextInput";
 import { Paper } from "components/shared/Paper/Paper";
@@ -83,37 +86,17 @@ export const ConfigEventsPaper = ({
       });
   };
 
-  const renderIcon = useCallback((type: string) => {
-    const iconProps = { style: { width: rem(16), height: rem(16) } };
-    switch (type) {
-      case "ban":
-        return <IconHandStop {...iconProps} />;
-      case "match":
-        return <IconFlag {...iconProps} />;
-      case "unban":
-        return <IconHandOff {...iconProps} />;
-      default:
-        return null;
-    }
-  }, []);
-
   const renderRow = useCallback(
     (
       event: EventResponse,
       key: "type" | "timestamp" | "ip" | "status" | "location",
     ) => {
-      const badgeColor =
-        event.status === "active"
-          ? "pink"
-          : event.status === "recent"
-            ? "cyan"
-            : "dark";
       switch (key) {
         case "type":
           return (
             <IconText
               text={event.type}
-              icon={renderIcon(event.type)}
+              icon={<EventIcon type={event.type} />}
               textProps={{ style: { textTransform: "capitalize" } }}
             />
           );
@@ -140,21 +123,12 @@ export const ConfigEventsPaper = ({
             </Group>
           );
         case "status":
-          return (
-            <Badge
-              color={badgeColor}
-              size="md"
-              variant="filled"
-              style={{ display: "block" }}
-            >
-              {event.status}
-            </Badge>
-          );
+          return <StatusBadge status={event.status} />;
         default:
           break;
       }
     },
-    [ipInfos, renderIcon],
+    [ipInfos],
   );
 
   const renderOption = (item: ComboboxLikeRenderOptionInput<ComboboxItem>) => (
@@ -162,7 +136,7 @@ export const ConfigEventsPaper = ({
       <Group>
         <IconText
           text={item.option.value}
-          icon={renderIcon(item.option.value)}
+          icon={<EventIcon type={item.option.value as EventType} />}
           textProps={{ style: { textTransform: "capitalize" } }}
         />
       </Group>
@@ -279,7 +253,11 @@ export const ConfigEventsPaper = ({
         title={`Event Information`}
         centered
       >
-        <ConfigEventInformation event={focusedEvent} config={config} />
+        <ConfigEventInformation
+          event={focusedEvent}
+          config={config}
+          ipInfos={ipInfos[focusedEvent.ip]}
+        />
       </Modal>
     </Paper>
   );

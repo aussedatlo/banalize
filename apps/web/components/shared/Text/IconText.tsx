@@ -22,7 +22,7 @@ export const IconText = ({
   textProps,
 }: IconTextProps) => {
   return (
-    <Group gap="xs">
+    <Group gap={0}>
       <ThemeIcon color={color} size={rem(25)}>
         {icon}
       </ThemeIcon>

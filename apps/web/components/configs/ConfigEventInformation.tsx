@@ -1,6 +1,4 @@
-"use client";
-
-import { ConfigSchema, EventResponse } from "@banalize/types";
+import { ConfigSchema, EventResponse, IpInfosResponse } from "@banalize/types";
 import {
   BoxProps,
   Card,
@@ -10,8 +8,10 @@ import {
   Skeleton,
   Text,
 } from "@mantine/core";
-import { useIpInfos } from "app/hooks/useIpInfos";
+import { StatusBadge } from "components/shared/Badge/StatusBadge";
+import { EventIcon } from "components/shared/Icon/EventIcon";
 import { HighlightedText } from "components/shared/Text/HightlightedText";
+import { IconText } from "components/shared/Text/IconText";
 
 type LineInformationProps = {
   label: string;
@@ -42,25 +42,41 @@ export const LineInformation = ({
 type ConfigEventInformationProps = {
   config: ConfigSchema;
   event: EventResponse;
+  ipInfos: Partial<IpInfosResponse>;
 };
 
 export const ConfigEventInformation = ({
   config,
   event,
+  ipInfos,
 }: ConfigEventInformationProps) => {
-  const ipInfos = useIpInfos(event.ip);
   const line = "line" in event ? event.line : undefined;
 
   return (
     <>
       <Card radius="md">
-        <LineInformation label="Type" value={event.type} />
+        <LineInformation
+          label="Type"
+          value={
+            <IconText
+              text={event.type}
+              icon={<EventIcon type={event.type} />}
+              textProps={{ style: { textTransform: "capitalize" } }}
+            />
+          }
+        />
         <Divider />
-        <LineInformation label="Time" value={event.timestamp} />
+        <LineInformation
+          label="Time"
+          value={new Date(event.timestamp).toLocaleString()}
+        />
         <Divider />
         <LineInformation label="IP" value={event.ip} />
         <Divider />
-        <LineInformation label="Status" value={event.status} />
+        <LineInformation
+          label="Status"
+          value={<StatusBadge status={event.status} />}
+        />
       </Card>
 
       {line && (
