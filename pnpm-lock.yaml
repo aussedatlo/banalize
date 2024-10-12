@@ -96,7 +96,7 @@ importers:
         specifier: 'link:'
         version: 'link:'
       reflect-metadata:
-        specifier: ^0.2.0
+        specifier: ^0.2.2
         version: 0.2.2
       rxjs:
         specifier: ^7.8.1

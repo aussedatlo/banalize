@@ -41,7 +41,7 @@
     "maxmind": "^4.3.22",
     "mongoose": "^8.6.1",
     "nest-test": "link:",
-    "reflect-metadata": "^0.2.0",
+    "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {

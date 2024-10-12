@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseArrayPipe, Query } from "@nestjs/common";
+import { Controller, Get, Param, Query } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { IpInfosFiltersDto } from "./dtos/ip-infos-filters.dto";
 import { IpInfosResponse } from "./responses/ip-infos.response";
@@ -20,9 +20,9 @@ export class IpInfosController {
   @ApiOperation({ summary: "get ip infos for multiple IPs" })
   @ApiResponse({ type: [IpInfosResponse] })
   async findMany(
-    @Query("ips", ParseArrayPipe) ips: string[],
+    @Query() filters: IpInfosFiltersDto,
   ): Promise<Record<string, Partial<IpInfosResponse>>> {
-    const filters: IpInfosFiltersDto = { ips };
+    console.log("filters", filters);
     return this.ipInfosService.findMany(filters);
   }
 }

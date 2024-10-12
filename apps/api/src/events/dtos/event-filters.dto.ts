@@ -4,6 +4,7 @@ import {
   EventType,
 } from "@banalize/types";
 import { ApiProperty } from "@nestjs/swagger";
+import { Transform } from "class-transformer";
 import {
   ArrayNotEmpty,
   IsArray,
@@ -33,6 +34,9 @@ export class EventFiltersDto implements EventFilters {
   @IsArray()
   @ArrayNotEmpty()
   @IsEnum(EventType, { each: true })
+  @Transform(({ value }) =>
+    typeof value === "string" ? value.split(",").map((v) => v.trim()) : value,
+  )
   type?: EventType[];
 
   @ApiProperty({
@@ -46,6 +50,9 @@ export class EventFiltersDto implements EventFilters {
   @IsArray()
   @ArrayNotEmpty()
   @IsEnum(EventStatus, { each: true })
+  @Transform(({ value }) =>
+    typeof value === "string" ? value.split(",").map((v) => v.trim()) : value,
+  )
   status?: EventStatus[];
 
   @ApiProperty({
@@ -65,6 +72,7 @@ export class EventFiltersDto implements EventFilters {
     type: Number,
   })
   @IsOptional()
+  @Transform(({ value }) => Number(value.trim()))
   page?: number;
 
   @ApiProperty({
@@ -74,5 +82,6 @@ export class EventFiltersDto implements EventFilters {
     type: Number,
   })
   @IsOptional()
+  @Transform(({ value }) => Number(value.trim()))
   limit?: number;
 }
