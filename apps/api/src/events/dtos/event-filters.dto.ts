@@ -9,7 +9,6 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsEnum,
-  IsIP,
   IsOptional,
   IsString,
 } from "class-validator";
@@ -62,7 +61,6 @@ export class EventFiltersDto implements EventFilters {
   })
   @IsOptional()
   @IsString()
-  @IsIP("4")
   ip?: string;
 
   @ApiProperty({

@@ -40,7 +40,9 @@ export class EventsService {
     }
 
     if (filters.ip) {
-      filtersPipeline.push({ $match: { ip: filters.ip } });
+      filtersPipeline.push({
+        $match: { ip: { $regex: filters.ip, $options: "i" } },
+      });
     }
 
     if (filters.status && filters.status.length > 0) {
