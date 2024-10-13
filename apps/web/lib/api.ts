@@ -133,9 +133,6 @@ const fetchByConfigId = async <T>(
 export const fetchMatchesByConfigId = (configId: string) =>
   fetchByConfigId<MatchSchema>(configId, "matches");
 
-export const fetchBansByConfigId = (configId: string) =>
-  fetchByConfigId<BanSchema>(configId, "bans");
-
 export const fetchUnbansByConfigId = (configId: string) =>
   fetchByConfigId<UnbanSchema>(configId, "unbans");
 
@@ -153,14 +150,14 @@ export const fetchMatches = async (
 
 export const fetchBans = async (
   filters: BanFiltersDto,
-): Promise<BanSchema[]> => {
+): Promise<{ bans: BanSchema[]; totalCount: number }> => {
   const queryString = createQueryString(filters);
-  const { data } = await fetchFromApi<BanSchema[]>(
+  const { data, totalCount } = await fetchFromApi<BanSchema[]>(
     `/bans?${queryString}`,
     {},
     [],
   );
-  return data;
+  return { bans: data, totalCount };
 };
 
 export const fetchStatsSummary = async (): Promise<StatsSummaryResponse> => {

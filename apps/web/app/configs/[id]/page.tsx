@@ -15,7 +15,6 @@ import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBre
 
 import {
   fetchBans,
-  fetchBansByConfigId,
   fetchConfigById,
   fetchConfigs,
   fetchEvents,
@@ -41,7 +40,10 @@ export default async function ConfigPage({
 }) {
   const configId = params.id;
   const matches = await fetchMatchesByConfigId(configId);
-  const bans = await fetchBansByConfigId(configId);
+  const { totalCount: bansTotalCount } = await fetchBans({
+    configId,
+    limit: 0,
+  });
   const config = await fetchConfigById(configId);
   const statsMonthly = await fetchStatsTimeline({
     configId,
@@ -71,7 +73,11 @@ export default async function ConfigPage({
       timestamp_gt: new Date().getTime() - config.findTime * 1000,
     })) ?? [];
 
-  const activeBans = await fetchBans({ configId, active: true });
+  const { totalCount: activeBansTotalCount } = await fetchBans({
+    configId,
+    active: true,
+    limit: 0,
+  });
   const { data: events, totalCount } = await fetchEvents({ configId });
   const ipList = Array.from(new Set(events.map((event) => event.ip)));
   const IpInfos = await fetchIpInfos({ ips: ipList });
@@ -134,12 +140,12 @@ export default async function ConfigPage({
             items={[
               {
                 text: "Total Bans",
-                value: bans.length.toString(),
+                value: bansTotalCount.toString(),
                 help: "Total number of bans issued since the beginning",
               },
               {
                 text: "Active bans",
-                value: activeBans.length.toString(),
+                value: activeBansTotalCount.toString(),
                 help: "Currently active bans in effect",
               },
             ]}
