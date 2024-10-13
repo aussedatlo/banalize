@@ -42,16 +42,17 @@ export class MatchEventHandlerService {
       configId: config._id,
     });
 
-    const matches = await this.matchesService.findAll({
+    const { totalCount } = await this.matchesService.findAll({
       configId: config._id,
       ip,
       timestamp_gt: timestamp - config.findTime * 1000,
+      limit: 0,
     });
 
-    this.logger.debug(`Matched ${matches.length} times`);
+    this.logger.debug(`Matched ${totalCount} times`);
 
-    if (matches.length >= config.maxMatches) {
-      this.logger.log(`Matched ${matches.length} times, banning ${ip}`);
+    if (totalCount >= config.maxMatches) {
+      this.logger.log(`Matched ${totalCount} times, banning ${ip}`);
       this.eventEmitter.emit(
         Events.BAN_CREATION_REQUESTED,
         new BanEvent(ip, config),

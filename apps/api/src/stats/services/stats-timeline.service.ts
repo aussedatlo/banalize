@@ -87,7 +87,7 @@ export class StatsTimelineService implements OnModuleInit {
     const { bans } = await this.bansService.findAll(
       configId ? { configId } : {},
     );
-    const matches = await this.matchesService.findAll(
+    const { matches } = await this.matchesService.findAll(
       configId ? { configId } : {},
     );
 

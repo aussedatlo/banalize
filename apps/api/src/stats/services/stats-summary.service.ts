@@ -31,27 +31,28 @@ export class StatsSummaryService {
         ? { configId, active: true, limit: 0 }
         : { active: true, limit: 0 },
     );
-    const recentMatches = await this.matchesService.findAll(
-      configId
-        ? {
-            configId,
-            timestamp_gt: new Date().getTime() - config.findTime * 1000,
-          }
-        : {},
-    );
+    const { totalCount: recentMatchesCount } =
+      await this.matchesService.findAll(
+        configId
+          ? {
+              configId,
+              timestamp_gt: new Date().getTime() - config.findTime * 1000,
+            }
+          : {},
+      );
 
     const { totalCount: allBansCount } = await this.bansService.findAll(
       configId ? { configId, limit: 0 } : { limit: 0 },
     );
-    const allMatches = await this.matchesService.findAll(
+    const { totalCount: allMatchesCount } = await this.matchesService.findAll(
       configId ? { configId } : {},
     );
 
     return {
       allBansCount,
-      allMatchesCount: allMatches.length,
+      allMatchesCount,
       activeBansCount,
-      recentMatchesCount: recentMatches.length,
+      recentMatchesCount,
     };
   }
 }
