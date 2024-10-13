@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
-import { BansService } from "src/bans/bans.service";
+import { BansService } from "src/bans/services/bans.service";
 import { BanEvent } from "src/bans/types/ban-event.types";
 import { Events } from "src/shared/enums/events.enum";
 import { QueuePriority } from "src/shared/enums/priority.enum";
@@ -29,14 +29,14 @@ export class BanEventHandlerService {
     const { ip, config } = event;
     this.logger.log(`Ban ip: ${ip}, config: ${config.param}`);
 
-    // disable all current bans
-    const currentBans = await this.bansService.findAll({
+    const { totalCount } = await this.bansService.findAll({
       ip,
       configId: config._id,
       active: true,
+      limit: 0,
     });
 
-    if (currentBans.length > 0) {
+    if (totalCount > 0) {
       this.logger.log(`Ban already exists for ${ip}`);
       return;
     }

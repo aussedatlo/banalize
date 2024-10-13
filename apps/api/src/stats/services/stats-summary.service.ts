@@ -1,6 +1,6 @@
 import { StatsSummary } from "@banalize/types";
 import { Injectable } from "@nestjs/common";
-import { BansService } from "src/bans/bans.service";
+import { BansService } from "src/bans/services/bans.service";
 import { ConfigsService } from "src/configs/configs.service";
 import { MatchesService } from "src/matches/services/matches.service";
 import { StatsSummaryResponse } from "src/stats/responses/stats-summary.response";
@@ -26,8 +26,10 @@ export class StatsSummaryService {
   async computeStats(configId: string): Promise<StatsSummary> {
     const config = await this.configsService.findOne(configId);
 
-    const activeBans = await this.bansService.findAll(
-      configId ? { configId, active: true } : { active: true },
+    const { totalCount: activeBansCount } = await this.bansService.findAll(
+      configId
+        ? { configId, active: true, limit: 0 }
+        : { active: true, limit: 0 },
     );
     const recentMatches = await this.matchesService.findAll(
       configId
@@ -38,17 +40,17 @@ export class StatsSummaryService {
         : {},
     );
 
-    const allBans = await this.bansService.findAll(
-      configId ? { configId } : {},
+    const { totalCount: allBansCount } = await this.bansService.findAll(
+      configId ? { configId, limit: 0 } : { limit: 0 },
     );
     const allMatches = await this.matchesService.findAll(
       configId ? { configId } : {},
     );
 
     return {
-      allBansCount: allBans.length,
+      allBansCount,
       allMatchesCount: allMatches.length,
-      activeBansCount: activeBans.length,
+      activeBansCount,
       recentMatchesCount: recentMatches.length,
     };
   }

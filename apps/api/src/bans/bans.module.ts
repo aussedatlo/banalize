@@ -3,10 +3,10 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigsModule } from "src/configs/configs.module";
 import { SharedModule } from "src/shared/shared.module";
 import { BansController } from "./bans.controller";
-import { BansService } from "./bans.service";
 import { BanSchema, BanSchemaDefinition } from "./schemas/ban.schema";
 import { BanCleanupService } from "./services/ban-cleanup.service";
 import { BanEventHandlerService } from "./services/ban-event-handler.service";
+import { BansService } from "./services/bans.service";
 
 @Module({
   imports: [

@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { BansService } from "src/bans/bans.service";
+import { BansService } from "src/bans/services/bans.service";
 import { ConfigsService } from "src/configs/configs.service";
 import { Events } from "src/shared/enums/events.enum";
 import { UnbanEvent } from "src/unbans/types/unban-event.types";
@@ -25,7 +25,9 @@ export class BanCleanupService implements OnModuleInit {
     this.logger.log("Running ban expiration cleanup task...");
     const timestamp = new Date().getTime();
 
-    const activebans = await this.bansService.findAll({ active: true });
+    const { bans: activebans } = await this.bansService.findAll({
+      active: true,
+    });
     this.logger.debug(`Found ${activebans.length} active bans`);
 
     for (const ban of activebans) {

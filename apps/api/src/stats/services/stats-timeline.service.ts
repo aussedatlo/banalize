@@ -3,8 +3,8 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { format, getISOWeek } from "date-fns";
-import { BansService } from "src/bans/bans.service";
 import { BanSchema } from "src/bans/schemas/ban.schema";
+import { BansService } from "src/bans/services/bans.service";
 import { BanEvent } from "src/bans/types/ban-event.types";
 import { ConfigsService } from "src/configs/configs.service";
 import { MatchSchema } from "src/matches/schemas/match.schema";
@@ -84,7 +84,9 @@ export class StatsTimelineService implements OnModuleInit {
 
   private async computeStats(configId?: string): Promise<void> {
     const id = configId ?? "global";
-    const bans = await this.bansService.findAll(configId ? { configId } : {});
+    const { bans } = await this.bansService.findAll(
+      configId ? { configId } : {},
+    );
     const matches = await this.matchesService.findAll(
       configId ? { configId } : {},
     );
