@@ -35,7 +35,7 @@ import { Paper } from "components/shared/Paper/Paper";
 import { Table } from "components/shared/Table/Table";
 import { IconText } from "components/shared/Text/IconText";
 import { formatDistance } from "date-fns";
-import { fetchEvents, fetchIpInfos } from "lib/api";
+import { useEventsWithIpInfos } from "hooks/useEvents";
 import { useCallback, useEffect, useState } from "react";
 import { ConfigEventInformation } from "./ConfigEventInformation";
 
@@ -79,25 +79,19 @@ export const ConfigEventsPaper = ({
   );
   const theme = useMantineTheme();
 
-  const updateEvents = useCallback(async () => {
-    const { data, totalCount } = await fetchEvents({
-      configId: config._id,
-      page: activePage,
-      limit: MAX_ITEMS,
-      type: typeFilter,
-      status: statusFilter,
-      ip: ipFilter,
-    });
-
-    const ipList = Array.from(new Set(data.map((event) => event.ip)));
-    const ipInfos = await fetchIpInfos({ ips: ipList });
-
-    setState({ events: data, totalCount, ipInfos });
-  }, [config._id, activePage, typeFilter, statusFilter, ipFilter]);
+  const { events, totalCount, ipInfos } = useEventsWithIpInfos({
+    configId: config._id,
+    page: activePage,
+    limit: MAX_ITEMS,
+    type: typeFilter,
+    status: statusFilter,
+    ip: ipFilter,
+  });
 
   useEffect(() => {
-    updateEvents();
-  }, [updateEvents]);
+    if (!events || !totalCount || !ipInfos) return;
+    setState({ events, totalCount, ipInfos });
+  }, [events, ipInfos, totalCount]);
 
   const renderRow = useCallback(
     (
@@ -216,7 +210,7 @@ export const ConfigEventsPaper = ({
                 </Box>
               )}
               leftSection={
-                typeFilter.length === 3 ? (
+                statusFilter.length === 5 ? (
                   <IconFilterOff
                     style={{
                       width: rem(16),
