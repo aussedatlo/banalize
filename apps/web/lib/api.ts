@@ -197,6 +197,9 @@ export const fetchStatsTimeline = async (
 export const fetchIpInfos = async (
   filters: IpInfosFiltersDto,
 ): Promise<Record<string, Partial<IpInfosResponse>>> => {
+  if (filters.ips.length === 0) {
+    return {};
+  }
   const queryString = createQueryString(filters);
   const { data } = await fetchFromApi<Record<string, Partial<IpInfosResponse>>>(
     `/ip-infos?${queryString}`,
