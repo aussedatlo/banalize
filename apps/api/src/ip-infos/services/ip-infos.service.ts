@@ -12,7 +12,7 @@ export class IpInfosService implements OnModuleInit {
   private readonly logger = new Logger(IpInfosService.name);
   private readonly dbPath = path.join(__dirname, "GeoLite2-City.mmdb");
   private readonly dbUrl =
-    "https://github.com/P3TERX/GeoLite.mmdb/releases/download/2024.10.07/GeoLite2-City.mmdb";
+    "https://github.com/P3TERX/GeoLite.mmdb/releases/download/2024.10.13/GeoLite2-City.mmdb";
 
   async onModuleInit() {
     if (!fs.existsSync(this.dbPath)) {
