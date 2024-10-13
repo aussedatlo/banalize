@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import { WatcherStatus } from "@banalize/types";
 import { Box, Grid, GridCol, Group, Notification } from "@mantine/core";
 import { IconFlag, IconHandStop } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
@@ -59,18 +60,19 @@ export default async function ConfigPage({
     weekly: statsWeekly,
     daily: statsDaily,
   };
-  const status = (await fetchWatcherStatus(configId)).data[configId];
+  const status = (await fetchWatcherStatus(configId))?.data?.[configId] ?? {
+    error: undefined,
+    status: WatcherStatus.UNKNWOWN,
+  };
 
-  const recentMatches = await fetchMatches({
-    configId,
-    timestamp_gt: new Date().getTime() - config.findTime * 1000,
-  });
+  const recentMatches =
+    (await fetchMatches({
+      configId,
+      timestamp_gt: new Date().getTime() - config.findTime * 1000,
+    })) ?? [];
 
   const activeBans = await fetchBans({ configId, active: true });
-  const { data: events, totalCount } = (await fetchEvents({ configId })) ?? {
-    events: [],
-    totalCount: 0,
-  };
+  const { data: events, totalCount } = await fetchEvents({ configId });
   const ipList = Array.from(new Set(events.map((event) => event.ip)));
   const IpInfos = await fetchIpInfos({ ips: ipList });
 

@@ -75,7 +75,7 @@ export const ConfigEventsPaper = ({
     ipInfos: initIpInfos,
   });
   const [focusedEvent, setFocusedEvent] = useState<EventResponse>(
-    state.events[0],
+    state.events?.[0],
   );
   const theme = useMantineTheme();
 
@@ -285,7 +285,7 @@ export const ConfigEventsPaper = ({
         <ConfigEventInformation
           event={focusedEvent}
           config={config}
-          ipInfos={state.ipInfos[focusedEvent.ip]}
+          ipInfos={state.ipInfos?.[focusedEvent?.ip]}
         />
       </Modal>
     </Paper>

@@ -50,6 +50,10 @@ export const ConfigEventInformation = ({
   event,
   ipInfos,
 }: ConfigEventInformationProps) => {
+  if (!event) {
+    return null;
+  }
+
   const line = "line" in event ? event.line : undefined;
 
   return (

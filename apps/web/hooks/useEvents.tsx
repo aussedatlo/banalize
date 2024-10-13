@@ -13,7 +13,7 @@ export const useEvents = (filters: EventFiltersDto) => {
 
 export const useEventsWithIpInfos = (filters: EventFiltersDto) => {
   const { events, totalCount } = useEvents(filters);
-  const ips = Array.from(new Set(events?.map((event) => event.ip)));
+  const ips = Array.from(new Set((events ?? []).map((event) => event.ip)));
   const { data: ipInfos } = useSWR(JSON.stringify(ips), () =>
     fetchIpInfos({ ips }),
   );

@@ -122,7 +122,11 @@ const fetchByConfigId = async <T>(
   resource: string,
 ): Promise<T[]> => {
   const queryString = createQueryString({ configId });
-  const { data } = await fetchFromApi<T[]>(`/${resource}?${queryString}`);
+  const { data } = await fetchFromApi<T[]>(
+    `/${resource}?${queryString}`,
+    {},
+    [],
+  );
   return data;
 };
 
@@ -139,7 +143,11 @@ export const fetchMatches = async (
   filters: MatchFiltersDto,
 ): Promise<MatchSchema[]> => {
   const queryString = createQueryString(filters);
-  const { data } = await fetchFromApi<MatchSchema[]>(`/matches?${queryString}`);
+  const { data } = await fetchFromApi<MatchSchema[]>(
+    `/matches?${queryString}`,
+    {},
+    [],
+  );
   return data;
 };
 
@@ -147,7 +155,11 @@ export const fetchBans = async (
   filters: BanFiltersDto,
 ): Promise<BanSchema[]> => {
   const queryString = createQueryString(filters);
-  const { data } = await fetchFromApi<BanSchema[]>(`/bans?${queryString}`);
+  const { data } = await fetchFromApi<BanSchema[]>(
+    `/bans?${queryString}`,
+    {},
+    [],
+  );
   return data;
 };
 
@@ -198,6 +210,8 @@ export const fetchEvents = async (
   const queryString = createQueryString(filters);
   const { data, totalCount } = await fetchFromApi<EventResponse[]>(
     `/events?${queryString}`,
+    {},
+    [],
   );
   return { data, totalCount };
 };
