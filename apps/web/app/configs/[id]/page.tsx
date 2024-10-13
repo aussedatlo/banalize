@@ -20,7 +20,6 @@ import {
   fetchEvents,
   fetchIpInfos,
   fetchMatches,
-  fetchMatchesByConfigId,
   fetchStatsTimeline,
   fetchWatcherStatus,
 } from "lib/api";
@@ -39,7 +38,10 @@ export default async function ConfigPage({
   params: { id: string };
 }) {
   const configId = params.id;
-  const matches = await fetchMatchesByConfigId(configId);
+  const { totalCount: matchesTotalCount } = await fetchMatches({
+    configId,
+    limit: 0,
+  });
   const { totalCount: bansTotalCount } = await fetchBans({
     configId,
     limit: 0,
@@ -67,10 +69,11 @@ export default async function ConfigPage({
     status: WatcherStatus.UNKNWOWN,
   };
 
-  const recentMatches =
+  const { totalCount: recentMatchesTotalCount } =
     (await fetchMatches({
       configId,
       timestamp_gt: new Date().getTime() - config.findTime * 1000,
+      limit: 0,
     })) ?? [];
 
   const { totalCount: activeBansTotalCount } = await fetchBans({
@@ -121,12 +124,12 @@ export default async function ConfigPage({
             items={[
               {
                 text: "Total Matches",
-                value: matches.length.toString(),
+                value: matchesTotalCount.toString(),
                 help: "Total number of matches recorded since the start",
               },
               {
-                text: "Recent matches", // Replaced "Active matches" with "Recent matches"
-                value: recentMatches.length.toString(), // Changed variable name for clarity
+                text: "Recent matches",
+                value: recentMatchesTotalCount.toString(),
                 help: "Matches that were created within the specified 'find time' threshold",
               },
             ]}

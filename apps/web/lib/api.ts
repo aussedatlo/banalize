@@ -11,7 +11,6 @@ import type {
   StatsSummaryResponse,
   StatsTimelineFiltersDto,
   StatsTimelineResponse,
-  UnbanSchema,
   WatcherStatusesResponse,
 } from "@banalize/types";
 
@@ -117,35 +116,16 @@ export const deleteConfig = async (id: string): Promise<ConfigSchema> => {
   return data;
 };
 
-const fetchByConfigId = async <T>(
-  configId: string,
-  resource: string,
-): Promise<T[]> => {
-  const queryString = createQueryString({ configId });
-  const { data } = await fetchFromApi<T[]>(
-    `/${resource}?${queryString}`,
-    {},
-    [],
-  );
-  return data;
-};
-
-export const fetchMatchesByConfigId = (configId: string) =>
-  fetchByConfigId<MatchSchema>(configId, "matches");
-
-export const fetchUnbansByConfigId = (configId: string) =>
-  fetchByConfigId<UnbanSchema>(configId, "unbans");
-
 export const fetchMatches = async (
   filters: MatchFiltersDto,
-): Promise<MatchSchema[]> => {
+): Promise<{ matches: MatchSchema[]; totalCount: number }> => {
   const queryString = createQueryString(filters);
-  const { data } = await fetchFromApi<MatchSchema[]>(
+  const { data, totalCount } = await fetchFromApi<MatchSchema[]>(
     `/matches?${queryString}`,
     {},
     [],
   );
-  return data;
+  return { matches: data, totalCount };
 };
 
 export const fetchBans = async (
