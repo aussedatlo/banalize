@@ -276,10 +276,7 @@ export const ConfigEventsPaper = ({
           mt="lg"
           total={Math.ceil(state.totalCount / MAX_ITEMS)}
           value={activePage}
-          onChange={(value) => {
-            setPage(value);
-            updateEvents();
-          }}
+          onChange={setPage}
           c="grey"
           color="cyan"
         />
