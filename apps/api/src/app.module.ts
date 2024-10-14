@@ -9,6 +9,7 @@ import { EventsModule } from "./events/events.module";
 import { FirewallModule } from "./firewall/firewall.module";
 import { IpInfosModule } from "./ip-infos/ip-infos.module";
 import { MatchesModule } from "./matches/matches.module";
+import { NotificationsModule } from "./notifications/notifications.module";
 import { SharedModule } from "./shared/shared.module";
 import { StatsModule } from "./stats/stats.module";
 import { UnbansModule } from "./unbans/unbans.module";
@@ -30,6 +31,7 @@ import { WatchersModule } from "./watchers/watchers.module";
     IpInfosModule,
     StatsModule,
     EventsModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}
