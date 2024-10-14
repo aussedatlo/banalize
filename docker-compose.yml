@@ -51,6 +51,7 @@ services:
       - api
     environment:
       BANALIZE_WEB_API_SERVER_URL: http://localhost:5000
+      BANALIZE_WEB_BASE_URL: http://localhost:3000
       BANALIZE_WEB_PORT: 3000
 
 volumes:

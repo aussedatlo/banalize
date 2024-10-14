@@ -14,8 +14,8 @@ import {
   ConfigCreatedEvent,
   ConfigRemovedEvent,
   ConfigUpdatedEvent,
-} from "src/events/config-event.types";
-import { Events } from "src/events/events.enum";
+} from "src/configs/types/config-event.types";
+import { Events } from "src/shared/enums/events.enum";
 import { Watcher } from "src/watchers/interfaces/watcher.interface";
 import { WatcherFactory } from "src/watchers/watcher.factory";
 

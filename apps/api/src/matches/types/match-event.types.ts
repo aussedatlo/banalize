@@ -1,4 +1,4 @@
-import { ConfigSchema } from "src/configs/schemas/config.schema";
+import { ConfigSchema } from "@banalize/types";
 
 export class MatchEvent {
   constructor(

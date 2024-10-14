@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { BansController } from "./bans.controller";
-import { BansService } from "./bans.service";
 import { BanSchema } from "./schemas/ban.schema";
+import { BansService } from "./services/bans.service";
 
 describe("BansController", () => {
   let bansController: BansController;

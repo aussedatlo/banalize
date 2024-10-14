@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import { Logger, LogLevel, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
@@ -22,7 +24,11 @@ async function bootstrap() {
   SwaggerModule.setup("api", app, document);
 
   // Enable validation globally
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
 
   // Enable shutdown hooks
   app.enableShutdownHooks();

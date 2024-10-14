@@ -1,5 +1,6 @@
 import { type MatchFiltersDto as MatchFilters } from "@banalize/types";
 import { ApiProperty } from "@nestjs/swagger";
+import { Transform } from "class-transformer";
 import { IsIP, IsOptional, IsString } from "class-validator";
 
 export class MatchFiltersDto implements MatchFilters {
@@ -29,4 +30,24 @@ export class MatchFiltersDto implements MatchFilters {
   })
   @IsOptional()
   readonly timestamp_gt?: number;
+
+  @ApiProperty({
+    example: 1,
+    description: "the page number",
+    required: false,
+    type: Number,
+  })
+  @IsOptional()
+  @Transform(({ value }) => Number(value.trim()))
+  page?: number;
+
+  @ApiProperty({
+    example: 10,
+    description: "the number of items per page",
+    required: false,
+    type: Number,
+  })
+  @IsOptional()
+  @Transform(({ value }) => Number(value.trim()))
+  limit?: number;
 }

@@ -3,14 +3,14 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { format, getISOWeek } from "date-fns";
-import { BansService } from "src/bans/bans.service";
 import { BanSchema } from "src/bans/schemas/ban.schema";
+import { BansService } from "src/bans/services/bans.service";
+import { BanEvent } from "src/bans/types/ban-event.types";
 import { ConfigsService } from "src/configs/configs.service";
-import { BanEvent } from "src/events/ban-event.types";
-import { Events } from "src/events/events.enum";
-import { MatchEvent } from "src/events/match-event.types";
 import { MatchSchema } from "src/matches/schemas/match.schema";
 import { MatchesService } from "src/matches/services/matches.service";
+import { MatchEvent } from "src/matches/types/match-event.types";
+import { Events } from "src/shared/enums/events.enum";
 import { StatsTimelineFiltersDto } from "src/stats/dtos/stats-timeline-filters.dto";
 
 const SAMPLE_SIZE = 10;
@@ -84,8 +84,10 @@ export class StatsTimelineService implements OnModuleInit {
 
   private async computeStats(configId?: string): Promise<void> {
     const id = configId ?? "global";
-    const bans = await this.bansService.findAll(configId ? { configId } : {});
-    const matches = await this.matchesService.findAll(
+    const { bans } = await this.bansService.findAll(
+      configId ? { configId } : {},
+    );
+    const { matches } = await this.matchesService.findAll(
       configId ? { configId } : {},
     );
 

@@ -1,128 +1,197 @@
 import type {
+  BanFiltersDto,
   BanSchema,
   ConfigSchema,
+  EventFiltersDto,
+  EventResponse,
+  IpInfosFiltersDto,
+  IpInfosResponse,
+  MatchFiltersDto,
   MatchSchema,
   StatsSummaryResponse,
+  StatsTimelineFiltersDto,
   StatsTimelineResponse,
-  UnbanSchema,
   WatcherStatusesResponse,
 } from "@banalize/types";
 
-const fetchFromApi = async (
+const API_BASE_URL_SERVER = process.env.BANALIZE_WEB_API_SERVER_URL;
+const API_BASE_URL_CLIENT = `${process.env.BANALIZE_WEB_BASE_URL}/api`;
+
+if (!API_BASE_URL_SERVER) {
+  throw new Error("BANALIZE_WEB_API_SERVER_URL is not defined");
+}
+
+// Types
+type QueryParams =
+  | {
+      [key: string]: string | number | string[] | undefined;
+    }
+  | object;
+
+export const fetchFromApi = async <T extends object>(
   endpoint: string,
-  options?: RequestInit,
-  defaultValue?: object,
-) => {
-  console.log(
-    "API request to",
-    process.env.BANALIZE_WEB_API_SERVER_URL + endpoint,
-  );
+  options: RequestInit = {},
+  defaultValue: object = {},
+): Promise<{ data: T; totalCount: number }> => {
+  const isServer = typeof window === "undefined";
+  const url = isServer ? API_BASE_URL_SERVER : API_BASE_URL_CLIENT;
+  console.log("API request to", url + endpoint);
   try {
-    const res = await fetch(
-      process.env.BANALIZE_WEB_API_SERVER_URL + endpoint,
-      {
-        cache: "no-store",
-        ...options,
-      },
-    );
-    return await res.json();
+    const res = await fetch(url + endpoint, {
+      cache: "no-store",
+      ...options,
+    });
+    if (!res.ok) {
+      throw new Error(`API error: ${res.status} ${res.statusText}`);
+    }
+    return {
+      data: (await res.json()) as T,
+      totalCount: Number(res.headers.get("x-total-count")) || 0,
+    };
   } catch (error) {
-    console.error(error);
-    return defaultValue;
+    console.error("Fetch error:", error);
+    return { data: defaultValue as T, totalCount: 0 };
   }
 };
 
+const createQueryString = (params: QueryParams): string => {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params)
+    .filter(([_, value]) => value != null && value !== "")
+    .forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        // Append each array item as the same key
+        value.forEach((item) => searchParams.append(key, String(item)));
+      } else {
+        // Append the single value
+        searchParams.append(key, String(value));
+      }
+    });
+
+  return searchParams.toString();
+};
+
+// Fetch Functions
 export const fetchConfigs = async (): Promise<ConfigSchema[]> => {
-  return fetchFromApi("/configs", undefined, []);
+  const { data } = await fetchFromApi<ConfigSchema[]>(
+    "/configs",
+    undefined,
+    [],
+  );
+  return data;
 };
 
 export const fetchConfigById = async (id: string): Promise<ConfigSchema> => {
-  return fetchFromApi(`/configs/${id}`);
+  const { data } = await fetchFromApi<ConfigSchema>(`/configs/${id}`);
+  return data;
 };
 
-export const createConfig = async (config: Omit<ConfigSchema, "_id">) => {
-  return fetchFromApi("/configs", {
+export const createConfig = async (
+  config: Omit<ConfigSchema, "_id">,
+): Promise<ConfigSchema> => {
+  const { data } = await fetchFromApi<ConfigSchema>("/configs", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(config),
   });
+  return data;
 };
 
-export const updateConfig = async (config: ConfigSchema) => {
-  return fetchFromApi(`/configs/${config._id}`, {
+export const updateConfig = async (
+  config: ConfigSchema,
+): Promise<ConfigSchema> => {
+  const { data } = await fetchFromApi<ConfigSchema>(`/configs/${config._id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(config),
   });
+  return data;
 };
 
-export const deleteConfig = async (id: string) => {
-  return fetchFromApi(`/configs/${id}`, { method: "DELETE" });
-};
-
-const createQueryString = (filters: Record<string, string>): string =>
-  new URLSearchParams(filters).toString();
-
-export const fetchMatchesByConfigId = async (
-  configId: string,
-): Promise<MatchSchema[]> => {
-  const queryString = createQueryString({ configId });
-  return fetchFromApi(`/matches?${queryString}`);
-};
-
-export const fetchBansByConfigId = async (
-  configId: string,
-): Promise<BanSchema[]> => {
-  const queryString = createQueryString({ configId });
-  return fetchFromApi(`/bans?${queryString}`);
-};
-
-export const fetchUnbansByConfigId = async (
-  configId: string,
-): Promise<UnbanSchema[]> => {
-  const queryString = createQueryString({ configId });
-  return fetchFromApi(`/unbans?${queryString}`);
-};
-
-export const fetchRecentMatches = async (
-  configId: string,
-  timestamp_gt: number,
-): Promise<MatchSchema[]> => {
-  const queryString = createQueryString({
-    configId,
-    timestamp_gt: timestamp_gt.toString(),
+export const deleteConfig = async (id: string): Promise<ConfigSchema> => {
+  const { data } = await fetchFromApi<ConfigSchema>(`/configs/${id}`, {
+    method: "DELETE",
   });
-  return fetchFromApi(`/matches?${queryString}`);
+  return data;
 };
 
-export const fetchActiveBans = async (
-  configId: string,
-): Promise<BanSchema[]> => {
-  const queryString = createQueryString({
-    configId,
-    active: true.toString(),
-  });
-  return fetchFromApi(`/bans?${queryString}`);
+export const fetchMatches = async (
+  filters: MatchFiltersDto,
+): Promise<{ matches: MatchSchema[]; totalCount: number }> => {
+  const queryString = createQueryString(filters);
+  const { data, totalCount } = await fetchFromApi<MatchSchema[]>(
+    `/matches?${queryString}`,
+    {},
+    [],
+  );
+  return { matches: data, totalCount };
+};
+
+export const fetchBans = async (
+  filters: BanFiltersDto,
+): Promise<{ bans: BanSchema[]; totalCount: number }> => {
+  const queryString = createQueryString(filters);
+  const { data, totalCount } = await fetchFromApi<BanSchema[]>(
+    `/bans?${queryString}`,
+    {},
+    [],
+  );
+  return { bans: data, totalCount };
 };
 
 export const fetchStatsSummary = async (): Promise<StatsSummaryResponse> => {
-  return fetchFromApi("/stats/summary");
+  const { data } = await fetchFromApi<StatsSummaryResponse>("/stats/summary");
+  return data;
 };
 
 export const fetchWatcherStatuses =
   async (): Promise<WatcherStatusesResponse> => {
-    return fetchFromApi("/watchers/status");
+    const { data } =
+      await fetchFromApi<WatcherStatusesResponse>("/watchers/status");
+    return data;
   };
 
 export const fetchWatcherStatus = async (
   configId: string,
 ): Promise<WatcherStatusesResponse> => {
-  return fetchFromApi(`/watchers/status/${configId}`);
+  const { data } = await fetchFromApi<WatcherStatusesResponse>(
+    `/watchers/status/${configId}`,
+  );
+  return data;
 };
 
-export const fetchStatsTimelineByConfigId = async (
-  id: string,
-  period: string,
+export const fetchStatsTimeline = async (
+  filters: StatsTimelineFiltersDto,
 ): Promise<StatsTimelineResponse> => {
-  return fetchFromApi(`/stats/timeline?period=${period}&configId=${id}`);
+  const queryString = createQueryString(filters);
+  const { data } = await fetchFromApi<StatsTimelineResponse>(
+    `/stats/timeline?${queryString}`,
+  );
+  return data;
+};
+
+export const fetchIpInfos = async (
+  filters: IpInfosFiltersDto,
+): Promise<Record<string, Partial<IpInfosResponse>>> => {
+  if (filters.ips.length === 0) {
+    return {};
+  }
+  const queryString = createQueryString(filters);
+  const { data } = await fetchFromApi<Record<string, Partial<IpInfosResponse>>>(
+    `/ip-infos?${queryString}`,
+  );
+  return data;
+};
+
+export const fetchEvents = async (
+  filters: EventFiltersDto,
+): Promise<{ data: EventResponse[]; totalCount: number }> => {
+  const queryString = createQueryString(filters);
+  const { data, totalCount } = await fetchFromApi<EventResponse[]>(
+    `/events?${queryString}`,
+    {},
+    [],
+  );
+  return { data, totalCount };
 };

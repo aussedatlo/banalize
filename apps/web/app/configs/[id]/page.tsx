@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import { WatcherStatus } from "@banalize/types";
 import { Box, Grid, GridCol, Group, Notification } from "@mantine/core";
 import { IconFlag, IconHandStop } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
@@ -13,17 +14,15 @@ import { TryRegexConfigButton } from "components/configs/TryRegexConfigButton";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 
 import {
-  fetchActiveBans,
-  fetchBansByConfigId,
+  fetchBans,
   fetchConfigById,
   fetchConfigs,
-  fetchMatchesByConfigId,
-  fetchRecentMatches,
-  fetchStatsTimelineByConfigId,
-  fetchUnbansByConfigId,
+  fetchEvents,
+  fetchIpInfos,
+  fetchMatches,
+  fetchStatsTimeline,
   fetchWatcherStatus,
 } from "lib/api";
-import { formatEvents } from "lib/events";
 
 export async function generateStaticParams() {
   const configs = await fetchConfigs();
@@ -39,27 +38,52 @@ export default async function ConfigPage({
   params: { id: string };
 }) {
   const configId = params.id;
-  const matches = await fetchMatchesByConfigId(configId);
-  const bans = await fetchBansByConfigId(configId);
-  const unbans = await fetchUnbansByConfigId(configId);
+  const { totalCount: matchesTotalCount } = await fetchMatches({
+    configId,
+    limit: 0,
+  });
+  const { totalCount: bansTotalCount } = await fetchBans({
+    configId,
+    limit: 0,
+  });
   const config = await fetchConfigById(configId);
-  const statsMonthly = await fetchStatsTimelineByConfigId(configId, "monthly");
-  const statsWeekly = await fetchStatsTimelineByConfigId(configId, "weekly");
-  const statsDaily = await fetchStatsTimelineByConfigId(configId, "daily");
+  const statsMonthly = await fetchStatsTimeline({
+    configId,
+    period: "monthly",
+  });
+  const statsWeekly = await fetchStatsTimeline({
+    configId,
+    period: "weekly",
+  });
+  const statsDaily = await fetchStatsTimeline({
+    configId,
+    period: "daily",
+  });
   const stats = {
     monthly: statsMonthly,
     weekly: statsWeekly,
     daily: statsDaily,
   };
-  const status = (await fetchWatcherStatus(configId)).data[configId];
+  const status = (await fetchWatcherStatus(configId))?.data?.[configId] ?? {
+    error: undefined,
+    status: WatcherStatus.UNKNWOWN,
+  };
 
-  const recentMatches = await fetchRecentMatches(
+  const { totalCount: recentMatchesTotalCount } =
+    (await fetchMatches({
+      configId,
+      timestamp_gt: new Date().getTime() - config.findTime * 1000,
+      limit: 0,
+    })) ?? [];
+
+  const { totalCount: activeBansTotalCount } = await fetchBans({
     configId,
-    new Date().getTime() - config.findTime * 1000,
-  );
-
-  const activeBans = await fetchActiveBans(configId);
-  const events = formatEvents(matches, bans, unbans, config);
+    active: true,
+    limit: 0,
+  });
+  const { data: events, totalCount } = await fetchEvents({ configId });
+  const ipList = Array.from(new Set(events.map((event) => event.ip)));
+  const IpInfos = await fetchIpInfos({ ips: ipList });
 
   return (
     <Box>
@@ -100,12 +124,12 @@ export default async function ConfigPage({
             items={[
               {
                 text: "Total Matches",
-                value: matches.length.toString(),
+                value: matchesTotalCount.toString(),
                 help: "Total number of matches recorded since the start",
               },
               {
-                text: "Recent matches", // Replaced "Active matches" with "Recent matches"
-                value: recentMatches.length.toString(), // Changed variable name for clarity
+                text: "Recent matches",
+                value: recentMatchesTotalCount.toString(),
                 help: "Matches that were created within the specified 'find time' threshold",
               },
             ]}
@@ -119,12 +143,12 @@ export default async function ConfigPage({
             items={[
               {
                 text: "Total Bans",
-                value: bans.length.toString(),
+                value: bansTotalCount.toString(),
                 help: "Total number of bans issued since the beginning",
               },
               {
                 text: "Active bans",
-                value: activeBans.length.toString(),
+                value: activeBansTotalCount.toString(),
                 help: "Currently active bans in effect",
               },
             ]}
@@ -134,7 +158,12 @@ export default async function ConfigPage({
         </GridCol>
 
         <GridCol span={12}>
-          <ConfigEventsPaper events={events} config={config} />
+          <ConfigEventsPaper
+            events={events}
+            totalCount={totalCount}
+            config={config}
+            ipInfos={IpInfos}
+          />
         </GridCol>
       </Grid>
     </Box>

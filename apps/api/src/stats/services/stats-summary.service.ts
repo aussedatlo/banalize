@@ -1,6 +1,6 @@
 import { StatsSummary } from "@banalize/types";
 import { Injectable } from "@nestjs/common";
-import { BansService } from "src/bans/bans.service";
+import { BansService } from "src/bans/services/bans.service";
 import { ConfigsService } from "src/configs/configs.service";
 import { MatchesService } from "src/matches/services/matches.service";
 import { StatsSummaryResponse } from "src/stats/responses/stats-summary.response";
@@ -26,30 +26,33 @@ export class StatsSummaryService {
   async computeStats(configId: string): Promise<StatsSummary> {
     const config = await this.configsService.findOne(configId);
 
-    const activeBans = await this.bansService.findAll(
-      configId ? { configId, active: true } : { active: true },
-    );
-    const recentMatches = await this.matchesService.findAll(
+    const { totalCount: activeBansCount } = await this.bansService.findAll(
       configId
-        ? {
-            configId,
-            timestamp_gt: new Date().getTime() - config.findTime * 1000,
-          }
-        : {},
+        ? { configId, active: true, limit: 0 }
+        : { active: true, limit: 0 },
     );
+    const { totalCount: recentMatchesCount } =
+      await this.matchesService.findAll(
+        configId
+          ? {
+              configId,
+              timestamp_gt: new Date().getTime() - config.findTime * 1000,
+            }
+          : {},
+      );
 
-    const allBans = await this.bansService.findAll(
-      configId ? { configId } : {},
+    const { totalCount: allBansCount } = await this.bansService.findAll(
+      configId ? { configId, limit: 0 } : { limit: 0 },
     );
-    const allMatches = await this.matchesService.findAll(
+    const { totalCount: allMatchesCount } = await this.matchesService.findAll(
       configId ? { configId } : {},
     );
 
     return {
-      allBansCount: allBans.length,
-      allMatchesCount: allMatches.length,
-      activeBansCount: activeBans.length,
-      recentMatchesCount: recentMatches.length,
+      allBansCount,
+      allMatchesCount,
+      activeBansCount,
+      recentMatchesCount,
     };
   }
 }
