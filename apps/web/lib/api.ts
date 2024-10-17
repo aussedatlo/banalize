@@ -8,6 +8,7 @@ import type {
   IpInfosResponse,
   MatchFiltersDto,
   MatchSchema,
+  NotifierConfigSchema,
   StatsSummaryResponse,
   StatsTimelineFiltersDto,
   StatsTimelineResponse,
@@ -194,4 +195,51 @@ export const fetchEvents = async (
     [],
   );
   return { data, totalCount };
+};
+
+export const fetchNotifierConfigs = async (): Promise<
+  NotifierConfigSchema[]
+> => {
+  const { data } = await fetchFromApi<NotifierConfigSchema[]>(
+    "/notifications",
+    { cache: "no-store" },
+    [],
+  );
+  return data;
+};
+
+export const createNotifierConfig = async (
+  dto: NotifierConfigSchema,
+): Promise<NotifierConfigSchema> => {
+  const { data } = await fetchFromApi<NotifierConfigSchema>("/notifications", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  });
+  return data;
+};
+
+export const updateNotifierConfig = async (
+  id: string,
+  dto: NotifierConfigSchema,
+): Promise<NotifierConfigSchema> => {
+  const { data } = await fetchFromApi<NotifierConfigSchema>(
+    `/notifications/${id}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dto),
+    },
+  );
+  return data;
+};
+
+export const deleteNotifierConfig = async (
+  id: string,
+): Promise<NotifierConfigSchema> => {
+  const { data } = await fetchFromApi<NotifierConfigSchema>(
+    `/notifications/${id}`,
+    { method: "DELETE" },
+  );
+  return data;
 };
