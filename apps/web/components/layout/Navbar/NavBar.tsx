@@ -2,7 +2,7 @@
 
 import { AppShell, Burger, Code, Group, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconGraphFilled, IconShieldLockFilled } from "@tabler/icons-react";
+import { IconBellFilled, IconShieldLockFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PropsWithChildren } from "react";
@@ -10,7 +10,7 @@ import classes from "./NavBar.module.css";
 
 const data = [
   { link: "/configs", label: "configs", icon: IconShieldLockFilled },
-  { link: "/stats", label: "stats", icon: IconGraphFilled },
+  { link: "/notifications", label: "notifications", icon: IconBellFilled },
 ];
 
 export const NavBar = ({ children }: PropsWithChildren) => {

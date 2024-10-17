@@ -9,7 +9,15 @@ import {
 import { IconCheck } from "@tabler/icons-react";
 import classes from "./MultiSelect.module.css";
 
-export const MultiSelect = ({ renderOption, ...props }: MultiSelectProps) => {
+type MultiSelectCustomProps = MultiSelectProps & {
+  withPills?: boolean;
+};
+
+export const MultiSelect = ({
+  renderOption,
+  withPills = false,
+  ...props
+}: MultiSelectCustomProps) => {
   const render = (item: ComboboxLikeRenderOptionInput<ComboboxItem>) => (
     <Group justify="space-between" w="100%">
       <Group>{renderOption && renderOption(item)}</Group>
@@ -28,7 +36,7 @@ export const MultiSelect = ({ renderOption, ...props }: MultiSelectProps) => {
   return (
     <MantineMultiSelect
       classNames={{
-        pill: classes.pill,
+        pill: !withPills ? classes.pill : "",
         input: classes.input,
         option: classes.option,
       }}
