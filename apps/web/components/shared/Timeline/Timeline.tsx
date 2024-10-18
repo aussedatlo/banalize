@@ -90,7 +90,7 @@ export function Timeline({ events }: TimelineProps) {
             if (!item) return null;
             const isTop = index % 2 !== 0;
             const nextEvent = displayedEvents[index + 1];
-            const isLastEvent = index === visibleEvents.length - 1;
+            const isLastEvent = index === displayedEvents.length - 1;
 
             const intermediateEvents = events.filter(
               (e) =>
