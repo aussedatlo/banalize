@@ -53,7 +53,7 @@ export class IpInfosService implements OnModuleInit {
       return this.mapToIpInfos(lookup.get(ip));
     } catch (error) {
       this.logger.error("Error querying IP:", error);
-      throw new Error("Failed to query IP address.");
+      return {};
     }
   }
 
@@ -94,26 +94,30 @@ export class IpInfosService implements OnModuleInit {
   }
 
   private async downloadDatabase(url: string, dest: string): Promise<void> {
-    const response = await axios({
-      method: "get",
-      url,
-      responseType: "stream",
-    });
-
-    const file = fs.createWriteStream(dest);
-    return new Promise((resolve) => {
-      response.data.pipe(file);
-      file.on("finish", () => {
-        file.close();
-        this.logger.log("Database downloaded successfully.");
-        resolve();
+    try {
+      const response = await axios({
+        method: "get",
+        url,
+        responseType: "stream",
       });
 
-      file.on("error", (err) => {
-        fs.unlink(dest, () => {});
-        this.logger.error("Error downloading database:", err);
-        resolve();
+      const file = fs.createWriteStream(dest);
+      return new Promise((resolve) => {
+        response.data.pipe(file);
+        file.on("finish", () => {
+          file.close();
+          this.logger.log("Database downloaded successfully.");
+          resolve();
+        });
+
+        file.on("error", (err) => {
+          fs.unlink(dest, () => {});
+          this.logger.error("Error downloading database:", err);
+          resolve();
+        });
       });
-    });
+    } catch (error) {
+      this.logger.error("Error downloading database:", error);
+    }
   }
 }
