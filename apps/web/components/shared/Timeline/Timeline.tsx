@@ -1,11 +1,11 @@
 "use client";
 
+import { BanSchema, MatchSchema } from "@banalize/types";
 import { ActionIcon, Group } from "@mantine/core";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import cx from "clsx";
 import { useRef, useState } from "react";
 import classes from "./Timeline.module.css";
-import { BanSchema, MatchSchema } from "@banalize/types";
 
 const EVENTS_TO_SHOW = 5;
 

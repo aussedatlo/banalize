@@ -1,22 +1,12 @@
-import { EventFiltersDto } from "@banalize/types";
-import { fetchEvents, fetchIpInfos } from "lib/api";
+import { BanFiltersDto } from "@banalize/types";
+import { fetchBans } from "lib/api";
 import useSWR from "swr";
 
-export const useEvents = (filters: EventFiltersDto) => {
-  const { data } = useSWR(JSON.stringify(filters), () => fetchEvents(filters));
+export const useBans = (filters: BanFiltersDto) => {
+  const { data } = useSWR(JSON.stringify(filters), () => fetchBans(filters));
 
   return {
-    events: data?.data,
+    bans: data?.bans,
     totalCount: data?.totalCount,
   };
-};
-
-export const useEventsWithIpInfos = (filters: EventFiltersDto) => {
-  const { events, totalCount } = useEvents(filters);
-  const ips = Array.from(new Set((events ?? []).map((event) => event.ip)));
-  const { data: ipInfos } = useSWR(JSON.stringify(ips), () =>
-    fetchIpInfos({ ips }),
-  );
-
-  return { events, totalCount, ipInfos };
 };

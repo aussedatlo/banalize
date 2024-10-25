@@ -1,11 +1,11 @@
+import { BanSchema, MatchSchema } from "@banalize/types";
 import { Box, Grid, GridCol, Group } from "@mantine/core";
 import { IconHistory } from "@tabler/icons-react";
+import { UnbanIpButton } from "components/configs/UnbanIpButton";
 import { Paper } from "components/shared/Paper/Paper";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 import { Timeline, TimelineEvent } from "components/shared/Timeline/Timeline";
-import { BanSchema, MatchSchema } from "@banalize/types";
 import { fetchBans, fetchConfigById, fetchMatches } from "lib/api";
-import { UnbanIpButton } from "components/configs/UnbanIpButton";
 
 function findFirstDate<T extends { timestamp: number }>(
   data: T[],
@@ -15,11 +15,11 @@ function findFirstDate<T extends { timestamp: number }>(
   return new Date(earliestTimestamp);
 }
 
-function findLastDate<T extends { timestamp: number }>(data: T[]): Date | null {
-  if (data.length === 0) return null;
-  const earliestTimestamp = Math.max(...data.map((item) => item.timestamp));
-  return new Date(earliestTimestamp);
-}
+// function findLastDate<T extends { timestamp: number }>(data: T[]): Date | null {
+//   if (data.length === 0) return null;
+//   const earliestTimestamp = Math.max(...data.map((item) => item.timestamp));
+//   return new Date(earliestTimestamp);
+// }
 
 function generateTimelineEvents(
   matches: MatchSchema[],
@@ -61,27 +61,27 @@ export default async function TimelinePage({
 
   const bansHistory = await fetchBans({
     configId,
-    ip: ip
+    ip: ip,
   });
 
   const matchesHistory = await fetchMatches({
     configId,
-    ip: ip
+    ip: ip,
   });
 
   const unbansHistory = await fetchBans({
     configId,
     ip: ip,
-    active: false
+    active: false,
   });
   console.log("banHistory:", bansHistory.totalCount);
   console.log("matchesHistory :", matchesHistory.totalCount);
 
   const firstMatch = findFirstDate(matchesHistory.matches);
-  const lastMatch = findLastDate(matchesHistory.matches);
+  // const lastMatch = findLastDate(matchesHistory.matches);
 
   const firstBan = findFirstDate(bansHistory.bans);
-  const lastBan = findLastDate(bansHistory.bans);
+  // const lastBan = findLastDate(bansHistory.bans);
   // check the first event date
   const firstEvent =
     firstMatch && firstBan

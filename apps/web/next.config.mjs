@@ -20,10 +20,12 @@ const nextConfig = {
     ];
   },
   async rewrites() {
+    const apiUrl = process.env.BANALIZE_WEB_API_SERVER_URL || "http://localhost:3000";
+
     return [
       {
         source: "/api/:path*",
-        destination: process.env.BANALIZE_WEB_API_SERVER_URL+"/:path*",
+        destination: `${apiUrl}/:path*`, // Utilisation de l'URL complète
       },
     ];
   },
