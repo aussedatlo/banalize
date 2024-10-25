@@ -1,13 +1,11 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { type ConfigSchema } from "@banalize/types";
 import { ActionIcon, rem, Tooltip } from "@mantine/core";
 import {IconHandOff, IconHandStop } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { fetchBans } from "lib/api";
+import { useBans } from "hooks/useBans";
 
 type UnbanIpButtonProps = {
   config: ConfigSchema;
@@ -21,31 +19,63 @@ export const UnbanIpButton = ({ config, ip }: UnbanIpButtonProps) => {
   const [isCurrentlyBanned, setIsCurrentlyBanned] = useState(false);
   const [banId, setBanId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const checkBanStatus = async () => {
-      try {
-        const banStatus = await fetchBans({
-          configId,
-          ip: ip,
-          active: true,
-        });
-        console.log(banStatus);
-        setIsCurrentlyBanned(banStatus.totalCount > 0);
-        if (banStatus.totalCount > 0) {
-          setBanId(banStatus.bans[0]._id);
-        }
-      } catch (error) {
-        console.error("Error checking ban status:", error);
-      }
-    };
+  const test = useBans({
+    configId,
+    ip,
+    active: true,
+  });
+  console.log("test: ", test);
 
-    checkBanStatus();
-  }, [isCurrentlyBanned]);
+  //
+  // useEffect(() => {
+  //   const getCurrentlyBanned = async (config: ConfigSchema) => {
+  //     const res = await fetch(`/api/bans?configId=${config._id}&active=true&ip=${ip}`, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //
+  //     if (!res.ok) {
+  //       console.log("error");
+  //       console.error(await res.json());
+  //     }
+  //
+  //     const data = await res.json();
+  //     console.log("data:", data);
+  //     router.refresh();
+  //   };
+  //
+  //   getCurrentlyBanned(config);
+  //
+
+
+
+    // const checkBanStatus = async () => {
+    //   try {
+    //     const banStatus = await fetchBans({
+    //       configId,
+    //       ip: ip,
+    //       active: true,
+    //     });
+    //     console.log(banStatus);
+    //     setIsCurrentlyBanned(banStatus.totalCount > 0);
+    //     if (banStatus.totalCount > 0) {
+    //       setBanId(banStatus.bans[0]._id);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error checking ban status:", error);
+    //   }
+    // };
+    //
+    // checkBanStatus();
+  // }, [isCurrentlyBanned]);
 
 console.log(isCurrentlyBanned);
 
 
   const updateBan = async (config: ConfigSchema) => {
+    return;
     const res = await fetch(`/api/bans/${banId}/disable`, {
       method: "PATCH",
       headers: {
