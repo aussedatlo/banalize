@@ -1,7 +1,7 @@
 import { BanSchema, MatchSchema } from "@banalize/types";
 import { Box, Grid, GridCol, Group } from "@mantine/core";
 import { IconHistory } from "@tabler/icons-react";
-import { UnbanIpButton } from "components/configs/UnbanIpButton";
+import { BanUnbanIpButton } from "components/configs/BanUnbanIpButton";
 import { Paper } from "components/shared/Paper/Paper";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 import { Timeline, TimelineEvent } from "components/shared/Timeline/Timeline";
@@ -104,7 +104,7 @@ export default async function TimelinePage({
           <RouterBreadcrumbs path={`/configs/${configId}/${ip}`} />
         </Group>
         <Group>
-          <UnbanIpButton config={config} ip={ip} />
+          <BanUnbanIpButton config={config} ip={ip} />
         </Group>
       </Group>
 

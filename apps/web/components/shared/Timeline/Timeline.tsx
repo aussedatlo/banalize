@@ -55,10 +55,19 @@ export function Timeline({ events }: TimelineProps) {
   const bansAndUnbans = events.filter(
     (event) => event.type === "ban" || event.type === "unban",
   );
-  const displayedEvents = [firstEvent, ...bansAndUnbans, lastEvent].filter(
-    (event, index, self) =>
-      event !== undefined && self.indexOf(event) === index,
-  );
+
+  const displayedEvents = [firstEvent, ...bansAndUnbans, lastEvent]
+    .filter(Boolean)
+    .reduce((unique, event) => {
+      const exists = unique.some(
+        (e) =>
+          e.date.getTime() === event.date.getTime() && e.type === event.type,
+      );
+      return exists ? unique : [...unique, event];
+    }, [] as TimelineEvent[])
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  const maxStartIndex = Math.max(0, displayedEvents.length - EVENTS_TO_SHOW);
 
   const visibleEvents = displayedEvents.slice(
     startIndex,
@@ -66,13 +75,11 @@ export function Timeline({ events }: TimelineProps) {
   );
 
   const handlePrevious = () => {
-    setStartIndex(Math.max(0, startIndex - 1));
+    setStartIndex((prevIndex) => Math.max(0, prevIndex - 1));
   };
 
   const handleNext = () => {
-    setStartIndex(
-      Math.min(startIndex + 1, displayedEvents.length - EVENTS_TO_SHOW),
-    );
+    setStartIndex((prevIndex) => Math.min(prevIndex + 1, maxStartIndex));
   };
 
   return (
@@ -89,8 +96,8 @@ export function Timeline({ events }: TimelineProps) {
           {visibleEvents.map((item, index) => {
             if (!item) return null;
             const isTop = index % 2 !== 0;
-            const nextEvent = displayedEvents[index + 1];
-            const isLastEvent = index === displayedEvents.length - 1;
+            const nextEvent = visibleEvents[index + 1];
+            const isLastEvent = !nextEvent;
 
             const intermediateEvents = events.filter(
               (e) =>
@@ -109,6 +116,8 @@ export function Timeline({ events }: TimelineProps) {
               </div>
             );
 
+            const uniqueKey = `${item.date.getTime()}-${item.type}-${index}`;
+
             const concatClasses = cx([classes.bottom], {
               [classes.lastBottom]: isLastEvent,
               [classes.isBan]: item.type === "ban",
@@ -117,7 +126,7 @@ export function Timeline({ events }: TimelineProps) {
             });
 
             return (
-              <div key={index} className={cx(classes.swiperSlide)}>
+              <div key={uniqueKey} className={cx(classes.swiperSlide)}>
                 <div className={classes.top}>{isTop ? text : null}</div>
                 <div className={concatClasses}>
                   {!isTop ? text : <div />}
@@ -157,7 +166,7 @@ export function Timeline({ events }: TimelineProps) {
       <ActionIcon
         onClick={handleNext}
         color={"yellow"}
-        disabled={startIndex + EVENTS_TO_SHOW >= displayedEvents.length}
+        disabled={startIndex >= maxStartIndex}
       >
         <IconChevronRight size={24} />
       </ActionIcon>
