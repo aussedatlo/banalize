@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "[ -e .env ] && set -a && . ./.env; next dev --turbo --port ${BANALIZE_WEB_PORT-3000}",
-    "build": "next build",
+    "build": "[ -e .env ] && set -a && . ./.env; next build",
     "start": "[ -e .env ] && set -a && . ./.env; next start --port ${BANALIZE_WEB_PORT-3000}",
     "export": "next build && next export",
     "typecheck": "tsc --noEmit",

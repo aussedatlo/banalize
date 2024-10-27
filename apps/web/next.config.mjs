@@ -19,6 +19,18 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    const apiUrl = process.env.BANALIZE_WEB_API_SERVER_URL || "http://localhost:3000";
+
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${apiUrl}/:path*`, // Utilisation de l'URL complète
+      },
+    ];
+  },
+  // This is required to support PostHog trailing slash API requests
+  skipTrailingSlashRedirect: true,
 };
 
 export default nextConfig;

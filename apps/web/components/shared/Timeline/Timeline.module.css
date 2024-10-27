@@ -1,0 +1,240 @@
+.timelineContainer {
+  width: calc(100% - 120px);
+  overflow-x: auto;
+  scrollbar-width: none; /* Pour Firefox */
+  -ms-overflow-style: none; /* Pour Internet Explorer et Edge */
+}
+
+.timelineContainer::-webkit-scrollbar {
+  display: none; /* Pour Chrome, Safari et Opera */
+}
+
+.timeline {
+  display: flex;
+  padding: 0;
+  text-align: center;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  width: max-content;
+  min-width: 100%;
+}
+
+.timeline li {
+  transition: all 200ms ease-in;
+}
+
+.timeline div {
+  flex: 1;
+}
+
+.top {
+  width: 100%;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  font-weight: 100;
+  height: 100px;
+}
+
+.bottom,
+.firstBottom {
+  padding: 0 40px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  transition: all 200ms ease-in;
+  flex-direction: column;
+  height: 100px;
+}
+
+.top div {
+  font-weight: 600;
+  flex-direction: column-reverse;
+  display: flex;
+}
+
+.firstBottom div,
+.bottom div:first-child {
+  font-weight: 600;
+  padding-top: 20px;
+  flex-direction: column;
+  display: flex;
+}
+
+.bottom > div:first-child::before {
+  content: "";
+  width: 25px;
+  height: 25px;
+  background-color: #e8eeff;
+  border-radius: 25px;
+  border: 4px solid var(--mantine-color-yellow-filled);
+  position: absolute;
+  top: -15px;
+  left: calc(50% - 12px);
+  z-index: 1;
+}
+
+.noBar::before {
+  display: none;
+}
+
+.eventDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--mantine-color-orange-6);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.banDot {
+  background-color: var(--mantine-color-red-6);
+}
+
+.eventLabel {
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+.eventDate {
+  font-size: 0.8em;
+  color: var(--mantine-color-gray-6);
+}
+
+.swiperControl {
+  text-align: right;
+}
+
+.swiperContainer {
+  width: 100%;
+  height: 250px;
+  margin: 50px 0;
+  overflow: hidden;
+  padding: 0 20px 30px;
+}
+
+.swiperSlide {
+  width: 200px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.swiperSlide:nth-child(2n) {
+  width: 40%;
+}
+
+.swiperSlide:nth-child(3n) {
+  width: 20%;
+}
+
+.isBan.bottom div::before {
+  border-color: var(--mantine-color-red-8);
+}
+
+.isUnban.bottom div::before {
+  border-color: var(--mantine-color-green-8);
+}
+
+.eventLink {
+  position: absolute;
+  height: 4px;
+  top: 0;
+  transform: translateY(-100%);
+  width: 100%;
+  right: -50%;
+}
+
+.gotHover {
+  cursor: pointer;
+}
+
+.gotHover:hover {
+  height: 6px;
+  transform: translateY(calc(-100% + 1px));
+}
+
+.gradientMatchToBan {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-yellow-filled),
+    var(--mantine-color-red-6)
+  );
+}
+
+.gradientBanToMatch {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-red-6),
+    var(--mantine-color-yellow-filled)
+  );
+}
+
+.gradientBanToUnban {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-red-6),
+    var(--mantine-color-green-6)
+  );
+}
+
+.gradientUnbanToBan {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-green-6),
+    var(--mantine-color-red-6)
+  );
+}
+
+.gradientUnbanToMatch {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-green-6),
+    var(--mantine-color-yellow-filled)
+  );
+}
+
+.solidBan {
+  background-color: var(--mantine-color-red-6);
+}
+
+.solidMatch {
+  background-color: var(--mantine-color-yellow-filled);
+}
+
+.intermediateEvents {
+  position: absolute;
+  background: rgb(0 0 0 / 70%);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.noHover {
+  cursor: default;
+}
+
+.navigationButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: var(--mantine-color-gray-6);
+  transition: color 0.3s ease;
+}
+
+.navigationButton:hover {
+  color: var(--mantine-color-blue-6);
+}
+
+.navigationButton:disabled {
+  color: var(--mantine-color-gray-4);
+  cursor: not-allowed;
+}

@@ -12,6 +12,7 @@ import { StatusBadge } from "components/shared/Badge/StatusBadge";
 import { EventIcon } from "components/shared/Icon/EventIcon";
 import { HighlightedText } from "components/shared/Text/HightlightedText";
 import { IconText } from "components/shared/Text/IconText";
+import Link from "next/link";
 
 type LineInformationProps = {
   label: string;
@@ -80,6 +81,15 @@ export const ConfigEventInformation = ({
         <LineInformation
           label="Status"
           value={<StatusBadge status={event.status} />}
+        />
+        <Divider />
+        <LineInformation
+          label="Timeline"
+          value={
+            <Link href={`/configs/${event.configId}/${event.ip}`}>
+              See history
+            </Link>
+          }
         />
       </Card>
 

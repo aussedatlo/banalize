@@ -42,6 +42,7 @@ export const fetchFromApi = async <T extends object>(
       cache: "no-store",
       ...options,
     });
+
     if (!res.ok) {
       throw new Error(`API error: ${res.status} ${res.statusText}`);
     }
