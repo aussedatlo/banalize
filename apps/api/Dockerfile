@@ -10,4 +10,4 @@ COPY . .
 
 RUN pnpm i && pnpm build:api
 
-CMD ["pnpm", "api", "start"]
+CMD ["node", "apps/api/dist/main.js"]

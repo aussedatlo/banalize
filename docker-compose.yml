@@ -31,6 +31,8 @@ services:
       BANALIZE_API_FIREWALL_TYPE: iptables
       BANALIZE_API_FIREWALL_CHAIN: FORWARD
       BANALIZE_API_LOG_DEBUG: false
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
     volumes:
       # Mount the docker socket to the container
       # if you want to use the docker watcher
