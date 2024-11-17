@@ -89,7 +89,7 @@ export const ConfigEventsPaper = ({
   });
 
   useEffect(() => {
-    if (!events || !totalCount || !ipInfos) return;
+    if (!events || totalCount === undefined || !ipInfos) return;
     setState({ events, totalCount, ipInfos });
   }, [events, ipInfos, totalCount]);
 
