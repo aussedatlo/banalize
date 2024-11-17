@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 RUN npm install -g pnpm
 
-RUN apt update && apt install -y iptables ufw
+RUN apt update && apt install -y iptables
 
 COPY . .
 
