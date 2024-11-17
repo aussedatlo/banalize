@@ -25,7 +25,7 @@ jobs:
         run: docker compose build web
 
       - name: Start containers
-        run: docker compose up -d && sleep 15
+        run: docker compose up -d && sleep 30
 
       - name: Check api container
         run: |
