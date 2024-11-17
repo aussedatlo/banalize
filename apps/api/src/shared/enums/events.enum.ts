@@ -9,4 +9,8 @@ export enum Events {
   UNBAN_CREATE_REQUESTED = "unban.create.requested",
   FIREWALL_DENY = "firewall.deny",
   FIREWALL_ALLOW = "firewall.allow",
+  NOTIFY = "notify",
+  NOTIFY_CONFIG_CREATION_DONE = "notify.config.creation.done",
+  NOTIFY_CONFIG_UPDATE_DONE = "notify.config.update.done",
+  NOTIFY_CONFIG_DELETE_DONE = "notify.config.delete.done",
 }

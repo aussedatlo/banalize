@@ -11,13 +11,14 @@ import { IpInfosFiltersDto } from "../dtos/ip-infos-filters.dto";
 export class IpInfosService implements OnModuleInit {
   private readonly logger = new Logger(IpInfosService.name);
   private readonly dbPath = path.join(__dirname, "GeoLite2-City.mmdb");
-  private readonly dbUrl =
-    "https://github.com/P3TERX/GeoLite.mmdb/releases/download/2024.10.13/GeoLite2-City.mmdb";
+  private readonly repoUrl =
+    "https://api.github.com/repos/P3TERX/GeoLite.mmdb/releases/latest";
 
   async onModuleInit() {
     if (!fs.existsSync(this.dbPath)) {
       this.logger.log("GeoLite2-City.mmdb not found, downloading...");
-      await this.downloadDatabase(this.dbUrl, this.dbPath);
+      const dbUrl = await this.getLatestDbUrl();
+      await this.downloadDatabase(dbUrl, this.dbPath);
     } else {
       this.logger.log("GeoLite2-City.mmdb already exists, skipping download.");
     }
@@ -25,7 +26,8 @@ export class IpInfosService implements OnModuleInit {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async updateDatabase() {
-    this.downloadDatabase(this.dbUrl, this.dbPath);
+    const dbUrl = await this.getLatestDbUrl();
+    this.downloadDatabase(dbUrl, this.dbPath);
   }
 
   async findMany({
@@ -53,7 +55,7 @@ export class IpInfosService implements OnModuleInit {
       return this.mapToIpInfos(lookup.get(ip));
     } catch (error) {
       this.logger.error("Error querying IP:", error);
-      throw new Error("Failed to query IP address.");
+      return {};
     }
   }
 
@@ -92,28 +94,59 @@ export class IpInfosService implements OnModuleInit {
       .map((char) => 127397 + char.charCodeAt(0));
     return String.fromCodePoint(...codePoints);
   }
+  private async getLatestDbUrl(): Promise<string> {
+    try {
+      const response = await axios.get(this.repoUrl);
+      const assets = response.data.assets;
+      const asset = assets.find(
+        (a: { name: string }) => a.name === "GeoLite2-City.mmdb",
+      );
+
+      if (asset && asset.browser_download_url) {
+        this.logger.log(
+          `Latest database URL found: ${asset.browser_download_url}`,
+        );
+        return asset.browser_download_url;
+      } else {
+        this.logger.error(
+          "GeoLite2-City.mmdb not found in the latest release.",
+        );
+        return "";
+      }
+    } catch (error) {
+      this.logger.error(
+        "Error fetching latest release info from GitHub:",
+        error,
+      );
+      return "";
+    }
+  }
 
   private async downloadDatabase(url: string, dest: string): Promise<void> {
-    const response = await axios({
-      method: "get",
-      url,
-      responseType: "stream",
-    });
-
-    const file = fs.createWriteStream(dest);
-    return new Promise((resolve) => {
-      response.data.pipe(file);
-      file.on("finish", () => {
-        file.close();
-        this.logger.log("Database downloaded successfully.");
-        resolve();
+    try {
+      const response = await axios({
+        method: "get",
+        url,
+        responseType: "stream",
       });
 
-      file.on("error", (err) => {
-        fs.unlink(dest, () => {});
-        this.logger.error("Error downloading database:", err);
-        resolve();
+      const file = fs.createWriteStream(dest);
+      return new Promise((resolve) => {
+        response.data.pipe(file);
+        file.on("finish", () => {
+          file.close();
+          this.logger.log("Database downloaded successfully.");
+          resolve();
+        });
+
+        file.on("error", (err) => {
+          fs.unlink(dest, () => {});
+          this.logger.error("Error downloading database:", err);
+          resolve();
+        });
       });
-    });
+    } catch (error) {
+      this.logger.error("Error downloading database:", error);
+    }
   }
 }
