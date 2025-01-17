@@ -8,16 +8,10 @@ import { NotifyEvent } from "src/notifications/types/notify-event.types";
 import { Events } from "src/shared/enums/events.enum";
 import { NotifierConfigService } from "./notifier-config-service.service";
 
-const INITIAL_NOTIFIERS: Record<EventType, Notifier[]> = {
-  [EventType.BAN]: [],
-  [EventType.UNBAN]: [],
-  [EventType.MATCH]: [],
-};
-
 @Injectable()
 export class NotifierManager implements OnModuleInit {
   private readonly logger: Logger = new Logger(NotifierManager.name);
-  private notifiers: Record<EventType, Notifier[]> = INITIAL_NOTIFIERS;
+  private notifiers: Record<EventType, Notifier[]> = null;
 
   constructor(
     private readonly notifierConfigService: NotifierConfigService,
@@ -46,13 +40,20 @@ export class NotifierManager implements OnModuleInit {
   }
 
   private async loadNotifiers() {
-    this.notifiers = INITIAL_NOTIFIERS;
+    this.notifiers = {
+      [EventType.BAN]: [],
+      [EventType.UNBAN]: [],
+      [EventType.MATCH]: [],
+    };
+    console.log(this.notifiers);
     const configs = await this.notifierConfigService.findAll();
+    console.log(configs);
     for (const config of configs) {
       const notifier = this.notifierFactory.createNotifier(config);
       for (const type of config.events) {
         this.notifiers[type].push(notifier);
       }
     }
+    console.log(this.notifiers);
   }
 }

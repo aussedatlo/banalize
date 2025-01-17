@@ -35,7 +35,7 @@ export class NotifierConfigService {
   }
 
   async delete(id: string) {
-    const result = this.notifierConfigModel.findByIdAndDelete(id).exec();
+    const result = await this.notifierConfigModel.findByIdAndDelete(id).exec();
     this.eventEmitter.emit(Events.NOTIFY_CONFIG_DELETE_DONE);
     return result;
   }
