@@ -45,15 +45,12 @@ export class NotifierManager implements OnModuleInit {
       [EventType.UNBAN]: [],
       [EventType.MATCH]: [],
     };
-    console.log(this.notifiers);
     const configs = await this.notifierConfigService.findAll();
-    console.log(configs);
     for (const config of configs) {
       const notifier = this.notifierFactory.createNotifier(config);
       for (const type of config.events) {
         this.notifiers[type].push(notifier);
       }
     }
-    console.log(this.notifiers);
   }
 }

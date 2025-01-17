@@ -97,11 +97,7 @@ export const NotifierConfigForm: React.FC<NotifierConfigFormProps> = ({
           }
         : { events: values.events, signalConfig: values.signalConfig };
 
-    console.log(dto);
-
     const result = await onSubmit(dto);
-
-    console.log(result);
 
     if ("message" in result && typeof result.message === "string") {
       setMessage(result.message);
