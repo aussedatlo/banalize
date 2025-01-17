@@ -87,15 +87,17 @@ export const NotifierConfigForm: React.FC<NotifierConfigFormProps> = ({
 
   const onSubmitRequested = async (values: NotifierConfigDto) => {
     const dto =
-      type === NotifierType.EMAIL
-        ? { events: values.events, emailConfig: values.emailConfig }
+      type === NotifierType.EMAIL && values.emailConfig
+        ? {
+            events: values.events,
+            emailConfig: {
+              ...values.emailConfig,
+              port: Number(values.emailConfig.port),
+            },
+          }
         : { events: values.events, signalConfig: values.signalConfig };
 
-    console.log(dto);
-
     const result = await onSubmit(dto);
-
-    console.log(result);
 
     if ("message" in result && typeof result.message === "string") {
       setMessage(result.message);

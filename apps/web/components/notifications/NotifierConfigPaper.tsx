@@ -8,6 +8,7 @@ import { DeleteSmallButton } from "components/shared/Buttons/DeleteSmallButton";
 import { EditSmallButton } from "components/shared/Buttons/EditSmallButton";
 import { Paper } from "components/shared/Paper/Paper";
 import { useNotifications } from "hooks/useNotifications";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { NotifierConfigForm } from "./NotifierConfigForm";
 
@@ -21,11 +22,13 @@ export const NotifierConfigPaper = ({
   const [config, setConfig] = useState<NotifierConfigSchema>(initialConfig);
   const [opened, { open, close }] = useDisclosure(false);
   const { remove, update } = useNotifications();
+  const router = useRouter();
   const type = config.emailConfig ? "Email" : "Signal";
   const icon = config.emailConfig ? <IconMail /> : <IconMessageCircle />;
 
   const onDelete = async () => {
     await remove(config._id);
+    router.refresh();
   };
 
   const onUpdate = async (dto: NotifierConfigDto) => {
