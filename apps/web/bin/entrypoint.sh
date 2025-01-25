@@ -1,18 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 
-ENV_PREFIX="BANALIZE_"
+# use the docker environment
+env | grep BANALIZE_WEB > apps/web/.env
 
-# Loop over all environment variables that start with the defined prefix
-for var in $(env | grep "^$ENV_PREFIX" | awk -F= '{print $1}'); do
-  # Get the value of the environment variable
-  value=$(eval echo \$$var)
+echo "using the following environment variables:"
+cat apps/web/.env
 
-  # Log the substitution process for debugging purposes
-  echo "Replacing placeholder $var with value $value in .next/ files..."
+export PORT=$BANALIZE_WEB_PORT
+export HOSTNAME=0.0.0.0
 
-  # Replace the environment variable placeholder in all files inside the .next/ directory
-  find apps/web/.next/ -type f -exec sed -i "s|$var|$value|g" {} \;
-done
+# copy server files to the right place
+cp -rv apps/web/.next/standalone /tmp/
+cp -rv apps/web/.next/static /tmp/standalone/apps/web/.next/
+cp -rv apps/web/public /tmp/standalone/apps/web/
 
-# Keep the container alive after the replacements
-pnpm web start
+# start the server
+cd /tmp/standalone && node apps/web/server.js
+ 

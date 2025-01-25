@@ -6,6 +6,6 @@ COPY . .
 
 RUN npm install -g pnpm
 
-RUN pnpm i && pnpm build:web
+RUN cp .env.docker apps/web/.env && pnpm i && pnpm build:web
 
 CMD ["/bin/sh", "-c", "./apps/web/bin/entrypoint.sh"]

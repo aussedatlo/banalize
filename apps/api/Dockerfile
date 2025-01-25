@@ -10,4 +10,5 @@ COPY . .
 
 RUN pnpm i && pnpm build:api
 
-CMD ["node", "apps/api/dist/main.js"]
+CMD ["/bin/sh", "-c", "./apps/api/bin/entrypoint.sh"]
+
