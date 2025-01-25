@@ -5,7 +5,6 @@ const nextConfig = {
   output: "standalone",
   env: {
     BANALIZE_WEB_API_SERVER_URL: process.env.BANALIZE_WEB_API_SERVER_URL,
-    BANALIZE_WEB_BASE_URL: process.env.BANALIZE_WEB_BASE_URL,
     NEXT_PUBLIC_BANALIZE_WEB_VERSION: packageJson.version,
   },
   async redirects() {

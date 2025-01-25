@@ -16,7 +16,6 @@ import type {
 } from "@banalize/types";
 
 const API_BASE_URL_SERVER = process.env.BANALIZE_WEB_API_SERVER_URL;
-const API_BASE_URL_CLIENT = `${process.env.BANALIZE_WEB_BASE_URL}/api`;
 
 if (!API_BASE_URL_SERVER) {
   throw new Error("BANALIZE_WEB_API_SERVER_URL is not defined");
@@ -35,7 +34,7 @@ export const fetchFromApi = async <T extends object>(
   defaultValue: object = {},
 ): Promise<{ data: T; totalCount: number }> => {
   const isServer = typeof window === "undefined";
-  const url = isServer ? API_BASE_URL_SERVER : API_BASE_URL_CLIENT;
+  const url = isServer ? API_BASE_URL_SERVER : "/api";
   console.log("API request to", url + endpoint);
   try {
     const res = await fetch(url + endpoint, {
