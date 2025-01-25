@@ -71,7 +71,10 @@ export default async function TimelinePage({
     <Box>
       <Group justify="space-between" mb="lg">
         <Group>
-          <RouterBreadcrumbs path={`/configs/${config.name}/${ip}`} />
+          <RouterBreadcrumbs
+            path={`/configs/${config._id}/${ip}`}
+            displayedPath={`/configs/${config.name}/${ip}`}
+          />
         </Group>
         <Group>
           <BanUnbanIpButton config={config} ip={ip} />
