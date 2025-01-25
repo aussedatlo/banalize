@@ -3,10 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "[ -e .env ] && set -a && . ./.env; next dev --turbo --port ${BANALIZE_WEB_PORT-3000}",
-    "build": "[ -e .env ] && set -a && . ./.env; next build",
-    "start": "[ -e .env ] && set -a && . ./.env; next start --port ${BANALIZE_WEB_PORT-3000}",
-    "export": "next build && next export",
+    "dev": "bin/run.sh dev --turbo",
+    "build": "bin/run.sh build",
+    "start": "bin/run.sh next start",
     "typecheck": "tsc --noEmit",
     "lint": "next lint && pnpm lint:stylelint",
     "lint:fix": "next lint --fix && pnpm lint:stylelint --fix",

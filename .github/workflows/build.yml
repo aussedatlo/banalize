@@ -22,5 +22,3 @@ jobs:
 
       - name: Build packages
         run: pnpm build
-        env:
-          BANALIZE_WEB_API_SERVER_URL: http://localhost:5040
