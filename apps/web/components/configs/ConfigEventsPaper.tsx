@@ -69,6 +69,7 @@ export const ConfigEventsPaper = ({
     EventStatus.ACTIVE,
     EventStatus.EXPIRED,
     EventStatus.UNBANNED,
+    EventStatus.IGNORED,
   ]);
   const [opened, { open, close }] = useDisclosure(false);
   const [state, setState] = useState({
@@ -202,6 +203,7 @@ export const ConfigEventsPaper = ({
                 { value: EventStatus.RECENT, label: "Recent" },
                 { value: EventStatus.STALE, label: "Stale" },
                 { value: EventStatus.UNBANNED, label: "Unbanned" },
+                { value: EventStatus.IGNORED, label: "Ignored" },
               ]}
               value={statusFilter}
               onChange={(e) => setStatusFilter(e as EventStatus[])}
