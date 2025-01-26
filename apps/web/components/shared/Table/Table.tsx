@@ -5,7 +5,7 @@ import classes from "./Table.module.css";
 
 type CustomTableProps<T, K extends string> = {
   items: T[];
-  headers: Record<K, string>;
+  headers: Partial<Record<K, string>>;
   renderRow: (item: T, key: K) => React.ReactNode;
   onRowClick?: (item: T) => void;
 };

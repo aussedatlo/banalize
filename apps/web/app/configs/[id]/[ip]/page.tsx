@@ -2,10 +2,17 @@ import { BanSchema, EventType, MatchSchema } from "@banalize/types";
 import { Box, Grid, GridCol, Group } from "@mantine/core";
 import { IconHistory } from "@tabler/icons-react";
 import { BanUnbanIpButton } from "components/configs/BanUnbanIpButton";
+import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
 import { Paper } from "components/shared/Paper/Paper";
 import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 import { Timeline, TimelineEvent } from "components/shared/Timeline/Timeline";
-import { fetchBans, fetchConfigById, fetchMatches } from "lib/api";
+import {
+  fetchBans,
+  fetchConfigById,
+  fetchEvents,
+  fetchIpInfos,
+  fetchMatches,
+} from "lib/api";
 
 function generateTimelineEvents(
   matches: MatchSchema[],
@@ -40,10 +47,14 @@ export default async function TimelinePage({
 }: {
   params: { id: string; ip: string };
 }) {
-  const configId = params.id;
+  const { id: configId, ip } = params;
   const config = await fetchConfigById(configId);
-
-  const ip = params.ip;
+  const { data: events, totalCount: totalEventsCount } = await fetchEvents({
+    configId,
+    ip,
+  });
+  const ipList = Array.from(new Set(events.map((event) => event.ip)));
+  const IpInfos = await fetchIpInfos({ ips: ipList });
 
   const bansHistory = await fetchBans({
     configId,
@@ -92,6 +103,16 @@ export default async function TimelinePage({
               </Group>
             )}
           </Paper>
+        </GridCol>
+
+        <GridCol span={12}>
+          <ConfigEventsPaper
+            events={events}
+            totalCount={totalEventsCount}
+            config={config}
+            ipInfos={IpInfos}
+            ipFilter={ip}
+          />
         </GridCol>
       </Grid>
     </Box>

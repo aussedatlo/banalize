@@ -4,6 +4,7 @@ import { type ConfigSchema } from "@banalize/types";
 import { ActionIcon, Notification, rem, Tooltip } from "@mantine/core";
 import { IconHandOff, IconHandStop } from "@tabler/icons-react";
 import { useBans } from "hooks/useBans";
+import { useEventsWithIpInfos } from "hooks/useEvents";
 import { ban, unban } from "lib/api";
 import { useState } from "react";
 
@@ -19,11 +20,15 @@ export const BanUnbanIpButton = ({ config, ip }: UnbanIpButtonProps) => {
   const {
     bans,
     totalCount: isBanned,
-    mutate,
+    mutate: mutateBans,
   } = useBans({
     configId,
     ip,
     active: true,
+  });
+  const { mutate: mutateEvents } = useEventsWithIpInfos({
+    configId,
+    ip,
   });
 
   const onBan = async () => {
@@ -33,7 +38,8 @@ export const BanUnbanIpButton = ({ config, ip }: UnbanIpButtonProps) => {
     } catch (error) {
       setError("Failed to ban IP");
     } finally {
-      mutate();
+      mutateBans();
+      mutateEvents();
     }
   };
 
@@ -45,7 +51,8 @@ export const BanUnbanIpButton = ({ config, ip }: UnbanIpButtonProps) => {
     } catch (error) {
       setError("Failed to unban IP");
     } finally {
-      mutate();
+      mutateBans();
+      mutateEvents();
     }
   };
 
