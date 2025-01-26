@@ -1,5 +1,7 @@
 import { Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { exec } from "child_process";
+import { Events } from "src/shared/enums/events.enum";
 import { promisify } from "util";
 import { Firewall } from "./firewall.interface";
 
@@ -10,6 +12,8 @@ export class IptablesFirewallService
   private readonly chain = "banalize";
   private readonly link = process.env.BANALIZE_API_FIREWALL_CHAIN ?? "INPUT";
   private bannedIps: string[] = [];
+
+  constructor(private readonly eventEmitter: EventEmitter2) {}
 
   private execAsync = promisify(exec);
 
@@ -27,6 +31,11 @@ export class IptablesFirewallService
     await this.createChain();
     await this.linkChain();
     await this.flushChain();
+
+    // Emit the event in the next tick to avoid circular dependencies
+    setTimeout(() => {
+      this.eventEmitter.emit(Events.FIREWALL_READY);
+    }, 0);
   }
 
   async denyIp(ip: string): Promise<void> {
