@@ -1,6 +1,6 @@
 import { BanFiltersDto } from "@banalize/types";
 import { fetchBans } from "lib/api";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 export const useBans = (filters: BanFiltersDto) => {
   const { data } = useSWR(JSON.stringify(filters), () => fetchBans(filters));
@@ -8,5 +8,6 @@ export const useBans = (filters: BanFiltersDto) => {
   return {
     bans: data?.bans,
     totalCount: data?.totalCount,
+    mutate: () => mutate(JSON.stringify(filters)),
   };
 };

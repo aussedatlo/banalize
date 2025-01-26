@@ -1,4 +1,4 @@
-import { BanSchema, MatchSchema } from "@banalize/types";
+import { BanSchema, EventType, MatchSchema } from "@banalize/types";
 import { Box, Grid, GridCol, Group } from "@mantine/core";
 import { IconHistory } from "@tabler/icons-react";
 import { BanUnbanIpButton } from "components/configs/BanUnbanIpButton";
@@ -14,19 +14,19 @@ function generateTimelineEvents(
 ): TimelineEvent[] {
   const matchEvents = matches.map((match) => ({
     date: new Date(match.timestamp),
-    type: "match" as const,
+    type: EventType.MATCH,
     event: match,
   }));
 
   const banEvents = bans.map((ban) => ({
     date: new Date(ban.timestamp),
-    type: "ban" as const,
+    type: EventType.BAN,
     event: ban,
   }));
 
   const unbanEvents = unbans.map((unban) => ({
     date: new Date(unban.timestamp),
-    type: "unban" as const,
+    type: EventType.UNBAN,
     event: unban,
   }));
 
