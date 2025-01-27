@@ -76,7 +76,7 @@ export class ConfigCreationDto implements ConfigCreation {
   @IsCidrOrIp()
   @IsOptional()
   @ApiProperty({
-    example: ["192.168.1.1", "192.168.1.0/32"],
+    example: ["192.168.1.1", "192.168.1.0/24"],
     description: "the list of IPs to ignore",
     required: false,
   })
