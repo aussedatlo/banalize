@@ -35,7 +35,7 @@ export const BanUnbanIpButton = ({ config, ip }: UnbanIpButtonProps) => {
     try {
       await ban({ configId, ip, timestamp: new Date().getTime() });
       setSuccess("IP was banned");
-    } catch (error) {
+    } catch (_) {
       setError("Failed to ban IP");
     } finally {
       mutateBans();
@@ -48,7 +48,7 @@ export const BanUnbanIpButton = ({ config, ip }: UnbanIpButtonProps) => {
       const promise = bans?.map((ban) => unban(ban._id));
       await Promise.all(promise ?? []);
       setSuccess("IP was unbanned");
-    } catch (error) {
+    } catch (_) {
       setError("Failed to unban IP");
     } finally {
       mutateBans();
