@@ -4,4 +4,5 @@ export enum EventStatus {
   ACTIVE = "active",
   EXPIRED = "expired",
   UNBANNED = "unbanned",
+  IGNORED = "ignored",
 }

@@ -73,7 +73,7 @@ export class DockerWatcherService implements Watcher {
       if (line.length) {
         this.processedLines++;
         const ip = extractIp(this.config.regex, line)?.match.ip;
-        if (ip && !this.config.ignoreIps.includes(ip)) {
+        if (ip) {
           this.logger.debug("Matched line");
 
           this.eventEmitter.emit(

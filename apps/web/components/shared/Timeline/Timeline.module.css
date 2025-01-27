@@ -1,0 +1,240 @@
+.timelineContainer {
+  width: calc(100% - 120px);
+  overflow-x: auto;
+  scrollbar-width: none; /* Pour Firefox */
+  -ms-overflow-style: none; /* Pour Internet Explorer et Edge */
+}
+
+.timelineContainer::-webkit-scrollbar {
+  display: none; /* Pour Chrome, Safari et Opera */
+}
+
+.timeline {
+  display: flex;
+  padding: 0;
+  text-align: center;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  width: max-content;
+  min-width: 100%;
+}
+
+.timeline li {
+  transition: all 200ms ease-in;
+}
+
+.timeline div {
+  flex: 1;
+}
+
+.top {
+  width: 100%;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  font-weight: 100;
+  height: 100px;
+}
+
+.bottom,
+.firstBottom {
+  padding: 0 40px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  transition: all 200ms ease-in;
+  flex-direction: column;
+  height: 100px;
+}
+
+.top div {
+  flex-direction: column-reverse;
+  display: flex;
+}
+
+.firstBottom div,
+.bottom {
+  font-weight: 600;
+  padding-top: 20px;
+  flex-direction: column;
+  display: flex;
+}
+
+.bottom > div:first-child::before {
+  content: "";
+  width: 25px;
+  height: 25px;
+  background-color: #e8eeff;
+  border-radius: 25px;
+  border: 4px solid var(--mantine-color-cyan-filled);
+  position: absolute;
+  top: -15px;
+  left: calc(50% - 12px);
+  z-index: 1;
+}
+
+.noBar::before {
+  display: none;
+}
+
+.eventDot {
+  border-radius: 50%;
+  background-color: var(--mantine-color-cyan-filled);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.banDot {
+  background-color: var(--mantine-color-pink-filled);
+}
+
+.eventDate {
+  font-size: 0.8em;
+  color: var(--mantine-color-gray-6);
+}
+
+.swiperControl {
+  text-align: right;
+}
+
+.swiperContainer {
+  width: 100%;
+  height: 250px;
+  margin: 50px 0;
+  overflow: hidden;
+  padding: 0 20px 30px;
+}
+
+.swiperSlide {
+  width: 200px;
+  text-align: center;
+}
+
+.swiperSlide:nth-child(2n) {
+  width: 40%;
+}
+
+.swiperSlide:nth-child(3n) {
+  width: 20%;
+}
+
+.isBan.bottom div::before {
+  border-color: var(--mantine-color-pink-filled);
+}
+
+.isUnban.bottom div::before {
+  border-color: var(--mantine-color-cyan-filled);
+}
+
+.eventLink {
+  position: absolute;
+  height: 4px;
+  top: 0;
+  transform: translateY(-100%);
+  width: 100%;
+  right: -50%;
+}
+
+.gradientMatchToBan {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-cyan-filled),
+    var(--mantine-color-pink-filled)
+  );
+}
+
+.gradientBanToMatch {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-pink-filled),
+    var(--mantine-color-cyan-filled)
+  );
+}
+
+.gradientBanToUnban {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-pink-filled),
+    var(--mantine-color-cyan-filled)
+  );
+}
+
+.gradientUnbanToBan {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-cyan-filled),
+    var(--mantine-color-pink-filled)
+  );
+}
+
+.gradientUnbanToMatch {
+  background: linear-gradient(
+    to right,
+    var(--mantine-color-cyan-filled),
+    var(--mantine-color-cyan-filled)
+  );
+}
+
+.solidBan {
+  background-color: var(--mantine-color-red-6);
+}
+
+.solidMatch {
+  background-color: var(--mantine-color-cyan-filled);
+}
+
+.intermediateEvents {
+  position: absolute;
+  background: var(--mantine-color-dark-7);
+  color: white;
+  border-radius: 4px;
+  border: 1px solid var(--mantine-color-dark-5);
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 10;
+  padding: var(--mantine-spacing-sm);
+}
+
+.noHover {
+  cursor: default;
+}
+
+.navigationButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: var(--mantine-color-gray-6);
+  transition: color 0.3s ease;
+}
+
+.navigationButton:hover {
+  color: var(--mantine-color-blue-6);
+}
+
+.navigationButton:disabled {
+  color: var(--mantine-color-gray-4);
+  cursor: not-allowed;
+}
+
+.nextButton {
+  border: 1px solid var(--mantine-color-dark-4);
+  background-color: var(--mantine-color-dark-6);
+  border-radius: var(--mantine-radius-default);
+  cursor: pointer;
+  color: var(--mantine-color-text);
+}
+
+.nextButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.nextButton:hover:not(:disabled) {
+  background-color: var(--mantine-color-dark-5);
+}

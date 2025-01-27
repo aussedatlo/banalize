@@ -10,6 +10,7 @@ type ItemBreadcrumb = {
 
 type RouterBreadcrumbsProps = {
   path: string;
+  displayedPath?: string;
 };
 
 const generateBreadcrumbs = (path: string): ItemBreadcrumb[] => {
@@ -31,17 +32,22 @@ const generateBreadcrumbs = (path: string): ItemBreadcrumb[] => {
     );
 };
 
-export const RouterBreadcrumbs = ({ path }: RouterBreadcrumbsProps) => {
-  const items = generateBreadcrumbs(path).map((item: ItemBreadcrumb) =>
+export const RouterBreadcrumbs = ({
+  path,
+  displayedPath,
+}: RouterBreadcrumbsProps) => {
+  const splitDisplayedPath = displayedPath?.split("/") ?? [];
+
+  const items = generateBreadcrumbs(path).map((item: ItemBreadcrumb, index) =>
     item.enabled ? (
       <Link key={item.title} href={item.href} className={classes.link}>
         <Text fz={"h3"} className={classes.breadcrumb}>
-          {item.title}
+          {displayedPath ? splitDisplayedPath[index + 1] : item.title}
         </Text>
       </Link>
     ) : (
       <Text key={item.title} fz={"h3"} className={classes.breadcrumb}>
-        {item.title}
+        {displayedPath ? splitDisplayedPath[index + 1] : item.title}
       </Text>
     ),
   );

@@ -63,9 +63,15 @@ export class EventsService {
           configId: 1,
           status: {
             $cond: {
-              if: { $gte: ["$timestamp", recentThreshold] },
-              then: EventStatus.RECENT,
-              else: EventStatus.STALE,
+              if: { $in: ["$ip", config.ignoreIps] },
+              then: EventStatus.IGNORED,
+              else: {
+                $cond: {
+                  if: { $gte: ["$timestamp", recentThreshold] },
+                  then: EventStatus.RECENT,
+                  else: EventStatus.STALE,
+                },
+              },
             },
           },
           line: 1,

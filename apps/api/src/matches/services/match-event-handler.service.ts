@@ -32,6 +32,7 @@ export class MatchEventHandlerService {
       `Matched line: ${line}, ip: ${ip}, config: ${config.param}`,
     );
 
+    const ignored = config.ignoreIps.includes(ip);
     const timestamp = new Date().getTime();
 
     await this.matchesService.create({
@@ -41,6 +42,12 @@ export class MatchEventHandlerService {
       timestamp,
       configId: config._id,
     });
+
+    if (ignored) {
+      this.logger.debug(`Match ignored, not checking for bans`);
+      this.eventEmitter.emit(Events.MATCH_CREATION_DONE, event);
+      return;
+    }
 
     const { totalCount } = await this.matchesService.findAll({
       configId: config._id,

@@ -5,8 +5,10 @@ services:
     restart: unless-stopped
     ports:
       - "27017:27017"
-    env_file:
-      - .env.docker
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: admin
     volumes:
       - mongodb-data:/data/db
 
@@ -21,12 +23,16 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
-    stop_signal: SIGTERM
-    stop_grace_period: 30s
     depends_on:
       - mongodb
-    env_file:
-      - .env.docker
+    environment:
+      BANALIZE_API_MONGO_URI: mongodb://admin:pass@localhost:27017/admin
+      BANALIZE_API_SERVER_PORT: 5040
+      BANALIZE_API_FIREWALL_TYPE: iptables
+      BANALIZE_API_FIREWALL_CHAIN: FORWARD
+      BANALIZE_API_LOG_DEBUG: false
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
     volumes:
       # Mount the docker socket to the container
       # if you want to use the docker watcher
@@ -45,8 +51,9 @@ services:
       dockerfile: apps/web/Dockerfile
     depends_on:
       - api
-    env_file:
-      - .env.docker
+    environment:
+      BANALIZE_WEB_API_SERVER_URL: http://localhost:5040
+      BANALIZE_WEB_PORT: 5041
 
 volumes:
   mongodb-data:

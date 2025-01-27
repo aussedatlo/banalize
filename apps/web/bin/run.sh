@@ -9,7 +9,7 @@ fi
 
 # set default values
 export PORT=${BANALIZE_WEB_PORT-3000}
-export BANALIZE_WEB_API_SERVER_URL=${BANALIZE_WEB_API_SERVER_URL-http://localhost:5040}
+export BANALIZE_WEB_API_SERVER_URL=${BANALIZE_WEB_API_SERVER_URL-http://replace-me-with-the-api-server-url:6040}
 
 # run next command with all arguments
 pnpm exec next $@

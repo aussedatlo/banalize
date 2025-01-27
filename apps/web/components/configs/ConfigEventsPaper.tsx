@@ -46,6 +46,7 @@ type ConfigEventsPaperProps = {
   events: EventResponse[];
   totalCount: number;
   ipInfos: Record<string, Partial<IpInfosResponse>>;
+  ipFilter?: string;
 };
 
 export const ConfigEventsPaper = ({
@@ -53,9 +54,10 @@ export const ConfigEventsPaper = ({
   events: initEvents,
   totalCount: initTotalCount,
   ipInfos: initIpInfos,
+  ipFilter: initIpFilter,
 }: ConfigEventsPaperProps) => {
   const [activePage, setPage] = useState(1);
-  const [ipFilter, setIpFilter] = useState("");
+  const [ipFilter, setIpFilter] = useState(initIpFilter ?? "");
   const [typeFilter, setTypeFilter] = useState<EventType[]>([
     EventType.BAN,
     EventType.MATCH,
@@ -67,6 +69,7 @@ export const ConfigEventsPaper = ({
     EventStatus.ACTIVE,
     EventStatus.EXPIRED,
     EventStatus.UNBANNED,
+    EventStatus.IGNORED,
   ]);
   const [opened, { open, close }] = useDisclosure(false);
   const [state, setState] = useState({
@@ -140,7 +143,6 @@ export const ConfigEventsPaper = ({
 
   return (
     <Paper
-      title="Events"
       icon={<IconTimelineEvent />}
       override={
         <Group m="md" justify="space-between">
@@ -148,7 +150,9 @@ export const ConfigEventsPaper = ({
             <ThemeIcon color="pink">
               <IconGraph />
             </ThemeIcon>
-            <Text fz="h3">Events</Text>
+            <Text fz="h3">
+              {initIpFilter ? `Events for ${ipFilter}` : "Events"}
+            </Text>
           </Group>
 
           <Group>
@@ -199,6 +203,7 @@ export const ConfigEventsPaper = ({
                 { value: EventStatus.RECENT, label: "Recent" },
                 { value: EventStatus.STALE, label: "Stale" },
                 { value: EventStatus.UNBANNED, label: "Unbanned" },
+                { value: EventStatus.IGNORED, label: "Ignored" },
               ]}
               value={statusFilter}
               onChange={(e) => setStatusFilter(e as EventStatus[])}
@@ -229,34 +234,45 @@ export const ConfigEventsPaper = ({
                 )
               }
             />
-            <TextInput
-              ml="auto"
-              placeholder="Search by IP"
-              w={{ base: "100%", md: "auto" }}
-              leftSection={
-                <IconSearch
-                  style={{
-                    width: rem(16),
-                    height: rem(16),
-                    color: theme.colors.pink[8],
-                  }}
-                />
-              }
-              value={ipFilter}
-              onChange={(e) => setIpFilter(e.target.value)}
-            />
+            {!initIpFilter && (
+              <TextInput
+                ml="auto"
+                placeholder="Search by IP"
+                w={{ base: "100%", md: "auto" }}
+                leftSection={
+                  <IconSearch
+                    style={{
+                      width: rem(16),
+                      height: rem(16),
+                      color: theme.colors.pink[8],
+                    }}
+                  />
+                }
+                value={ipFilter}
+                onChange={(e) => setIpFilter(e.target.value)}
+              />
+            )}
           </Group>
         </Group>
       }
     >
       <Table
-        headers={{
-          type: "Event Type",
-          timestamp: "Timestamp",
-          ip: "IP Address",
-          location: "Location",
-          status: "Status",
-        }}
+        headers={
+          initIpFilter
+            ? {
+                type: "Event Type",
+                timestamp: "Timestamp",
+                location: "Location",
+                status: "Status",
+              }
+            : {
+                type: "Event Type",
+                timestamp: "Timestamp",
+                ip: "IP Address",
+                location: "Location",
+                status: "Status",
+              }
+        }
         items={state.events}
         onRowClick={(item) => {
           setFocusedEvent(item);

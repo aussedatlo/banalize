@@ -5,6 +5,7 @@ import { ActionIcon, Modal, rem, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconEdit } from "@tabler/icons-react";
 import { ConfigForm, ConfigFormType } from "components/configs/ConfigForm";
+import { useEventsWithIpInfos } from "hooks/useEvents";
 import { useRouter } from "next/navigation";
 
 type EditConfigButtonProps = {
@@ -14,6 +15,7 @@ type EditConfigButtonProps = {
 export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
   const [opened, { open, close }] = useDisclosure(false);
   const router = useRouter();
+  const { mutate } = useEventsWithIpInfos({ configId: config._id });
 
   const onConfigEdit = async (
     config: ConfigFormType,
@@ -37,6 +39,7 @@ export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
   const onDone = () => {
     close();
     router.refresh();
+    mutate();
   };
 
   return (
