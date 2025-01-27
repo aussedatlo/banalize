@@ -78,9 +78,9 @@ export class MatchEventHandlerService {
 // 1         = 1 * 2⁰
 
 export function ipToLong(ip: string): number {
-  const [octet1, octet2, octet3, octet4] = ip.split(".").map(Number);
+  const [byte1, byte2, byte3, byte4] = ip.split(".").map(Number);
 
-  return ((octet1 << 24) + (octet2 << 16) + (octet3 << 8) + octet4) >>> 0;
+  return ((byte1 << 24) + (byte2 << 16) + (byte3 << 8) + byte4) >>> 0;
 }
 
 export function isIpInCidr(ip: string, cidr: string): boolean {

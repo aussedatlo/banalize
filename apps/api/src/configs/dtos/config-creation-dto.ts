@@ -12,8 +12,8 @@ import {
   IsPositive,
   IsString,
 } from "class-validator";
-import { IsRegex } from "src/configs/utils/is-regex-validator";
 import { IsCidrOrIp } from "src/configs/utils/is-cidr-or-ip-validator";
+import { IsRegex } from "src/configs/utils/is-regex-validator";
 
 export class ConfigCreationDto implements ConfigCreation {
   @IsString()
