@@ -33,13 +33,13 @@ describe("IsCidrOrIp", () => {
 
   it("should reject invalid IP addresses", async () => {
     const invalidIPs = [
-      ["256.1.2.3"], // Octet > 255
-      ["1.2.3.256"], // Octet > 255
-      ["1.2.3"], // Octet is missing
-      ["1.2.3.4.5"], // Too many octets
-      ["abc.def.ghi.jkl"], // Non-numeric octets
-      ["192.168.1."], // incomplete IP
-      [".192.168.1"], // Ip badly formatted
+      ["256.1.2.3"],
+      ["1.2.3.256"],
+      ["1.2.3"],
+      ["1.2.3.4.5"],
+      ["abc.def.ghi.jkl"],
+      ["192.168.1."],
+      [".192.168.1"],
     ];
 
     for (const ips of invalidIPs) {
@@ -51,12 +51,12 @@ describe("IsCidrOrIp", () => {
 
   it("should reject invalid CIDR notations", async () => {
     const invalidCIDRs = [
-      ["192.168.1.0/33"], // Masque > 32
-      ["192.168.1.0/-1"], // Masque négatif
-      ["192.168.1.0/"], // Masque manquant
-      ["192.168.1/24"], // IP incomplète
-      ["192.168.1.0.0/24"], // IP mal formatée
-      ["256.168.1.0/24"], // Octet > 255
+      ["192.168.1.0/33"],
+      ["192.168.1.0/-1"],
+      ["192.168.1.0/"],
+      ["192.168.1/24"],
+      ["192.168.1.0.0/24"],
+      ["256.168.1.0/24"],
     ];
 
     for (const cidrs of invalidCIDRs) {
@@ -67,7 +67,7 @@ describe("IsCidrOrIp", () => {
   });
 
   it("should reject if not an array", async () => {
-    // @ts-expect-error - Test intentionnel avec un type invalide
+    // @ts-expect-error - intentionally passing a string
     test.ipList = "192.168.1.1";
     const errors = await validate(test);
     expect(errors).toHaveLength(1);
