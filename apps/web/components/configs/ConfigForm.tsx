@@ -2,6 +2,7 @@
 
 import { WatcherType, type ConfigSchema } from "@banalize/types";
 import {
+  ActionIcon,
   Button,
   Group,
   Notification,
@@ -10,7 +11,12 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconBrandDocker, IconFile } from "@tabler/icons-react";
+import {
+  IconBrandDocker,
+  IconFile,
+  IconPlus,
+  IconTrash,
+} from "@tabler/icons-react";
 import { TextInput } from "components/shared/Input/TextInput";
 import { MenuIcon } from "components/shared/Menu/MenuIcon";
 import { useState } from "react";
@@ -43,6 +49,10 @@ export const ConfigForm = ({
 }: ConfigFormProps) => {
   const theme = useMantineTheme();
   const [message, setMessage] = useState<string | undefined>(undefined);
+  const [ignoreIps, setIgnoreIps] = useState<string>(
+    initialConfig?.ignoreIps ?? "",
+  );
+
   const form = useForm<ConfigFormType>({
     mode: "controlled",
     initialValues: {
@@ -61,17 +71,14 @@ export const ConfigForm = ({
 
   const onSubmitRequested = async (values: ConfigFormType) => {
     const config = {
-      _id: values._id,
-      name: values.name,
-      param: values.param,
-      regex: values.regex,
+      ...values,
+      ignoreIps,
       banTime: Number(values.banTime),
       findTime: Number(values.findTime),
       maxMatches: Number(values.maxMatches),
-      watcherType: values.watcherType,
-      ignoreIps: values.ignoreIps,
-      paused: values.paused,
     };
+
+    console.log("onSubmitRequested", config);
 
     const result = await onSumbit(config);
 
@@ -81,6 +88,31 @@ export const ConfigForm = ({
     }
 
     onDone();
+  };
+
+  const addIgnoreIp = () => {
+    setIgnoreIps((prev) => `${prev},`);
+  };
+
+  const removeIgnoreIp = (index: number) => {
+    setIgnoreIps((prev) => {
+      const updated = prev.split(",");
+      updated.splice(index, 1);
+      return updated.join(",");
+    });
+  };
+
+  const updateIgnoreIp = (index: number, value: string) => {
+    // should include only dot and numbers
+    if (!value.match(/^[0-9./]+$/)) {
+      return;
+    }
+
+    setIgnoreIps((prev) => {
+      const updated = prev.split(",");
+      updated[index] = value;
+      return updated.join(",");
+    });
   };
 
   return (
@@ -96,6 +128,7 @@ export const ConfigForm = ({
           {...form.getInputProps("_id")}
         />
       ) : null}
+
       <TextInput
         mt="md"
         label="Name"
@@ -182,14 +215,38 @@ export const ConfigForm = ({
         key={form.key("watcherType")}
       />
 
-      <TextInput
-        mt="md"
-        label="Ignore IPs"
-        placeholder=""
-        type="string"
-        key={form.key("ignoreIps")}
-        {...form.getInputProps("ignoreIps")}
-      />
+      <Text fz="sm" mt="md">
+        Ignore IPs
+      </Text>
+      {ignoreIps.split(",").map((value, index) => (
+        <Group key={index} align="center" mb="xs" gap="xs">
+          <TextInput
+            value={value}
+            onChange={(e) => updateIgnoreIp(index, e.currentTarget.value)}
+            placeholder={`Ignore IP ${index + 1}`}
+            style={{ flex: 1 }}
+          />
+          <ActionIcon
+            onClick={() => removeIgnoreIp(index)}
+            variant="filled"
+            size="lg"
+            color="pink"
+            disabled={ignoreIps.length === 0}
+          >
+            <IconTrash style={{ width: rem(18), height: rem(18) }} />
+          </ActionIcon>
+          {index === ignoreIps.split(",").length - 1 ? (
+            <ActionIcon
+              onClick={addIgnoreIp}
+              variant="filled"
+              size="lg"
+              color="cyan"
+            >
+              <IconPlus style={{ width: rem(18), height: rem(18) }} />
+            </ActionIcon>
+          ) : null}
+        </Group>
+      ))}
 
       {message !== undefined ? (
         <Notification
@@ -203,7 +260,7 @@ export const ConfigForm = ({
       ) : null}
 
       <Group justify="flex-end" mt="md">
-        <Button type="submit" color="pink">
+        <Button type="submit" color="cyan" w="100%">
           {initialConfig?._id ? "Update" : "Create"}
         </Button>
       </Group>
