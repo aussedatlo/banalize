@@ -7,12 +7,12 @@ import {
   Contains,
   IsArray,
   IsIn,
-  IsIP,
   IsNotEmpty,
   IsOptional,
   IsPositive,
   IsString,
 } from "class-validator";
+import { IsCidrOrIp } from "src/configs/utils/is-cidr-or-ip-validator";
 import { IsRegex } from "src/configs/utils/is-regex-validator";
 
 export class ConfigCreationDto implements ConfigCreation {
@@ -73,10 +73,10 @@ export class ConfigCreationDto implements ConfigCreation {
 
   @IsArray()
   @IsString({ each: true })
-  @IsIP("4", { each: true })
+  @IsCidrOrIp()
   @IsOptional()
   @ApiProperty({
-    example: ["192.168.1.1"],
+    example: ["192.168.1.1", "192.168.1.0/24"],
     description: "the list of IPs to ignore",
     required: false,
   })

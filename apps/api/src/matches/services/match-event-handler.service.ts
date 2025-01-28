@@ -32,7 +32,7 @@ export class MatchEventHandlerService {
       `Matched line: ${line}, ip: ${ip}, config: ${config.param}`,
     );
 
-    const ignored = config.ignoreIps.includes(ip);
+    const ignored = isIpInList(ip, config.ignoreIps);
     const timestamp = new Date().getTime();
 
     await this.matchesService.create({
@@ -68,4 +68,36 @@ export class MatchEventHandlerService {
 
     this.eventEmitter.emit(Events.MATCH_CREATION_DONE, event);
   };
+}
+
+// example
+// IP "192.168.1.1"
+// 192 << 24 = 192 * 2²⁴
+// 168 << 16 = 168 * 2¹⁶
+// 1 << 8    = 1 * 2⁸
+// 1         = 1 * 2⁰
+
+export function ipToLong(ip: string): number {
+  const [byte1, byte2, byte3, byte4] = ip.split(".").map(Number);
+
+  return ((byte1 << 24) + (byte2 << 16) + (byte3 << 8) + byte4) >>> 0;
+}
+
+export function isIpInCidr(ip: string, cidr: string): boolean {
+  const [network, bits = "32"] = cidr.split("/");
+  const mask = ~((1 << (32 - parseInt(bits))) - 1);
+
+  const ipLong = ipToLong(ip);
+  const networkLong = ipToLong(network);
+
+  return (ipLong & mask) === (networkLong & mask);
+}
+
+export function isIpInList(ip: string, ignoreList: string[]): boolean {
+  return ignoreList.some((ignore) => {
+    if (ignore.includes("/")) {
+      return isIpInCidr(ip, ignore);
+    }
+    return ip === ignore;
+  });
 }
