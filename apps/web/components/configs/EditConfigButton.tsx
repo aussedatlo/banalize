@@ -28,9 +28,7 @@ export const EditConfigButton = ({ config }: EditConfigButtonProps) => {
       body: JSON.stringify({
         ...config,
         ignoreIps:
-          config.ignoreIps?.length > 0
-            ? config.ignoreIps.split(",")
-            : undefined,
+          config.ignoreIps?.length > 0 ? config.ignoreIps.split(",") : [],
       }),
     });
     return await res.json();
