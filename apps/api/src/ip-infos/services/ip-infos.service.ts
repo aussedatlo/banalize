@@ -18,7 +18,7 @@ export class IpInfosService implements OnModuleInit {
     if (!fs.existsSync(this.dbPath)) {
       this.logger.log("GeoLite2-City.mmdb not found, downloading...");
       const dbUrl = await this.getLatestDbUrl();
-      await this.downloadDatabase(dbUrl, this.dbPath);
+      this.downloadDatabase(dbUrl, this.dbPath);
     } else {
       this.logger.log("GeoLite2-City.mmdb already exists, skipping download.");
     }
