@@ -10,5 +10,5 @@ COPY . .
 
 RUN pnpm i && pnpm build:api
 
-CMD ["/bin/sh", "-c", "./apps/api/bin/entrypoint.sh"]
+CMD ["./apps/api/bin/entrypoint.sh"]
 
