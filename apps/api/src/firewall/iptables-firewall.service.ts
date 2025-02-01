@@ -35,7 +35,7 @@ export class IptablesFirewallService
     // Emit the event in the next tick to avoid circular dependencies
     setTimeout(() => {
       this.eventEmitter.emit(Events.FIREWALL_READY);
-    }, 0);
+    }, 1000); // wait a little bit to make sure the init is done
   }
 
   async denyIp(ip: string): Promise<void> {
