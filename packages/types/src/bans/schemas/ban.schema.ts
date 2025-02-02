@@ -4,4 +4,6 @@ export type BanSchema = {
   timestamp: number;
   configId: string;
   active: boolean;
+  isManual: boolean;
+  matches?: string[];
 };

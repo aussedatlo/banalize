@@ -49,18 +49,16 @@ export class MatchEventHandlerService {
       return;
     }
 
-    const { totalCount, matches } = await this.matchesService.findAll({
+    const { matches, totalCount } = await this.matchesService.findAll({
       configId: config._id,
       ip,
       timestamp_gt: timestamp - config.findTime * 1000,
-      limit: 0,
+      limit: config.maxMatches,
     });
-
     this.logger.debug(`Matched ${totalCount} times`);
 
     if (totalCount >= config.maxMatches) {
       this.logger.log(`Matched ${totalCount} times, banning ${ip}`);
-      // get matches
       this.eventEmitter.emit(
         Events.BAN_CREATION_REQUESTED,
         new BanEvent(

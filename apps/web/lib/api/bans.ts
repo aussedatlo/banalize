@@ -14,6 +14,14 @@ export const fetchBans = async (
   return { bans: data || [], totalCount };
 };
 
+export const fetchBanById = async (id: string) => {
+  const { data } = await fetchFromApi<BanSchema>(
+    HttpMethod.GET,
+    `${ENDPOINT}/${id}`,
+  );
+  return data;
+};
+
 export const ban = async (dto: {
   configId: string;
   ip: string;

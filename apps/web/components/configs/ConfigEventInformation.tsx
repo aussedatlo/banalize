@@ -1,4 +1,9 @@
-import { ConfigSchema, EventResponse, IpInfosResponse } from "@banalize/types";
+import {
+  BanSchema,
+  ConfigSchema,
+  EventResponse,
+  IpInfosResponse,
+} from "@banalize/types";
 import {
   BoxProps,
   Card,
@@ -13,6 +18,8 @@ import { EventIcon } from "components/shared/Icon/EventIcon";
 import { HighlightedText } from "components/shared/Text/HightlightedText";
 import { IconText } from "components/shared/Text/IconText";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { fetchBanById } from "../../lib/api";
 
 type LineInformationProps = {
   label: string;
@@ -51,16 +58,33 @@ export const ConfigEventInformation = ({
   event,
   ipInfos,
 }: ConfigEventInformationProps) => {
+  const [ban, setBan] = useState<BanSchema | null>(null);
+  useEffect(() => {
+    const loadBan = async () => {
+      if (event.type === "ban") {
+        try {
+          const banData = await fetchBanById(event._id);
+          setBan(banData);
+        } catch (error) {
+          console.error("Error loading ban:", error);
+        }
+      }
+    };
+    loadBan();
+  }, [event._id, event.type]);
+
   if (!event) {
     return null;
   }
+
   console.log(config, event, ipInfos);
   // get the recent matches to show the reason of the ban
-  if (event.type === "ban") {
-    // fetch ban
-
-  }
-
+  // if (event.type === "ban") {
+  //   // fetch ban
+  //   console.log("we have a ban");
+  //   const ban = await fetchBanById(event._id);
+  //   console.log(ban);
+  // }
 
   const line = "line" in event ? event.line : undefined;
 
@@ -104,6 +128,22 @@ export const ConfigEventInformation = ({
         <>
           <Card radius="md" mt="lg">
             <HighlightedText text={line} regex={config.regex} />
+          </Card>
+        </>
+      )}
+
+      {event.type === "ban" && ban && !ban.isManual && (
+        <>
+          <Card radius="md" mt="lg">
+            {ban.matches
+              ? ban.matches.map((match, index) => (
+                  <LineInformation
+                    key={index}
+                    label={`Match ${index + 1}`}
+                    value={match}
+                  />
+                ))
+              : null}
           </Card>
         </>
       )}

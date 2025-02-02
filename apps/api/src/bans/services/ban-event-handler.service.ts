@@ -40,11 +40,6 @@ export class BanEventHandlerService {
       this.logger.log(`Ban already exists for ${ip}`);
       return;
     }
-    this.logger.log('event');
-    this.logger.log('config');
-    this.logger.log(isManual);
-    this.logger.log('matches');
-
     // create a new ban
     await this.bansService.create({
       ip,
