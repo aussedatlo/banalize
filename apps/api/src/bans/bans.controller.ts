@@ -18,6 +18,7 @@ import { BanCreationDto } from "./dtos/ban-creation.dto";
 import { BanFiltersDto } from "./dtos/ban-filters.dto";
 import { BanSchema } from "./schemas/ban.schema";
 import { BansService } from "./services/bans.service";
+import { BanEvent } from "./types/ban-event.types";
 
 @ApiTags("bans")
 @Controller("bans")
@@ -37,11 +38,20 @@ export class BansController {
       throw new Error("Config not found");
     }
     // create a new ban
-    return await this.bansService.create({
+    const ban = await this.bansService.create({
       ip: banCreationDto.ip,
       timestamp: banCreationDto.timestamp,
       configId: config._id,
     });
+
+    if (ban) {
+      this.eventEmitter.emit(
+        Events.BAN_CREATION_DONE,
+        new BanEvent(ban.ip, config),
+      );
+      this.eventEmitter.emit(Events.FIREWALL_DENY, { ip: ban.ip });
+    }
+    return ban;
   }
 
   @Get()

@@ -22,7 +22,7 @@ export class BanCleanupService implements OnModuleInit {
 
   @Cron(CronExpression.EVERY_MINUTE)
   async handleCron() {
-    this.logger.log("Running ban expiration cleanup task...");
+    this.logger.debug("Running ban expiration cleanup task...");
     const timestamp = new Date().getTime();
 
     const { bans: activebans } = await this.bansService.findAll({

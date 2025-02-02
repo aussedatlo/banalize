@@ -18,5 +18,5 @@ REAL="$BANALIZE_WEB_API_SERVER_URL"
 grep -rl $DUMMY apps/web-copy | xargs sed -i "s|$DUMMY|$REAL|g"
 
 # start the server
-node apps/web-copy/server.js
+exec node apps/web-copy/server.js
  
