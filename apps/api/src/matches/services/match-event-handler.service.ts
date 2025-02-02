@@ -64,7 +64,12 @@ export class MatchEventHandlerService {
       this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
       this.eventEmitter.emit(
         Events.BAN_CREATION_REQUESTED,
-        new BanEvent(ip, config),
+        new BanEvent(
+          ip,
+          config,
+          false,
+          matches.map((match) => match.line),
+        ),
       );
     }
 

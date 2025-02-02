@@ -26,7 +26,7 @@ export class BanEventHandlerService {
   }
 
   createBan = async (event: BanEvent) => {
-    const { ip, config } = event;
+    const { ip, config, isManual, matches } = event;
     this.logger.log(`Ban ip: ${ip}, config: ${config.param}`);
 
     const { totalCount } = await this.bansService.findAll({
@@ -40,11 +40,18 @@ export class BanEventHandlerService {
       this.logger.log(`Ban already exists for ${ip}`);
       return;
     }
+    this.logger.log('event');
+    this.logger.log('config');
+    this.logger.log(isManual);
+    this.logger.log('matches');
+
     // create a new ban
     await this.bansService.create({
       ip,
       timestamp: Date.now(),
       configId: config._id,
+      isManual: isManual,
+      matches: matches,
     });
 
     this.eventEmitter.emit(Events.BAN_CREATION_DONE, event);

@@ -42,6 +42,8 @@ export class BansController {
       ip: banCreationDto.ip,
       timestamp: banCreationDto.timestamp,
       configId: config._id,
+      isManual: banCreationDto.isManual,
+      matches: banCreationDto.matches,
     });
 
     if (ban) {

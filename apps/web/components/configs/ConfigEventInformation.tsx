@@ -54,6 +54,13 @@ export const ConfigEventInformation = ({
   if (!event) {
     return null;
   }
+  console.log(config, event, ipInfos);
+  // get the recent matches to show the reason of the ban
+  if (event.type === "ban") {
+    // fetch ban
+
+  }
+
 
   const line = "line" in event ? event.line : undefined;
 

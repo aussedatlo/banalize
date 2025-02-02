@@ -1,6 +1,7 @@
 import { type BanSchema as Ban } from "@banalize/types";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
+import { IsArray, IsBoolean, IsOptional } from "class-validator";
 import { HydratedDocument } from "mongoose";
 
 export type BanSchemaDocument = HydratedDocument<BanSchema>;
@@ -52,6 +53,23 @@ export class BanSchema implements Ban {
     description: "the ban active status",
   })
   active: boolean;
+
+  @IsBoolean()
+  @ApiProperty({
+    example: true,
+    description: "indicates if the ban was created manually",
+    default: false,
+  })
+  readonly isManual: boolean;
+
+  @IsArray()
+  @IsOptional()
+  @ApiProperty({
+    example: ["test 192.168.1.1 300", "test 192.168.1.1 400"],
+    description: "array of matched lines that triggered the ban",
+    required: false,
+  })
+  readonly matches?: string[];
 }
 
 export const BanSchemaDefinition = SchemaFactory.createForClass(BanSchema);
