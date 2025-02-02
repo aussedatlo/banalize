@@ -14,7 +14,13 @@ export const fetchBans = async (
   return { bans: data || [], totalCount };
 };
 
-export const ban = async (dto: BanCreationDto) => {
+export const ban = async (dto: {
+  configId: string;
+  ip: string;
+  timestamp: number;
+  isManual: boolean;
+  matches?: string[];
+}) => {
   const { data } = await fetchFromApi<BanSchema, BanCreationDto>(
     HttpMethod.POST,
     ENDPOINT,

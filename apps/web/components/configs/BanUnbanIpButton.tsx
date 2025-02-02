@@ -33,7 +33,12 @@ export const BanUnbanIpButton = ({ config, ip }: UnbanIpButtonProps) => {
 
   const onBan = async () => {
     try {
-      await ban({ configId, ip, timestamp: new Date().getTime() });
+      await ban({
+        configId,
+        ip,
+        timestamp: new Date().getTime(),
+        isManual: true,
+      });
       setSuccess("IP was banned");
     } catch (_) {
       setError("Failed to ban IP");

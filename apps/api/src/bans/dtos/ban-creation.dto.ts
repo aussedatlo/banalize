@@ -1,6 +1,12 @@
 import { type BanCreationDto as BanCreation } from "@banalize/types";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsPositive, IsString } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from "class-validator";
 
 export class BanCreationDto implements BanCreation {
   @IsString()
@@ -23,4 +29,21 @@ export class BanCreationDto implements BanCreation {
     description: "the id of the config",
   })
   readonly configId: string;
+
+  @IsBoolean()
+  @ApiProperty({
+    example: true,
+    description: "indicates if the ban was created manually",
+    default: false,
+  })
+  readonly isManual: boolean;
+
+  @IsArray()
+  @IsOptional()
+  @ApiProperty({
+    example: ["test 192.168.1.1 300", "test 192.168.1.1 400"],
+    description: "array of matched lines that triggered the ban",
+    required: false,
+  })
+  readonly matches?: string[];
 }
