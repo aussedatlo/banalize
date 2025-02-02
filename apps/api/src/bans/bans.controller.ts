@@ -64,6 +64,7 @@ export class BansController {
     @Res() res: Response,
   ): Promise<void> {
     const { bans, totalCount } = await this.bansService.findAll(filters);
+    console.log("bans", bans);
     res.setHeader("X-Total-Count", totalCount);
     res.json(bans);
   }
