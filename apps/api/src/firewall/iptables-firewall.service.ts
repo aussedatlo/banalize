@@ -1,10 +1,16 @@
-import { Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { exec } from "child_process";
 import { Events } from "src/shared/enums/events.enum";
 import { promisify } from "util";
 import { Firewall } from "./firewall.interface";
 
+@Injectable()
 export class IptablesFirewallService
   implements Firewall, OnModuleDestroy, OnModuleInit
 {

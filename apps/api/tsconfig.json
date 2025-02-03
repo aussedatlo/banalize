@@ -2,7 +2,8 @@
   "extends": "@banalize/typescript-config/node.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "dist"
+    "outDir": "dist",
+    "allowJs": true
   },
   "include": ["src", "test"],
   "exclude": ["node_modules", "dist"]

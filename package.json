@@ -15,7 +15,9 @@
     "lint": "turbo lint",
     "web": "pnpm --filter web",
     "types": "pnpm --filter types",
-    "packages": "pnpm --filter={./packages/*}"
+    "packages": "pnpm --filter={./packages/*}",
+    "test": "pnpm --filter=@banalize/api test",
+    "test:cov": "pnpm --filter=@banalize/api test:cov"
   },
   "devDependencies": {
     "@banalize/eslint-config": "workspace:*",
