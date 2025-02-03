@@ -1,3 +1,4 @@
+import { WatcherType } from "@banalize/types";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import {
@@ -8,7 +9,6 @@ import { Events } from "src/shared/enums/events.enum";
 import { ConfigsController } from "./configs.controller";
 import { ConfigsService } from "./configs.service";
 import { ConfigCreationDto } from "./dtos/config-creation-dto";
-import { WatcherType } from "./enums/watcher-type";
 import { ConfigSchema } from "./schemas/config.schema";
 
 describe("ConfigsController", () => {
@@ -25,6 +25,8 @@ describe("ConfigsController", () => {
     maxMatches: 3,
     watcherType: WatcherType.FILE,
     ignoreIps: [],
+    name: "Test config",
+    paused: false,
   };
 
   const mockConfigArray = [mockConfig];
@@ -36,6 +38,8 @@ describe("ConfigsController", () => {
     findTime: 600,
     maxMatches: 3,
     watcherType: WatcherType.FILE,
+    ignoreIps: [],
+    name: "Test config",
   };
 
   beforeEach(async () => {
@@ -49,6 +53,7 @@ describe("ConfigsController", () => {
             findAll: jest.fn().mockResolvedValue(mockConfigArray),
             findOne: jest.fn().mockResolvedValue(mockConfig),
             delete: jest.fn().mockResolvedValue(mockConfig),
+            update: jest.fn().mockResolvedValue(mockConfig),
           },
         },
         {
@@ -111,6 +116,24 @@ describe("ConfigsController", () => {
       expect(eventEmitter.emit).toHaveBeenCalledWith(
         Events.CONFIG_REMOVE_DONE,
         new ConfigRemovedEvent(mockConfig._id),
+      );
+    });
+  });
+
+  describe("update", () => {
+    it("should update a config and emit an event", async () => {
+      const result = await configsController.update(
+        "66dca3ca17f21044b9dbcaf5",
+        mockCreateConfigDto,
+      );
+      expect(result).toEqual(mockConfig);
+      expect(configsService.update).toHaveBeenCalledWith(
+        "66dca3ca17f21044b9dbcaf5",
+        mockCreateConfigDto,
+      );
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        Events.CONFIG_UPDATE_DONE,
+        new ConfigCreatedEvent(mockConfig),
       );
     });
   });

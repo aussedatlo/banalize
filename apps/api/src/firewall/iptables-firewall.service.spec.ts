@@ -1,21 +1,33 @@
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import * as ChildProcess from "child_process";
+import { Events } from "src/shared/enums/events.enum";
 import { IptablesFirewallService } from "./iptables-firewall.service";
 
 jest.mock("child_process");
 
 describe("IptablesFirewallService", () => {
   let service: IptablesFirewallService;
+  let eventEmitter: EventEmitter2;
   let execSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     jest.clearAllMocks();
     execSpy = jest.spyOn(ChildProcess, "exec");
     const module: TestingModule = await Test.createTestingModule({
-      providers: [IptablesFirewallService],
+      providers: [
+        {
+          provide: EventEmitter2,
+          useValue: {
+            emit: jest.fn(),
+          },
+        },
+        IptablesFirewallService,
+      ],
     }).compile();
 
     service = module.get<IptablesFirewallService>(IptablesFirewallService);
+    eventEmitter = module.get<EventEmitter2>(EventEmitter2);
   });
 
   it("should be defined", () => {
@@ -23,7 +35,10 @@ describe("IptablesFirewallService", () => {
   });
 
   it("should init the firewall", async () => {
+    jest.useFakeTimers();
+
     await service.onModuleInit();
+    jest.advanceTimersByTime(1000); // Fast-forward timer
 
     expect(execSpy).toHaveBeenCalledTimes(3);
     expect(execSpy).toHaveBeenNthCalledWith(
@@ -41,6 +56,9 @@ describe("IptablesFirewallService", () => {
       "iptables -F banalize",
       expect.any(Function),
     );
+    expect(eventEmitter.emit).toHaveBeenCalledWith(Events.FIREWALL_READY);
+
+    jest.useRealTimers();
   });
 
   it("should destroy the firewall", async () => {
