@@ -2,5 +2,5 @@
 module.exports = {
   parser: "@typescript-eslint/parser",
   extends: ["@banalize/eslint-config"],
-  ignorePatterns: ["jest.config.js"],
+  ignorePatterns: ["vitest.config.ts"],
 };

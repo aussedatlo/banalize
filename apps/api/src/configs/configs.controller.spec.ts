@@ -49,17 +49,17 @@ describe("ConfigsController", () => {
         {
           provide: ConfigsService,
           useValue: {
-            create: jest.fn().mockResolvedValue(mockConfig),
-            findAll: jest.fn().mockResolvedValue(mockConfigArray),
-            findOne: jest.fn().mockResolvedValue(mockConfig),
-            delete: jest.fn().mockResolvedValue(mockConfig),
-            update: jest.fn().mockResolvedValue(mockConfig),
+            create: vi.fn().mockResolvedValue(mockConfig),
+            findAll: vi.fn().mockResolvedValue(mockConfigArray),
+            findOne: vi.fn().mockResolvedValue(mockConfig),
+            delete: vi.fn().mockResolvedValue(mockConfig),
+            update: vi.fn().mockResolvedValue(mockConfig),
           },
         },
         {
           provide: EventEmitter2,
           useValue: {
-            emit: jest.fn(),
+            emit: vi.fn(),
           },
         },
       ],

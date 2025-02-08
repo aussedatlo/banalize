@@ -10,7 +10,7 @@ import {
 } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Response } from "express";
+import type { Response } from "express";
 import { Events } from "src/shared/enums/events.enum";
 import { UnbanEvent } from "src/unbans/types/unban-event.types";
 import { ConfigsService } from "../configs/configs.service";

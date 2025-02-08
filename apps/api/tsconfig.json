@@ -1,10 +1,11 @@
 {
   "extends": "@banalize/typescript-config/node.json",
   "compilerOptions": {
+    "types": ["vitest/globals"],
     "baseUrl": ".",
     "outDir": "dist",
     "allowJs": true
   },
-  "include": ["src", "test"],
+  "include": ["src", "test", "vitest.config.ts"],
   "exclude": ["node_modules", "dist"]
 }
