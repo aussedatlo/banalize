@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "bin/run.sh dev --turbo",
     "build": "bin/run.sh build",
-    "start": "bin/run.sh next start",
+    "start": "bin/run.sh start",
     "typecheck": "tsc --noEmit",
     "lint": "next lint && pnpm lint:stylelint",
     "lint:fix": "next lint --fix && pnpm lint:stylelint --fix",
