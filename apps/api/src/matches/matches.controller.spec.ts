@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { Response } from "express";
+import type { Response } from "express";
 import { MatchFiltersDto } from "./dtos/match-filters.dto";
 import { MatchesController } from "./matches.controller";
 import { MatchSchema } from "./schemas/match.schema";
@@ -21,10 +21,10 @@ describe("MatchesController", () => {
   const mockMatchArray = [mockMatch, mockMatch];
 
   const mockMatchesService = {
-    findAll: jest
+    findAll: vi
       .fn()
       .mockResolvedValue({ matches: mockMatchArray, totalCount: 2 }),
-    findOne: jest.fn().mockResolvedValue(mockMatch),
+    findOne: vi.fn().mockResolvedValue(mockMatch),
   };
 
   beforeEach(async () => {
@@ -49,8 +49,8 @@ describe("MatchesController", () => {
   describe("findAll", () => {
     it("should return all matches and set header", async () => {
       const mockResponse = {
-        setHeader: jest.fn(),
-        json: jest.fn(),
+        setHeader: vi.fn(),
+        json: vi.fn(),
       } as unknown as Response;
 
       const filters: MatchFiltersDto = {};

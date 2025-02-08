@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query, Res } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Response } from "express";
+import { type Response } from "express";
 import { MatchFiltersDto } from "./dtos/match-filters.dto";
 import { MatchSchema } from "./schemas/match.schema";
 import { MatchesService } from "./services/matches.service";

@@ -17,28 +17,36 @@ export class BanSchema implements Ban {
   })
   _id: string;
 
-  @Prop()
+  @Prop({
+    type: String,
+  })
   @ApiProperty({
     example: "192.168.1.1",
     description: "the matched ip",
   })
   ip: string;
 
-  @Prop()
+  @Prop({
+    type: Number,
+  })
   @ApiProperty({
     example: 1633297200000,
     description: "the timestamp of the match event",
   })
   timestamp: number;
 
-  @Prop()
+  @Prop({
+    type: String,
+  })
   @ApiProperty({
     example: "66dca3ca17f21044b9dbcaf5",
     description: "the id of the config",
   })
   configId: string;
 
-  @Prop()
+  @Prop({
+    type: Boolean,
+  })
   @ApiProperty({
     example: true,
     description: "the ban active status",

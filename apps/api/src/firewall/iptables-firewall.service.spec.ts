@@ -2,24 +2,31 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import * as ChildProcess from "child_process";
 import { Events } from "src/shared/enums/events.enum";
+import { MockInstance } from "vitest";
 import { IptablesFirewallService } from "./iptables-firewall.service";
 
-jest.mock("child_process");
+vi.mock("child_process", () => ({
+  exec: vi.fn((cmd, callback) => {
+    if (callback) {
+      callback(null, "", ""); // Simulating success
+    }
+  }),
+}));
 
 describe("IptablesFirewallService", () => {
   let service: IptablesFirewallService;
   let eventEmitter: EventEmitter2;
-  let execSpy: jest.SpyInstance;
+  let execSpy: MockInstance<typeof ChildProcess.exec>;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
-    execSpy = jest.spyOn(ChildProcess, "exec");
+    vi.clearAllMocks();
+    execSpy = vi.spyOn(ChildProcess, "exec");
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         {
           provide: EventEmitter2,
           useValue: {
-            emit: jest.fn(),
+            emit: vi.fn(),
           },
         },
         IptablesFirewallService,
@@ -35,10 +42,10 @@ describe("IptablesFirewallService", () => {
   });
 
   it("should init the firewall", async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     await service.onModuleInit();
-    jest.advanceTimersByTime(1000); // Fast-forward timer
+    vi.advanceTimersByTime(1000); // Fast-forward timer
 
     expect(execSpy).toHaveBeenCalledTimes(3);
     expect(execSpy).toHaveBeenNthCalledWith(
@@ -58,7 +65,7 @@ describe("IptablesFirewallService", () => {
     );
     expect(eventEmitter.emit).toHaveBeenCalledWith(Events.FIREWALL_READY);
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("should destroy the firewall", async () => {
@@ -98,7 +105,7 @@ describe("IptablesFirewallService", () => {
     it("should not deny an IP if it is already banned", async () => {
       const ip = "192.168.1.1";
       await service.denyIp(ip);
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       await service.denyIp(ip);
 
@@ -110,7 +117,7 @@ describe("IptablesFirewallService", () => {
     it("should allow an IP", async () => {
       const ip = "192.168.1.1";
       await service.denyIp(ip);
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       await service.allowIp(ip);
 

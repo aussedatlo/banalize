@@ -1,7 +1,7 @@
 import { ConfigSchema } from "@banalize/types";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
-import { Response } from "express";
+import { type Response } from "express";
 import { Events } from "src/shared/enums/events.enum";
 import { UnbanEvent } from "src/unbans/types/unban-event.types";
 import { ConfigsService } from "../configs/configs.service";
@@ -34,21 +34,21 @@ describe("BansController", () => {
   const mockBansArray = [mockBan, mockBan];
 
   const mockBansService = {
-    create: jest.fn().mockResolvedValue(mockBan),
-    findAll: jest.fn().mockResolvedValue({
+    create: vi.fn().mockResolvedValue(mockBan),
+    findAll: vi.fn().mockResolvedValue({
       bans: mockBansArray,
       totalCount: mockBansArray.length,
     }),
-    findOne: jest.fn().mockResolvedValue(mockBan),
-    update: jest.fn().mockResolvedValue({ ...mockBan, active: false }),
+    findOne: vi.fn().mockResolvedValue(mockBan),
+    update: vi.fn().mockResolvedValue({ ...mockBan, active: false }),
   };
 
   const mockConfigsService = {
-    findOne: jest.fn().mockResolvedValue(mockConfig),
+    findOne: vi.fn().mockResolvedValue(mockConfig),
   };
 
   const mockEventEmitter = {
-    emit: jest.fn(),
+    emit: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -124,8 +124,8 @@ describe("BansController", () => {
   describe("findAll", () => {
     it("should return all bans and set header", async () => {
       const mockResponse = {
-        setHeader: jest.fn(),
-        json: jest.fn(),
+        setHeader: vi.fn(),
+        json: vi.fn(),
       } as unknown as Response;
 
       const filters: BanFiltersDto = {};

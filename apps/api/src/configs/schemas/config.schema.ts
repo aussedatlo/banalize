@@ -14,66 +14,87 @@ export class ConfigSchema implements Config {
   @ApiProperty({
     example: "66dca3ca17f21044b9dbcaf5",
     description: "the id of the config",
+    type: String,
   })
   _id: string;
 
-  @Prop()
+  @Prop({
+    type: String,
+  })
   @ApiProperty({
     example: "test",
     description: "the name of the config",
   })
   name: string;
 
-  @Prop()
+  @Prop({
+    type: String,
+  })
   @ApiProperty({
     example: "/path/file.log",
     description: "the param of the watcher",
   })
   param: string;
 
-  @Prop()
+  @Prop({
+    type: String,
+  })
   @ApiProperty({
     example: "^test.*<IP>.*300$",
     description: "the regex to match",
   })
   regex: string;
 
-  @Prop()
+  @Prop({
+    type: Number,
+  })
   @ApiProperty({
     example: 300,
     description: "the ban time in seconds",
   })
   banTime: number;
 
-  @Prop()
+  @Prop({
+    type: Number,
+  })
   @ApiProperty({
     example: 600,
     description: "the find time in seconds",
   })
   findTime: number;
 
-  @Prop()
+  @Prop({
+    type: Number,
+  })
   @ApiProperty({
     example: 3,
     description: "the max matches to ban",
   })
   maxMatches: number;
 
-  @Prop()
+  @Prop({
+    type: String,
+  })
   @ApiProperty({
     example: "file",
     description: "the watcher type",
+    type: String,
   })
   watcherType: WatcherType;
 
-  @Prop()
+  @Prop({
+    type: [String],
+  })
   @ApiProperty({
     example: ["192.168.1.1"],
     description: "the ips to ignore",
+    type: [String],
   })
   ignoreIps: string[];
 
-  @Prop()
+  @Prop({
+    type: Boolean,
+  })
   @ApiProperty({
     example: false,
     description: "the watcher paused status",
