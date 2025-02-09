@@ -19,7 +19,7 @@ export class SignalNotifierService implements Notifier {
       await axios.post(this.config.signalConfig.server, {
         message: `${title}\n${message}`,
         number: this.config.signalConfig.number,
-        recipients: this.config.signalConfig.recipients,
+        recipients: [this.config.signalConfig.recipients],
       });
       return true;
     } catch (_) {
