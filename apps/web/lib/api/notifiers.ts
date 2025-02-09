@@ -43,3 +43,11 @@ export const deleteNotifierConfig = async (
   );
   return data;
 };
+
+export const sendTestNotification = async (id: string): Promise<void> => {
+  const { data } = await fetchFromApi<void>(
+    HttpMethod.POST,
+    `${ENDPOINT}/${id}/test`,
+  );
+  return data;
+};
