@@ -16,7 +16,7 @@ export class SignalNotifierService implements Notifier {
   async notify({ message, title }: Notification): Promise<boolean> {
     this.logger.debug(`SignalNotifierService: ${message}`);
     try {
-      axios.post(this.config.signalConfig.server, {
+      await axios.post(this.config.signalConfig.server, {
         message: `${title}\n${message}`,
         number: this.config.signalConfig.number,
         recipients: this.config.signalConfig.recipients,
