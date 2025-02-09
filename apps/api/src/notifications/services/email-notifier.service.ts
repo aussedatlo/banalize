@@ -13,7 +13,7 @@ export class EmailNotifierService implements Notifier {
     );
   }
 
-  async notify({ message, title }: Notification) {
+  async notify({ message, title }: Notification): Promise<boolean> {
     this.logger.debug(`EmailNotifierService: ${message}`);
     const { username, password, port, server, recipientEmail } =
       this.config.emailConfig;
@@ -35,10 +35,10 @@ export class EmailNotifierService implements Notifier {
         subject: title,
         text: message,
       });
-    } catch (error) {
-      this.logger.error(`Failed to send email: ${error}`);
+      return true;
+    } catch (_) {
+      this.logger.error(`Failed to send email`);
+      return false;
     }
-
-    transporter.close();
   }
 }

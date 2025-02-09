@@ -20,11 +20,13 @@ export class NotifierTestService {
     }
 
     const notifier = this.factory.createNotifier(config);
-    notifier.notify({
+    const result = await notifier.notify({
       title: "Banalize test title",
       message: "Banalize test message",
     });
 
-    return { message: "Notification sent" };
+    return result
+      ? { message: "Notification sent", success: true }
+      : { message: "Failed to send notification", success: false };
   }
 }
