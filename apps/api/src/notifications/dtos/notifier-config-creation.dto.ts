@@ -21,11 +21,11 @@ export class NotifierConfigDto implements NotifierConfig {
     description: "the email configuration",
     type: NotifierEmailConfigDto,
   })
-  emailConfig?: NotifierEmailConfigDto;
+  emailConfig?: NotifierEmailConfigDto | null = null;
 
   @ApiProperty({
     description: "the signal configuration",
     type: NotifierSignalConfigDto,
   })
-  signalConfig?: NotifierSignalConfigDto;
+  signalConfig?: NotifierSignalConfigDto | null = null;
 }
