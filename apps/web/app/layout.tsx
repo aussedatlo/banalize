@@ -1,8 +1,10 @@
 import "@mantine/charts/styles.css";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import "./global.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import MainLayout from "components/layout/MainLayout/MainLayout";
 import { PropsWithChildren } from "react";
 import { theme } from "../theme";
@@ -25,6 +27,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="dark">
+          <Notifications />
           <MainLayout>{children}</MainLayout>
         </MantineProvider>
       </body>

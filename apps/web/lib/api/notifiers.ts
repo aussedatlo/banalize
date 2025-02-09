@@ -1,4 +1,4 @@
-import { NotifierConfigSchema } from "@banalize/types";
+import { NotifierConfigDto, NotifierConfigSchema } from "@banalize/types";
 import { fetchFromApi, HttpMethod } from "./utils";
 
 const ENDPOINT = "/notifications";
@@ -14,23 +14,25 @@ export const fetchNotifierConfigs = async (): Promise<
 };
 
 export const createNotifierConfig = async (
-  dto: NotifierConfigSchema,
+  dto: NotifierConfigDto,
 ): Promise<NotifierConfigSchema> => {
-  const { data } = await fetchFromApi<
-    NotifierConfigSchema,
-    NotifierConfigSchema
-  >(HttpMethod.POST, ENDPOINT, dto);
+  const { data } = await fetchFromApi<NotifierConfigSchema, NotifierConfigDto>(
+    HttpMethod.POST,
+    ENDPOINT,
+    dto,
+  );
   return data;
 };
 
 export const updateNotifierConfig = async (
   id: string,
-  dto: NotifierConfigSchema,
+  dto: NotifierConfigDto,
 ): Promise<NotifierConfigSchema> => {
-  const { data } = await fetchFromApi<
-    NotifierConfigSchema,
-    NotifierConfigSchema
-  >(HttpMethod.PUT, `${ENDPOINT}/${id}`, dto);
+  const { data } = await fetchFromApi<NotifierConfigSchema, NotifierConfigDto>(
+    HttpMethod.PUT,
+    `${ENDPOINT}/${id}`,
+    dto,
+  );
   return data;
 };
 
@@ -44,8 +46,10 @@ export const deleteNotifierConfig = async (
   return data;
 };
 
-export const sendTestNotification = async (id: string): Promise<void> => {
-  const { data } = await fetchFromApi<void>(
+export const sendTestNotification = async (
+  id: string,
+): Promise<{ message: string; success: boolean }> => {
+  const { data } = await fetchFromApi<{ message: string; success: boolean }>(
     HttpMethod.POST,
     `${ENDPOINT}/${id}/test`,
   );

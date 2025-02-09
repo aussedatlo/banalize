@@ -3,18 +3,32 @@
 import { NotifierConfigDto } from "@banalize/types";
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
-import { useNotifications } from "hooks/useNotifications";
+import { createNotifierConfig } from "lib/api";
 import { useRouter } from "next/navigation";
 import { NotifierConfigForm } from "./NotifierConfigForm";
 
 export const CreateNotifierConfigButton = () => {
   const [opened, { open, close }] = useDisclosure(false);
-  const { create } = useNotifications();
   const router = useRouter();
 
   const onSubmit = async (dto: NotifierConfigDto) => {
-    const result = await create(dto);
+    const result = await createNotifierConfig(dto);
+
+    if (result && result._id) {
+      notifications.show({
+        title: "Config created",
+        message: "Notifier config was successfully created",
+        color: "cyan",
+      });
+    } else {
+      notifications.show({
+        title: "Config creation failed",
+        message: "Notifier config was not created",
+        color: "pink",
+      });
+    }
     router.refresh();
     close();
 
