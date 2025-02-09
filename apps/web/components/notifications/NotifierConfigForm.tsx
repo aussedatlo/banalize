@@ -65,19 +65,23 @@ export const NotifierConfigForm: React.FC<NotifierConfigFormProps> = ({
     mode: "controlled",
     initialValues: {
       events: ["ban", "unban", "match"],
-      emailConfig: {
-        username: "",
-        password: "",
-        server: "",
-        port: 587,
-        recipientEmail: "",
-      },
-      signalConfig: {
-        number: "",
-        recipients: [],
-        server: "",
-      },
       ...initialValues,
+      signalConfig: initialValues?.signalConfig
+        ? initialValues.signalConfig
+        : {
+            number: "",
+            recipients: [],
+            server: "",
+          },
+      emailConfig: initialValues?.emailConfig
+        ? initialValues.emailConfig
+        : {
+            username: "",
+            password: "",
+            server: "",
+            port: 587,
+            recipientEmail: "",
+          },
     },
   });
 
