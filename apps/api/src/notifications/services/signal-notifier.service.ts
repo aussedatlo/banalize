@@ -13,16 +13,18 @@ export class SignalNotifierService implements Notifier {
     );
   }
 
-  async notify({ message, title }: Notification) {
+  async notify({ message, title }: Notification): Promise<boolean> {
     this.logger.debug(`SignalNotifierService: ${message}`);
     try {
-      axios.post(this.config.signalConfig.server, {
+      await axios.post(this.config.signalConfig.server, {
         message: `${title}\n${message}`,
         number: this.config.signalConfig.number,
-        recipients: this.config.signalConfig.recipients,
+        recipients: [this.config.signalConfig.recipients],
       });
-    } catch (error) {
-      this.logger.error(`Failed to send signal: ${error}`);
+      return true;
+    } catch (_) {
+      this.logger.error(`Failed to send signal`);
+      return false;
     }
   }
 }

@@ -4,14 +4,7 @@ import {
   NotifierEmailConfigSchema,
   NotifierSignalConfigSchema,
 } from "@banalize/types";
-import {
-  Button,
-  Group,
-  Notification,
-  rem,
-  Text,
-  ThemeIcon,
-} from "@mantine/core";
+import { Button, Group, rem, Text, ThemeIcon } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconMail, IconMessageCircle } from "@tabler/icons-react";
 import { EventIcon } from "components/shared/Icon/EventIcon";
@@ -19,7 +12,7 @@ import { MultiSelect } from "components/shared/Input/MultiSelect";
 import { TextInput } from "components/shared/Input/TextInput";
 import { MenuIcon } from "components/shared/Menu/MenuIcon";
 import { IconText } from "components/shared/Text/IconText";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 enum NotifierType {
   EMAIL = "Email",
@@ -27,8 +20,7 @@ enum NotifierType {
 }
 
 type NotifierConfigFormProps = {
-  onSubmit: (dto: NotifierConfigDto) => Promise<object>;
-  onCancel: () => void;
+  onSubmit: (dto: NotifierConfigDto) => Promise<void>;
   initialValues?: NotifierConfigDto;
   id?: string;
 };
@@ -49,11 +41,9 @@ const keyToLabelMap: Record<Key, string> = {
 
 export const NotifierConfigForm: React.FC<NotifierConfigFormProps> = ({
   onSubmit,
-  onCancel,
   initialValues,
   id,
 }) => {
-  const [message, setMessage] = useState<string>();
   const [type, setType] = useState<NotifierType>(
     initialValues?.emailConfig
       ? NotifierType.EMAIL
@@ -65,25 +55,25 @@ export const NotifierConfigForm: React.FC<NotifierConfigFormProps> = ({
     mode: "controlled",
     initialValues: {
       events: ["ban", "unban", "match"],
-      emailConfig: {
-        username: "",
-        password: "",
-        server: "",
-        port: 587,
-        recipientEmail: "",
-      },
-      signalConfig: {
-        number: "",
-        recipients: [],
-        server: "",
-      },
       ...initialValues,
+      signalConfig: initialValues?.signalConfig
+        ? initialValues.signalConfig
+        : {
+            number: "",
+            recipients: [],
+            server: "",
+          },
+      emailConfig: initialValues?.emailConfig
+        ? initialValues.emailConfig
+        : {
+            username: "",
+            password: "",
+            server: "",
+            port: 587,
+            recipientEmail: "",
+          },
     },
   });
-
-  useEffect(() => {
-    setMessage(undefined);
-  }, []);
 
   const onSubmitRequested = async (values: NotifierConfigDto) => {
     const dto =
@@ -97,14 +87,7 @@ export const NotifierConfigForm: React.FC<NotifierConfigFormProps> = ({
           }
         : { events: values.events, signalConfig: values.signalConfig };
 
-    const result = await onSubmit(dto);
-
-    if ("message" in result && typeof result.message === "string") {
-      setMessage(result.message);
-      return;
-    }
-
-    onCancel();
+    await onSubmit(dto);
   };
 
   return (
@@ -182,17 +165,6 @@ export const NotifierConfigForm: React.FC<NotifierConfigFormProps> = ({
             {...form.getInputProps(`signalConfig.${key}`)}
           />
         ))}
-
-      {message && (
-        <Notification
-          mt="md"
-          color="pink"
-          title="Error"
-          onClose={() => setMessage(undefined)}
-        >
-          {JSON.stringify(message)}
-        </Notification>
-      )}
 
       <Group justify="flex-end" mt="md">
         <Button type="submit" color="pink">

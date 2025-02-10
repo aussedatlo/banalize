@@ -4,21 +4,19 @@ import { NotifierConfigDto } from "@banalize/types";
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
-import { useNotifications } from "hooks/useNotifications";
+import { createNotifierConfig } from "lib/api";
 import { useRouter } from "next/navigation";
 import { NotifierConfigForm } from "./NotifierConfigForm";
 
 export const CreateNotifierConfigButton = () => {
   const [opened, { open, close }] = useDisclosure(false);
-  const { create } = useNotifications();
   const router = useRouter();
 
   const onSubmit = async (dto: NotifierConfigDto) => {
-    const result = await create(dto);
-    router.refresh();
-    close();
-
-    return result;
+    await createNotifierConfig(dto).ifRight(() => {
+      router.refresh();
+      close();
+    });
   };
 
   return (
@@ -32,7 +30,7 @@ export const CreateNotifierConfigButton = () => {
       </Button>
 
       <Modal opened={opened} onClose={close} title="Create a new configuration">
-        <NotifierConfigForm onCancel={close} onSubmit={onSubmit} />
+        <NotifierConfigForm onSubmit={onSubmit} />
       </Modal>
     </>
   );

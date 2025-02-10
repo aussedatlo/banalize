@@ -1,9 +1,11 @@
 "use client";
 
+import { ConfigCreationDto } from "@banalize/types";
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { ConfigForm, ConfigFormType } from "components/configs/ConfigForm";
+import { createConfig } from "lib/api";
 import { useRouter } from "next/navigation";
 
 export const CreateConfigButton = () => {
@@ -11,26 +13,17 @@ export const CreateConfigButton = () => {
   const router = useRouter();
 
   const onConfigCreate = async (config: ConfigFormType) => {
-    const res = await fetch("/api/configs", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...config,
-        ignoreIps:
-          config.ignoreIps?.length > 0
-            ? config.ignoreIps.split(",")
-            : undefined,
-        paused: false,
-      }),
-    });
-    return await res.json();
-  };
+    const dto: ConfigCreationDto = {
+      ...config,
+      ignoreIps:
+        config.ignoreIps?.length > 0 ? config.ignoreIps.split(",") : [],
+      paused: false,
+    };
 
-  const onDone = () => {
-    close();
-    router.refresh();
+    await createConfig(dto).ifRight(() => {
+      close();
+      router.refresh();
+    });
   };
 
   return (
@@ -44,7 +37,7 @@ export const CreateConfigButton = () => {
       </Button>
 
       <Modal opened={opened} onClose={close} title="Create a new configuration">
-        <ConfigForm onSumbit={onConfigCreate} onDone={onDone} />
+        <ConfigForm onSumbit={onConfigCreate} />
       </Modal>
     </>
   );

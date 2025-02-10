@@ -1,15 +1,10 @@
+import { EitherAsync, Left, Right } from "purify-ts";
+import { ApiError, ApiResult, HttpMethod } from ".";
+
 const API_BASE_URL_SERVER = process.env.BANALIZE_WEB_API_SERVER_URL;
 
 if (!API_BASE_URL_SERVER) {
   throw new Error("BANALIZE_WEB_API_SERVER_URL is not defined");
-}
-
-export enum HttpMethod {
-  GET = "GET",
-  POST = "POST",
-  PUT = "PUT",
-  DELETE = "DELETE",
-  PATCH = "PATCH",
 }
 
 type QueryParams =
@@ -18,46 +13,58 @@ type QueryParams =
     }
   | object;
 
-export const fetchFromApi = async <OutputType, InputType = void>(
+export const fetchFromApi = <OutputType, InputType = void>(
   method: HttpMethod,
   endpoint: string,
   data?: InputType,
-) => {
-  // Use the server API URL when running on the server,
-  // otherwise use the client API URL
-  const isServer = typeof window === "undefined";
-  let url = `${isServer ? API_BASE_URL_SERVER : "/api"}${endpoint}`;
+): EitherAsync<ApiError, ApiResult<OutputType>> => {
+  return EitherAsync<ApiError, ApiResult<OutputType>>(
+    async ({ fromPromise }) => {
+      const isServer = typeof window === "undefined";
+      let url = `${isServer ? API_BASE_URL_SERVER : "/api"}${endpoint}`;
 
-  // If the method is GET, append the data as query parameters
-  if (method === "GET" && data) {
-    const queryString = createQueryString(data);
-    url += `?${queryString}`;
-  }
+      if (method === "GET" && data) {
+        const queryString = createQueryString(data);
+        url += `?${queryString}`;
+      }
 
-  console.log("API request to", url);
+      console.log("API request to", url);
 
-  // If the method is not GET, add the data as the request body
-  const body = method !== "GET" ? JSON.stringify(data) : undefined;
+      const body = method !== "GET" ? JSON.stringify(data) : undefined;
 
-  try {
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      cache: "no-cache",
-      body,
-    });
-    if (!res.ok) {
-      throw new Error(`API error: ${res.status} ${res.statusText}`);
-    }
+      return await fromPromise(
+        fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          cache: "no-cache",
+          body,
+        })
+          .then(async (res) => {
+            if (!res.ok) {
+              const error = await res.json();
+              return Left({
+                error: "Fetch error",
+                message: error.message,
+                statusCode: res.status,
+              });
+            }
 
-    return {
-      data: (await res.json()) as OutputType,
-      totalCount: Number(res.headers.get("x-total-count")) || 0,
-    };
-  } catch (error) {
-    console.error("Fetch error:", error);
-    return { data: undefined as OutputType, totalCount: 0 };
-  }
+            return Right({
+              data: (await res.json()) as OutputType,
+              totalCount: Number(res.headers.get("x-total-count")) || 0,
+            });
+          })
+          .catch((error) => {
+            console.error("Fetch error:", error);
+            return Left({
+              error: "Fetch error",
+              message: error.message ?? "An error occurred while fetching data",
+              statusCode: error.status ?? 500,
+            });
+          }),
+      );
+    },
+  );
 };
 
 const createQueryString = (params: QueryParams): string => {

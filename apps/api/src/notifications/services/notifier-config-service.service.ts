@@ -21,7 +21,9 @@ export class NotifierConfigService {
   }
 
   async update(id: string, dto: NotifierConfigDto) {
-    const result = this.notifierConfigModel.findByIdAndUpdate(id, dto).exec();
+    const result = await this.notifierConfigModel
+      .findByIdAndUpdate(id, dto)
+      .exec();
     this.eventEmitter.emit(Events.NOTIFY_CONFIG_UPDATE_DONE);
     return result;
   }

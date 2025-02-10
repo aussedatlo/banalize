@@ -1,7 +1,7 @@
 "use client";
 
 import { type ConfigSchema } from "@banalize/types";
-import { ActionIcon, Notification, rem, Tooltip } from "@mantine/core";
+import { ActionIcon, rem, Tooltip } from "@mantine/core";
 import { IconHandOff, IconHandStop } from "@tabler/icons-react";
 import { useBans } from "hooks/useBans";
 import { useEventsWithIpInfos } from "hooks/useEvents";
@@ -15,8 +15,6 @@ type UnbanIpButtonProps = {
 
 export const BanUnbanIpButton = ({ config, ip }: UnbanIpButtonProps) => {
   const [configId] = useState(config._id);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const {
     bans,
     totalCount: isBanned,
@@ -32,24 +30,16 @@ export const BanUnbanIpButton = ({ config, ip }: UnbanIpButtonProps) => {
   });
 
   const onBan = async () => {
-    try {
-      await ban({ configId, ip, timestamp: new Date().getTime() });
-      setSuccess("IP was banned");
-    } catch (_) {
-      setError("Failed to ban IP");
-    } finally {
+    await ban({ configId, ip, timestamp: new Date().getTime() }).ifRight(() => {
       mutateBans();
       mutateEvents();
-    }
+    });
   };
 
   const onUnban = async () => {
     try {
       const promise = bans?.map((ban) => unban(ban._id));
       await Promise.all(promise ?? []);
-      setSuccess("IP was unbanned");
-    } catch (_) {
-      setError("Failed to unban IP");
     } finally {
       mutateBans();
       mutateEvents();
@@ -58,28 +48,6 @@ export const BanUnbanIpButton = ({ config, ip }: UnbanIpButtonProps) => {
 
   return (
     <>
-      {error && (
-        <Notification
-          title="Error"
-          color="red"
-          withCloseButton
-          onClose={() => setError(null)}
-        >
-          {error}
-        </Notification>
-      )}
-
-      {success && (
-        <Notification
-          title="Success"
-          color="green"
-          withCloseButton
-          onClose={() => setSuccess(null)}
-        >
-          {success}
-        </Notification>
-      )}
-
       <Tooltip label={isBanned ? "Unban this IP" : "Ban this IP"} withArrow>
         <ActionIcon
           onClick={isBanned ? onUnban : onBan}

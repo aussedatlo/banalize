@@ -3,6 +3,7 @@
 import { type ConfigSchema } from "@banalize/types";
 import { ActionIcon, rem, Tooltip } from "@mantine/core";
 import { IconPlayerPause, IconPlayerPlay } from "@tabler/icons-react";
+import { updateConfig } from "lib/api";
 import { useRouter } from "next/navigation";
 
 type EditConfigButtonProps = {
@@ -12,31 +13,21 @@ type EditConfigButtonProps = {
 export const PauseConfigButton = ({ config }: EditConfigButtonProps) => {
   const router = useRouter();
 
-  const updateConfig = async (config: ConfigSchema) => {
-    const res = await fetch(`/api/configs/${config._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(config),
+  const update = async (config: ConfigSchema) => {
+    await updateConfig(config).ifRight(() => {
+      router.refresh();
     });
-
-    if (!res.ok) {
-      console.error(await res.json());
-    }
-
-    router.refresh();
   };
 
   const onResume = async () => {
-    updateConfig({
+    update({
       ...config,
       paused: false,
     });
   };
 
   const onPause = async () => {
-    updateConfig({
+    update({
       ...config,
       paused: true,
     });
