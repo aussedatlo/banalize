@@ -3,24 +3,23 @@ import {
   StatsTimelineFiltersDto,
   StatsTimelineResponse,
 } from "@banalize/types";
-import { fetchFromApi, HttpMethod } from "./utils";
+import { HttpMethod } from ".";
+import { fetchFromApi } from "./utils";
 
 const ENDPOINT = "/stats";
 
-export const fetchStatsSummary = async (): Promise<StatsSummaryResponse> => {
-  const { data } = await fetchFromApi<StatsSummaryResponse>(
-    HttpMethod.GET,
-    `${ENDPOINT}/summary`,
-  );
-  return data;
-};
+export const fetchStatsSummary = (): Promise<StatsSummaryResponse> =>
+  fetchFromApi<StatsSummaryResponse>(HttpMethod.GET, `${ENDPOINT}/summary`)
+    .map(({ data }) => data)
+    .orDefault({ data: {} });
 
-export const fetchStatsTimeline = async (
+export const fetchStatsTimeline = (
   filters: StatsTimelineFiltersDto,
-): Promise<StatsTimelineResponse> => {
-  const { data } = await fetchFromApi<
-    StatsTimelineResponse,
-    StatsTimelineFiltersDto
-  >(HttpMethod.GET, `${ENDPOINT}/timeline`, filters);
-  return data;
-};
+): Promise<StatsTimelineResponse> =>
+  fetchFromApi<StatsTimelineResponse, StatsTimelineFiltersDto>(
+    HttpMethod.GET,
+    `${ENDPOINT}/timeline`,
+    filters,
+  )
+    .map(({ data }) => data)
+    .orDefault({ bans: { data: {} }, matches: { data: {} } });

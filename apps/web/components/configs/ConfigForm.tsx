@@ -1,11 +1,10 @@
 "use client";
 
-import { WatcherType, type ConfigSchema } from "@banalize/types";
+import { WatcherType } from "@banalize/types";
 import {
   ActionIcon,
   Button,
   Group,
-  Notification,
   rem,
   Text,
   useMantineTheme,
@@ -35,20 +34,12 @@ export type ConfigFormType = {
 };
 
 type ConfigFormProps = {
-  onDone: () => void;
-  onSumbit: (
-    config: ConfigFormType,
-  ) => Promise<ConfigSchema | { message: string }>;
+  onSumbit: (config: ConfigFormType) => Promise<void>;
   initialConfig?: ConfigFormType;
 };
 
-export const ConfigForm = ({
-  onSumbit,
-  onDone,
-  initialConfig,
-}: ConfigFormProps) => {
+export const ConfigForm = ({ onSumbit, initialConfig }: ConfigFormProps) => {
   const theme = useMantineTheme();
-  const [message, setMessage] = useState<string | undefined>(undefined);
   const [ignoreIps, setIgnoreIps] = useState<string>(
     initialConfig?.ignoreIps ?? "",
   );
@@ -77,17 +68,7 @@ export const ConfigForm = ({
       findTime: Number(values.findTime),
       maxMatches: Number(values.maxMatches),
     };
-
-    console.log("onSubmitRequested", config);
-
-    const result = await onSumbit(config);
-
-    if ("message" in result) {
-      setMessage(result.message);
-      return;
-    }
-
-    onDone();
+    await onSumbit(config);
   };
 
   const addIgnoreIp = () => {
@@ -247,17 +228,6 @@ export const ConfigForm = ({
           ) : null}
         </Group>
       ))}
-
-      {message !== undefined ? (
-        <Notification
-          mt="md"
-          color="red"
-          title="Error"
-          onClose={() => setMessage(undefined)}
-        >
-          {JSON.stringify(message)}
-        </Notification>
-      ) : null}
 
       <Group justify="flex-end" mt="md">
         <Button type="submit" color="cyan" w="100%">

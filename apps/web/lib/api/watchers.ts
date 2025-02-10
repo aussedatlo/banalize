@@ -1,23 +1,21 @@
 import { WatcherStatusesResponse } from "@banalize/types";
-import { fetchFromApi, HttpMethod } from "./utils";
+import { HttpMethod } from ".";
+import { fetchFromApi } from "./utils";
 
 const ENDPOINT = "/watchers";
 
 export const fetchWatcherStatuses =
-  async (): Promise<WatcherStatusesResponse> => {
-    const { data } = await fetchFromApi<WatcherStatusesResponse>(
-      HttpMethod.GET,
-      `${ENDPOINT}/status`,
-    );
-    return data;
-  };
+  async (): Promise<WatcherStatusesResponse> =>
+    fetchFromApi<WatcherStatusesResponse>(HttpMethod.GET, `${ENDPOINT}/status`)
+      .map(({ data }) => data)
+      .orDefault({ data: {} });
 
-export const fetchWatcherStatus = async (
+export const fetchWatcherStatus = (
   configId: string,
-): Promise<WatcherStatusesResponse> => {
-  const { data } = await fetchFromApi<WatcherStatusesResponse>(
+): Promise<WatcherStatusesResponse> =>
+  fetchFromApi<WatcherStatusesResponse>(
     HttpMethod.GET,
     `${ENDPOINT}/status/${configId}`,
-  );
-  return data;
-};
+  )
+    .map(({ data }) => data)
+    .orDefault({ data: {} });

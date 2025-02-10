@@ -12,7 +12,6 @@ import {
   ThemeIcon,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
 import {
   IconDotsVertical,
   IconEdit,
@@ -42,61 +41,20 @@ export const NotifierConfigPaper = ({ config }: NotifierConfigPaperProps) => {
   const icon = config.emailConfig ? <IconMail /> : <IconMessageCircle />;
 
   const onDelete = async () => {
-    const result = await deleteNotifierConfig(config._id);
-
-    if (result && result._id) {
-      notifications.show({
-        title: "Config deleted",
-        message: "Notifier config was successfully deleted",
-        color: "cyan",
-      });
-    } else {
-      notifications.show({
-        title: "Config deletion failed",
-        message: "Notifier config was not deleted",
-        color: "pink",
-      });
-    }
-    router.refresh();
+    await deleteNotifierConfig(config._id).ifRight(() => {
+      router.refresh();
+    });
   };
 
   const onUpdate = async (dto: NotifierConfigDto) => {
-    const updated = await updateNotifierConfig(config._id, dto);
-    router.refresh();
-
-    if (updated && updated._id) {
-      notifications.show({
-        title: "Config updated",
-        message: "Notifier config was successfully updated",
-        color: "cyan",
-      });
-    } else {
-      notifications.show({
-        title: "Config update failed",
-        message: "Notifier config was not updated",
-        color: "pink",
-      });
-    }
-
-    return updated;
+    await updateNotifierConfig(config._id, dto).ifRight(() => {
+      close();
+      router.refresh();
+    });
   };
 
   const onTestNotification = async () => {
-    const result = await sendTestNotification(config._id);
-
-    if (result && result.success === true) {
-      notifications.show({
-        title: "Test notification sent",
-        message: "Test notification was successfully sent",
-        color: "cyan",
-      });
-    } else {
-      notifications.show({
-        title: "Test notification failed",
-        message: result.message ?? "An error occurred",
-        color: "pink",
-      });
-    }
+    await sendTestNotification(config._id);
   };
 
   return (
@@ -183,7 +141,6 @@ export const NotifierConfigPaper = ({ config }: NotifierConfigPaperProps) => {
 
       <Modal opened={opened} onClose={close} title="Edit config">
         <NotifierConfigForm
-          onCancel={close}
           onSubmit={onUpdate}
           initialValues={config}
           id={config._id}
