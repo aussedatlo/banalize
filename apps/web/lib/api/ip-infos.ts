@@ -12,5 +12,5 @@ export const fetchIpInfos = (
     ENDPOINT,
     filters,
   )
-    .map(({ data }) => ({ data }))
-    .orDefault({ data: {} });
+    .map(({ data }) => data)
+    .orDefault({});
