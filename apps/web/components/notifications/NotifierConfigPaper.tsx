@@ -11,6 +11,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { Menu } from "components/shared/Menu/Menu";
+import { ConfirmationModal } from "components/shared/Modal/ConfirmationModal";
 import { Paper } from "components/shared/Paper/Paper";
 import {
   deleteNotifierConfig,
@@ -25,12 +26,19 @@ type NotifierConfigPaperProps = {
 };
 
 export const NotifierConfigPaper = ({ config }: NotifierConfigPaperProps) => {
-  const [opened, { open, close }] = useDisclosure(false);
+  const [
+    CreateConfigModalOpened,
+    { open: CreateConfigModalOpen, close: CreateConfigModalClose },
+  ] = useDisclosure(false);
+  const [
+    DeleteModalOpened,
+    { open: DeleteModalOpen, close: DeleteModalClose },
+  ] = useDisclosure(false);
   const router = useRouter();
   const type = config.emailConfig ? "Email" : "Signal";
   const icon = config.emailConfig ? <IconMail /> : <IconMessageCircle />;
 
-  const onDelete = async () => {
+  const onConfirmDelete = async () => {
     await deleteNotifierConfig(config._id).ifRight(() => {
       router.refresh();
     });
@@ -66,12 +74,12 @@ export const NotifierConfigPaper = ({ config }: NotifierConfigPaperProps) => {
                     icon: (
                       <IconEdit style={{ width: rem(16), height: rem(16) }} />
                     ),
-                    onClick: open,
+                    onClick: CreateConfigModalOpen,
                   },
                   {
                     text: "Delete config",
                     icon: <IconTrash />,
-                    onClick: onDelete,
+                    onClick: DeleteModalOpen,
                   },
                   {
                     text: "Send test notification",
@@ -98,13 +106,25 @@ export const NotifierConfigPaper = ({ config }: NotifierConfigPaperProps) => {
         </Group>
       </Paper>
 
-      <Modal opened={opened} onClose={close} title="Edit config">
+      <Modal
+        opened={CreateConfigModalOpened}
+        onClose={CreateConfigModalClose}
+        title="Edit config"
+      >
         <NotifierConfigForm
           onSubmit={onUpdate}
           initialValues={config}
           id={config._id}
         />
       </Modal>
+
+      <ConfirmationModal
+        opened={DeleteModalOpened}
+        onCancel={DeleteModalClose}
+        onConfirm={onConfirmDelete}
+        title="Delete config"
+        message="Are you sure to delete this config? The action is irreversible."
+      />
     </>
   );
 };
