@@ -1,25 +1,16 @@
 "use client";
 
 import { NotifierConfigDto, NotifierConfigSchema } from "@banalize/types";
-import {
-  ActionIcon,
-  Badge,
-  Group,
-  Menu,
-  Modal,
-  rem,
-  Text,
-  ThemeIcon,
-} from "@mantine/core";
+import { Badge, Group, Modal, rem, Text, ThemeIcon } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
-  IconDotsVertical,
   IconEdit,
   IconMail,
   IconMessageCircle,
   IconTestPipe,
   IconTrash,
 } from "@tabler/icons-react";
+import { Menu } from "components/shared/Menu/Menu";
 import { Paper } from "components/shared/Paper/Paper";
 import {
   deleteNotifierConfig,
@@ -28,7 +19,6 @@ import {
 } from "lib/api";
 import { useRouter } from "next/navigation";
 import { NotifierConfigForm } from "./NotifierConfigForm";
-import styles from "./NotifierConfigPaper.module.css";
 
 type NotifierConfigPaperProps = {
   config: NotifierConfigSchema;
@@ -69,62 +59,31 @@ export const NotifierConfigPaper = ({ config }: NotifierConfigPaperProps) => {
               <Text fz="h3">{type} Notifier</Text>
             </Group>
             <Group>
-              <Menu>
-                <Menu.Target>
-                  <ActionIcon variant="filled" size="lg" color="cyan">
-                    <IconDotsVertical
-                      style={{ width: rem(18), height: rem(18) }}
-                    />
-                  </ActionIcon>
-                </Menu.Target>
-
-                <Menu.Dropdown>
-                  {[
-                    {
-                      text: "Edit config",
-                      icon: (
-                        <ThemeIcon color="dark" size={rem(22)}>
-                          <IconEdit
-                            style={{ width: rem(16), height: rem(16) }}
-                          />
-                        </ThemeIcon>
-                      ),
-                      onClick: open,
-                    },
-                    {
-                      text: "Delete config",
-                      icon: (
-                        <ThemeIcon color="dark" size={rem(22)}>
-                          <IconTrash
-                            style={{ width: rem(16), height: rem(16) }}
-                          />
-                        </ThemeIcon>
-                      ),
-                      onClick: onDelete,
-                    },
-                    {
-                      text: "Send test notification",
-                      icon: (
-                        <ThemeIcon color="dark" size={rem(22)}>
-                          <IconTestPipe
-                            style={{ width: rem(16), height: rem(16) }}
-                          />
-                        </ThemeIcon>
-                      ),
-                      onClick: onTestNotification,
-                    },
-                  ].map(({ text, icon, onClick }, index) => (
-                    <Menu.Item
-                      key={index}
-                      onClick={onClick}
-                      leftSection={icon}
-                      className={styles.input}
-                    >
-                      {text}
-                    </Menu.Item>
-                  ))}
-                </Menu.Dropdown>
-              </Menu>
+              <Menu
+                items={[
+                  {
+                    text: "Edit config",
+                    icon: (
+                      <IconEdit style={{ width: rem(16), height: rem(16) }} />
+                    ),
+                    onClick: open,
+                  },
+                  {
+                    text: "Delete config",
+                    icon: <IconTrash />,
+                    onClick: onDelete,
+                  },
+                  {
+                    text: "Send test notification",
+                    icon: (
+                      <IconTestPipe
+                        style={{ width: rem(16), height: rem(16) }}
+                      />
+                    ),
+                    onClick: onTestNotification,
+                  },
+                ]}
+              />
             </Group>
           </Group>
         }
