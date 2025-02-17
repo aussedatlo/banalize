@@ -29,7 +29,7 @@ export type ConfigFormType = {
   findTime: number;
   maxMatches: number;
   watcherType: WatcherType;
-  ignoreIps: string;
+  ignoreIps: string[];
   paused: boolean;
 };
 
@@ -40,8 +40,11 @@ type ConfigFormProps = {
 
 export const ConfigForm = ({ onSumbit, initialConfig }: ConfigFormProps) => {
   const theme = useMantineTheme();
-  const [ignoreIps, setIgnoreIps] = useState<string>(
-    initialConfig?.ignoreIps ?? "",
+  const [ignoreIps, setIgnoreIps] = useState<string[]>(
+    initialConfig?.ignoreIps === undefined ||
+      initialConfig.ignoreIps.length === 0
+      ? [""]
+      : initialConfig.ignoreIps,
   );
 
   const form = useForm<ConfigFormType>({
@@ -53,9 +56,9 @@ export const ConfigForm = ({ onSumbit, initialConfig }: ConfigFormProps) => {
       banTime: 3600,
       findTime: 3600,
       maxMatches: 3,
+      ignoreIps: [],
       ...initialConfig,
       watcherType: initialConfig?.watcherType ?? WatcherType.FILE,
-      ignoreIps: initialConfig?.ignoreIps ?? "",
       paused: initialConfig?.paused ?? false,
     },
   });
@@ -63,7 +66,7 @@ export const ConfigForm = ({ onSumbit, initialConfig }: ConfigFormProps) => {
   const onSubmitRequested = async (values: ConfigFormType) => {
     const config = {
       ...values,
-      ignoreIps,
+      ignoreIps: ignoreIps.filter((ip) => ip.trim() !== ""),
       banTime: Number(values.banTime),
       findTime: Number(values.findTime),
       maxMatches: Number(values.maxMatches),
@@ -72,27 +75,26 @@ export const ConfigForm = ({ onSumbit, initialConfig }: ConfigFormProps) => {
   };
 
   const addIgnoreIp = () => {
-    setIgnoreIps((prev) => `${prev},`);
+    setIgnoreIps((prev) => [...prev, ""]);
   };
 
   const removeIgnoreIp = (index: number) => {
     setIgnoreIps((prev) => {
-      const updated = prev.split(",");
-      updated.splice(index, 1);
-      return updated.join(",");
+      const updated = prev.filter((_, i) => i !== index);
+      return updated.length ? updated : [""];
     });
   };
 
   const updateIgnoreIp = (index: number, value: string) => {
     // should include only dot and numbers
-    if (!value.match(/^[0-9./]+$/)) {
+    if (!value.match(/^[0-9./]+$/) && value !== "") {
       return;
     }
 
     setIgnoreIps((prev) => {
-      const updated = prev.split(",");
+      const updated = [...prev];
       updated[index] = value;
-      return updated.join(",");
+      return updated;
     });
   };
 
@@ -199,7 +201,8 @@ export const ConfigForm = ({ onSumbit, initialConfig }: ConfigFormProps) => {
       <Text fz="sm" mt="md">
         Ignore IPs
       </Text>
-      {ignoreIps.split(",").map((value, index) => (
+
+      {ignoreIps.map((value, index) => (
         <Group key={index} align="center" mb="xs" gap="xs">
           <TextInput
             value={value}
@@ -216,7 +219,7 @@ export const ConfigForm = ({ onSumbit, initialConfig }: ConfigFormProps) => {
           >
             <IconTrash style={{ width: rem(18), height: rem(18) }} />
           </ActionIcon>
-          {index === ignoreIps.split(",").length - 1 ? (
+          {index === ignoreIps.length - 1 ? (
             <ActionIcon
               onClick={addIgnoreIp}
               variant="filled"

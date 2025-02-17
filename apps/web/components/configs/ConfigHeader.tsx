@@ -47,8 +47,6 @@ export const ConfigHeader = ({ config, status }: ConfigHeaderProps) => {
 
     const dto: ConfigSchema = {
       ...(config as ConfigFormType & { _id: string }),
-      ignoreIps:
-        config.ignoreIps?.length > 0 ? config.ignoreIps.split(",") : [],
     };
 
     await updateConfig(dto).ifRight(() => {
@@ -105,7 +103,7 @@ export const ConfigHeader = ({ config, status }: ConfigHeaderProps) => {
           onSumbit={onConfigEdit}
           initialConfig={{
             ...config,
-            ignoreIps: config.ignoreIps ? config.ignoreIps.join(",") : "",
+            ignoreIps: config.ignoreIps ?? [""],
             paused: config.paused ?? false,
           }}
         />
