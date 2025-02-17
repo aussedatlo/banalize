@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
 import { useState } from "react";
-import classes from "./MenuIcon.module.css";
+import classes from "./DropdownInput.module.css";
 
 type MenuIconItem<T> = {
   label: string;
@@ -24,7 +24,7 @@ type MenuIconProps<T> = {
 } & MenuProps &
   BoxProps;
 
-export const MenuIcon = <T,>({
+export const DropdownInput = <T,>({
   data,
   onValueChange,
   initialValue,

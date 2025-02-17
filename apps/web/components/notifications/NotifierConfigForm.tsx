@@ -8,9 +8,9 @@ import { Button, Group, rem, Text, ThemeIcon } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconMail, IconMessageCircle } from "@tabler/icons-react";
 import { EventIcon } from "components/shared/Icon/EventIcon";
-import { MultiSelect } from "components/shared/Input/MultiSelect";
+import { DropdownInput } from "components/shared/Input/DropdownInput";
+import { MultiSelectInput } from "components/shared/Input/MultiSelectInput";
 import { TextInput } from "components/shared/Input/TextInput";
-import { MenuIcon } from "components/shared/Menu/MenuIcon";
 import { IconText } from "components/shared/Text/IconText";
 import { useState } from "react";
 
@@ -94,7 +94,7 @@ export const NotifierConfigForm: React.FC<NotifierConfigFormProps> = ({
     <form onSubmit={form.onSubmit(onSubmitRequested)}>
       {id && <TextInput mt="md" label="Id" value={id} disabled type="string" />}
 
-      <MultiSelect
+      <MultiSelectInput
         withPills={true}
         mt="md"
         label="Events"
@@ -116,7 +116,7 @@ export const NotifierConfigForm: React.FC<NotifierConfigFormProps> = ({
       <Text fz="sm" mt="md">
         Notifier type
       </Text>
-      <MenuIcon
+      <DropdownInput
         w="100%"
         data={[
           {

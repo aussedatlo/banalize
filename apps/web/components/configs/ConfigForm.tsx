@@ -16,8 +16,8 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
+import { DropdownInput } from "components/shared/Input/DropdownInput";
 import { TextInput } from "components/shared/Input/TextInput";
-import { MenuIcon } from "components/shared/Menu/MenuIcon";
 import { useState } from "react";
 
 export type ConfigFormType = {
@@ -167,7 +167,7 @@ export const ConfigForm = ({ onSumbit, initialConfig }: ConfigFormProps) => {
       <Text fz="sm" mt="md">
         Watcher type
       </Text>
-      <MenuIcon
+      <DropdownInput
         w="100%"
         data={[
           {

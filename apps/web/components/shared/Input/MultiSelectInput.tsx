@@ -2,22 +2,22 @@ import {
   ComboboxItem,
   ComboboxLikeRenderOptionInput,
   Group,
-  MultiSelect as MantineMultiSelect,
+  MultiSelect,
   MultiSelectProps,
   rem,
 } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
-import classes from "./MultiSelect.module.css";
+import classes from "./MultiSelectInput.module.css";
 
-type MultiSelectCustomProps = MultiSelectProps & {
+type MultiSelectInputProps = MultiSelectProps & {
   withPills?: boolean;
 };
 
-export const MultiSelect = ({
+export const MultiSelectInput = ({
   renderOption,
   withPills = false,
   ...props
-}: MultiSelectCustomProps) => {
+}: MultiSelectInputProps) => {
   const render = (item: ComboboxLikeRenderOptionInput<ComboboxItem>) => (
     <Group justify="space-between" w="100%">
       <Group>{renderOption && renderOption(item)}</Group>
@@ -34,7 +34,7 @@ export const MultiSelect = ({
   );
 
   return (
-    <MantineMultiSelect
+    <MultiSelect
       classNames={{
         pill: !withPills ? classes.pill : "",
         input: classes.input,
