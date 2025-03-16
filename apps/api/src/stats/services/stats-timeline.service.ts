@@ -23,6 +23,7 @@ const WEEK_IN_MS = 7 * DAY_IN_MS;
 export class StatsTimelineService implements OnModuleInit {
   private readonly logger = new Logger(StatsTimelineService.name);
   private record: Record<string, StatsTimelineResponse> = {};
+  private isQueueProcessing = false;
 
   constructor(
     private readonly matchesService: MatchesService,
@@ -61,6 +62,9 @@ export class StatsTimelineService implements OnModuleInit {
   async handleBanOrMatchCreationDone(
     event: BanEvent | MatchEvent,
   ): Promise<void> {
+    if (this.isQueueProcessing) return;
+
+    this.isQueueProcessing = true;
     this.queueService.enqueue<BanEvent | MatchEvent>(
       event,
       this.addOneEvent.bind(this),
@@ -88,6 +92,8 @@ export class StatsTimelineService implements OnModuleInit {
       this.record[weeklyKey].matches.data[weeklyDate] += 1;
       this.record[monthlyKey].matches.data[monthlyDate] += 1;
     }
+
+    this.isQueueProcessing = false;
   }
 
   private async computeAllStats(): Promise<void> {
