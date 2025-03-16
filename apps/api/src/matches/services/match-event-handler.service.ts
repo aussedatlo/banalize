@@ -60,6 +60,8 @@ export class MatchEventHandlerService {
 
     if (totalCount >= config.maxMatches) {
       this.logger.log(`Matched ${totalCount} times, banning ${ip}`);
+
+      this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
       this.eventEmitter.emit(
         Events.BAN_CREATION_REQUESTED,
         new BanEvent(ip, config),

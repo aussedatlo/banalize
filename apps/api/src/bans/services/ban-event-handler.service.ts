@@ -47,7 +47,6 @@ export class BanEventHandlerService {
       configId: config._id,
     });
 
-    this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
     this.eventEmitter.emit(Events.BAN_CREATION_DONE, event);
   };
 }
