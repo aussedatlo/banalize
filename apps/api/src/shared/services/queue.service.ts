@@ -20,26 +20,30 @@ export class QueueService {
     handler: EventQueueItemHandler<EventType>,
     priority: QueuePriority,
   ) {
-    this.queue.push({ handler, priority, data });
-    this.queue.sort((a, b) => a.priority - b.priority);
+    // Insert event at the correct position (sorted by priority)
+    let index = this.queue.findIndex((item) => item.priority > priority);
+    if (index === -1) index = this.queue.length;
+    this.queue.splice(index, 0, { handler, priority, data });
+
     this.processQueue();
   }
 
   private async processQueue() {
     if (this.processing) return;
 
-    const nextItem = this.queue.shift();
-    if (!nextItem) return;
-
     this.processing = true;
 
-    try {
-      await nextItem.handler(nextItem.data);
-    } finally {
-      this.processing = false;
-      if (this.queue.length > 0) {
-        this.processQueue();
+    while (this.queue.length > 0) {
+      const nextItem = this.queue.shift();
+      if (!nextItem) break;
+
+      try {
+        await nextItem.handler(nextItem.data);
+      } catch (error) {
+        console.error("Queue processing error:", error);
       }
     }
+
+    this.processing = false;
   }
 }
