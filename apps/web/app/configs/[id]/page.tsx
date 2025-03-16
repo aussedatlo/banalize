@@ -5,13 +5,8 @@ import { Box, Grid, GridCol, Group, Notification } from "@mantine/core";
 import { IconFlag, IconHandStop } from "@tabler/icons-react";
 import { ConfigEventsPaper } from "components/configs/ConfigEventsPaper";
 import { ConfigGraphPaper } from "components/configs/ConfigGraphPaper";
+import { ConfigHeader } from "components/configs/ConfigHeader";
 import { ConfigStatsPaper } from "components/configs/ConfigStatsPaper";
-import { ConfigStatusBadge } from "components/configs/ConfigStatusBadge";
-import { DeleteConfigButton } from "components/configs/DeleteConfigButton";
-import { EditConfigButton } from "components/configs/EditConfigButton";
-import { PauseConfigButton } from "components/configs/PauseConfigButton";
-import { TryRegexConfigButton } from "components/configs/TryRegexConfigButton";
-import { RouterBreadcrumbs } from "components/shared/RouterBreadcrumbs/RouterBreadcrumbs";
 
 import {
   fetchBans,
@@ -88,19 +83,7 @@ export default async function ConfigPage({
   return (
     <Box>
       <Group justify="space-between" mb="lg">
-        <Group>
-          <RouterBreadcrumbs
-            path={`/configs/${config._id}`}
-            displayedPath={`/configs/${config.name}`}
-          />
-          <ConfigStatusBadge data={status} />
-        </Group>
-        <Group>
-          <TryRegexConfigButton config={config} />
-          <EditConfigButton config={config} />
-          <PauseConfigButton config={config} />
-          <DeleteConfigButton configId={configId} />
-        </Group>
+        <ConfigHeader config={config} status={status} />
       </Group>
 
       <Group w={"100%"}>

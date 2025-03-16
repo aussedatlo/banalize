@@ -13,10 +13,14 @@ export const CreateConfigButton = () => {
   const router = useRouter();
 
   const onConfigCreate = async (config: ConfigFormType) => {
+    console.log(
+      "config",
+      config.ignoreIps.filter((ip) => ip.trim() !== ""),
+    );
+
     const dto: ConfigCreationDto = {
       ...config,
-      ignoreIps:
-        config.ignoreIps?.length > 0 ? config.ignoreIps.split(",") : [],
+      ignoreIps: config.ignoreIps.filter((ip) => ip.trim() !== ""),
       paused: false,
     };
 

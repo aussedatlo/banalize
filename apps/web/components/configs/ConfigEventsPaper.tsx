@@ -29,7 +29,7 @@ import {
 } from "@tabler/icons-react";
 import { StatusBadge } from "components/shared/Badge/StatusBadge";
 import { EventIcon } from "components/shared/Icon/EventIcon";
-import { MultiSelect } from "components/shared/Input/MultiSelect";
+import { MultiSelectInput } from "components/shared/Input/MultiSelectInput";
 import { TextInput } from "components/shared/Input/TextInput";
 import { Paper } from "components/shared/Paper/Paper";
 import { Table } from "components/shared/Table/Table";
@@ -156,7 +156,7 @@ export const ConfigEventsPaper = ({
           </Group>
 
           <Group>
-            <MultiSelect
+            <MultiSelectInput
               data={[
                 { value: EventType.BAN, label: "Bans" },
                 {
@@ -196,7 +196,7 @@ export const ConfigEventsPaper = ({
                 )
               }
             />
-            <MultiSelect
+            <MultiSelectInput
               data={[
                 { value: EventStatus.ACTIVE, label: "Active" },
                 { value: EventStatus.EXPIRED, label: "Expired" },

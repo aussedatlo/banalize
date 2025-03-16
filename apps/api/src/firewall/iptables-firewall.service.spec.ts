@@ -79,7 +79,7 @@ describe("IptablesFirewallService", () => {
     );
     expect(execSpy).toHaveBeenNthCalledWith(
       2,
-      "iptables -D INPUT -j banalize",
+      "iptables-save | sed '/^-A INPUT -j banalize$/d' | iptables-restore",
       expect.any(Function),
     );
     expect(execSpy).toHaveBeenNthCalledWith(

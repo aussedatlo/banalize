@@ -67,7 +67,7 @@ export class IptablesFirewallService
   }
 
   private async unlinkChain(): Promise<void> {
-    const command = `iptables -D ${this.link} -j ${this.chain}`;
+    const command = `iptables-save | sed '/^-A ${this.link} -j ${this.chain}$/d' | iptables-restore`;
     this.executeCommand(command);
   }
 

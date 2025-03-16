@@ -32,8 +32,10 @@ export class BanCleanupService implements OnModuleInit {
 
     for (const ban of activebans) {
       const config = await this.configsService.findOne(ban.configId);
+      const configExists = !!config && config.banTime;
+      const banIsExpired = ban.timestamp + config.banTime * 1000 < timestamp;
 
-      if (ban.timestamp + config.banTime * 1000 > timestamp) {
+      if (configExists && !banIsExpired) {
         continue;
       }
 

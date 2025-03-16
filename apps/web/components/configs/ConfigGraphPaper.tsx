@@ -9,7 +9,7 @@ import {
   IconCalendarWeek,
   IconGraph,
 } from "@tabler/icons-react";
-import { MenuIcon } from "components/shared/Menu/MenuIcon";
+import { DropdownInput } from "components/shared/Input/DropdownInput";
 import { Paper } from "components/shared/Paper/Paper";
 import { useState } from "react";
 
@@ -84,7 +84,7 @@ export const ConfigGraphPaper = (stats: ConfigGraphPaperProps) => {
             <IconGraph />
           </ThemeIcon>
           <Text fz="h3">Graph</Text>
-          <MenuIcon
+          <DropdownInput
             ml="auto"
             w={{ base: "100%", md: rem(200) }}
             onValueChange={(value: Period) => setPeriod(value)}
