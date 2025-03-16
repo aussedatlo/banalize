@@ -8,7 +8,7 @@ import { Events } from "src/shared/enums/events.enum";
 import { Watcher } from "src/watchers/interfaces/watcher.interface";
 
 const TAIL_RETRY_INTERVAL = 5 * 1000;
-const TAIL_POLL_INTERVAL = 1000;
+const TAIL_POLL_INTERVAL = 100;
 
 export class FileWatcherService implements Watcher {
   private readonly logger = new Logger(FileWatcherService.name);
