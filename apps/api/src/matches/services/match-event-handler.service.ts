@@ -33,7 +33,7 @@ export class MatchEventHandlerService {
     );
 
     const ignored = isIpInList(ip, config.ignoreIps);
-    const timestamp = new Date().getTime();
+    const timestamp = Date.now();
 
     await this.matchesService.create({
       line,

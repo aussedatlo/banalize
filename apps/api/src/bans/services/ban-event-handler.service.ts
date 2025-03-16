@@ -43,7 +43,7 @@ export class BanEventHandlerService {
     // create a new ban
     await this.bansService.create({
       ip,
-      timestamp: new Date().getTime(),
+      timestamp: Date.now(),
       configId: config._id,
     });
 
