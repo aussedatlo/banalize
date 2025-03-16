@@ -11,6 +11,10 @@ import { MatchesService } from "./matches.service";
 export class MatchEventHandlerService {
   private readonly logger = new Logger(MatchEventHandlerService.name);
 
+  // Local in-memory cache
+  private matchCache = new Map<string, number>();
+  private bannedIps = new Set<string>();
+
   constructor(
     private matchesService: MatchesService,
     private eventEmitter: EventEmitter2,
@@ -21,12 +25,72 @@ export class MatchEventHandlerService {
   handleMatchCreationRequested(event: MatchEvent) {
     this.queueService.enqueue<MatchEvent>(
       event,
-      this.createMatch,
-      QueuePriority.MEDIUM,
+      this.handleCacheAndImmediateCheck,
+      QueuePriority.HIGH,
     );
   }
 
+  // High-Priority Task: Cache Update & Immediate Ban Check
+  // This task is used to handle a bulk of events that are coming in at the same time
+  // It will update the cache and check if the IP should be banned immediately
+  // - If the IP should be banned, it will emit a FIREWALL_DENY event
+  // - If the IP should not be banned, it will enqueue the next task
+  handleCacheAndImmediateCheck = async (event: MatchEvent) => {
+    this.logger.debug(
+      `Handling cache and immediate check for event ${event.ip}`,
+    );
+    const { ip, config } = event;
+    const cacheKey = `${config._id}:${ip}`;
+
+    const ignored = isIpInList(ip, config.ignoreIps);
+    if (ignored) {
+      this.logger.debug(`Match ignored, not checking for bans`);
+      this.queueService.enqueue<MatchEvent>(
+        event,
+        this.createMatch,
+        QueuePriority.MEDIUM,
+      );
+      return;
+    }
+
+    // Fetch or initialize match count in cache
+    const entry = this.matchCache.get(cacheKey);
+    if (!entry) {
+      this.logger.debug(`Cache miss for ${cacheKey}, fetching from DB`);
+      const { totalCount } = await this.matchesService.findAll({
+        configId: config._id,
+        ip,
+        limit: 0,
+      });
+      this.matchCache.set(cacheKey, totalCount);
+    }
+
+    // Increment match count in cache
+    const count = this.matchCache.get(cacheKey)! + 1;
+    this.matchCache.set(cacheKey, count);
+    this.logger.debug(`Matched ${count} times`);
+
+    // Check if already banned in cache, if not, ban
+    if (!this.bannedIps.has(ip) && count >= config.maxMatches) {
+      this.logger.log(`Matched ${count} times, banning ${ip} (cache)`);
+      this.bannedIps.add(ip);
+      this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
+    }
+
+    this.queueService.enqueue<MatchEvent>(
+      event,
+      this.createMatch,
+      QueuePriority.MEDIUM,
+    );
+  };
+
+  // Medium-Priority Task: Create Match & Check for Ban
   createMatch = async (event: MatchEvent) => {
+    // Clear cache & banned IPs
+    const alreadyBannedByCache: boolean = this.bannedIps.has(event.ip);
+    this.bannedIps.clear();
+    this.matchCache.clear();
+
     const { line, ip, config } = event;
     this.logger.log(
       `Matched line: ${line}, ip: ${ip}, config: ${config.param}`,
@@ -61,7 +125,10 @@ export class MatchEventHandlerService {
     if (totalCount >= config.maxMatches) {
       this.logger.log(`Matched ${totalCount} times, banning ${ip}`);
 
-      this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
+      if (!alreadyBannedByCache) {
+        this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
+      }
+
       this.eventEmitter.emit(
         Events.BAN_CREATION_REQUESTED,
         new BanEvent(ip, config),
