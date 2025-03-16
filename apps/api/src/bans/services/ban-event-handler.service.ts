@@ -20,7 +20,7 @@ export class BanEventHandlerService {
   handleBanCreationRequested(event: BanEvent) {
     this.queueService.enqueue<BanEvent>(
       event,
-      this.createBan,
+      this.createBan.bind(this),
       QueuePriority.HIGH,
     );
   }

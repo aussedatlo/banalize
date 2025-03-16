@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { SharedModule } from "src/shared/shared.module";
 import { NotificationsController } from "./notifications.controller";
 import { NotifierFactory } from "./notifier-factory";
 import {
@@ -19,6 +20,7 @@ import { NotifierTestService } from "./services/notifier-test-service.service";
         schema: NotifierConfigSchemaDefinition,
       },
     ]),
+    SharedModule,
   ],
   controllers: [NotificationsController],
   providers: [

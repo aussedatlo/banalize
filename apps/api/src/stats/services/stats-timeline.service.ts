@@ -11,6 +11,8 @@ import { MatchSchema } from "src/matches/schemas/match.schema";
 import { MatchesService } from "src/matches/services/matches.service";
 import { MatchEvent } from "src/matches/types/match-event.types";
 import { Events } from "src/shared/enums/events.enum";
+import { QueuePriority } from "src/shared/enums/priority.enum";
+import { QueueService } from "src/shared/services/queue.service";
 import { StatsTimelineFiltersDto } from "src/stats/dtos/stats-timeline-filters.dto";
 
 const SAMPLE_SIZE = 10;
@@ -26,6 +28,7 @@ export class StatsTimelineService implements OnModuleInit {
     private readonly matchesService: MatchesService,
     private readonly bansService: BansService,
     private readonly configsService: ConfigsService,
+    private readonly queueService: QueueService,
   ) {}
 
   async getStats(
@@ -45,13 +48,27 @@ export class StatsTimelineService implements OnModuleInit {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleCron(): Promise<void> {
-    this.logger.log("Computing stats on cron job");
-    this.computeAllStats();
+    this.logger.debug("Computing stats on cron job");
+    this.queueService.enqueue<void>(
+      undefined,
+      this.computeAllStats.bind(this),
+      QueuePriority.VERY_LOW,
+    );
   }
 
   @OnEvent(Events.BAN_CREATION_DONE)
   @OnEvent(Events.MATCH_CREATION_DONE)
-  addOneEvent(event: BanEvent | MatchEvent): void {
+  async handleBanOrMatchCreationDone(
+    event: BanEvent | MatchEvent,
+  ): Promise<void> {
+    this.queueService.enqueue<BanEvent | MatchEvent>(
+      event,
+      this.addOneEvent.bind(this),
+      QueuePriority.VERY_LOW,
+    );
+  }
+
+  async addOneEvent(event: BanEvent | MatchEvent): Promise<void> {
     const config = event.config;
     const date = new Date();
     const dailyKey = this.getKey(config._id, "daily");
