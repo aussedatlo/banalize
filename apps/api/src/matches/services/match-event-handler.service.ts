@@ -41,12 +41,13 @@ export class MatchEventHandlerService {
     );
     const { ip, config } = event;
     const cacheKey = `${config._id}:${ip}`;
+    let banned = false;
 
     const ignored = isIpInList(ip, config.ignoreIps);
     if (ignored) {
       this.logger.debug(`Match ignored, not checking for bans`);
       this.queueService.enqueue<MatchEvent>(
-        event,
+        { ...event, ignored: true, timestamp: Date.now(), banned },
         this.createMatch,
         QueuePriority.MEDIUM,
       );
@@ -72,13 +73,13 @@ export class MatchEventHandlerService {
 
     // Check if already banned in cache, if not, ban
     if (!this.bannedIps.has(ip) && count >= config.maxMatches) {
+      banned = true;
       this.logger.log(`Matched ${count} times, banning ${ip} (cache)`);
-      this.bannedIps.add(ip);
       this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
     }
 
     this.queueService.enqueue<MatchEvent>(
-      event,
+      { ...event, timestamp: Date.now(), ignored: false, banned },
       this.createMatch,
       QueuePriority.MEDIUM,
     );
@@ -86,18 +87,13 @@ export class MatchEventHandlerService {
 
   // Medium-Priority Task: Create Match & Check for Ban
   createMatch = async (event: MatchEvent) => {
-    // Clear cache & banned IPs
-    const alreadyBannedByCache: boolean = this.bannedIps.has(event.ip);
     this.bannedIps.clear();
     this.matchCache.clear();
 
-    const { line, ip, config } = event;
+    const { line, ip, config, ignored, timestamp, banned } = event;
     this.logger.log(
       `Matched line: ${line}, ip: ${ip}, config: ${config.param}`,
     );
-
-    const ignored = isIpInList(ip, config.ignoreIps);
-    const timestamp = Date.now();
 
     await this.matchesService.create({
       line,
@@ -113,22 +109,7 @@ export class MatchEventHandlerService {
       return;
     }
 
-    const { totalCount } = await this.matchesService.findAll({
-      configId: config._id,
-      ip,
-      timestamp_gt: timestamp - config.findTime * 1000,
-      limit: 0,
-    });
-
-    this.logger.debug(`Matched ${totalCount} times`);
-
-    if (totalCount >= config.maxMatches) {
-      this.logger.log(`Matched ${totalCount} times, banning ${ip}`);
-
-      if (!alreadyBannedByCache) {
-        this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
-      }
-
+    if (banned) {
       this.eventEmitter.emit(
         Events.BAN_CREATION_REQUESTED,
         new BanEvent(ip, config),
