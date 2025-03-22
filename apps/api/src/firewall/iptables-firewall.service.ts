@@ -46,44 +46,43 @@ export class IptablesFirewallService
 
   async denyIp(ip: string): Promise<void> {
     if (this.bannedIps.includes(ip)) return;
+    this.bannedIps.push(ip);
 
     const command = `iptables -A ${this.chain} -s ${ip}/32 -j REJECT --reject-with icmp-port-unreachable`;
-    this.executeCommand(command);
-    this.bannedIps.push(ip);
+    await this.executeCommand(command);
   }
 
   async allowIp(ip: string): Promise<void> {
     if (!this.bannedIps.includes(ip)) return;
+    this.bannedIps = this.bannedIps.filter((bannedIp) => bannedIp !== ip);
 
     const command = `iptables -D ${this.chain} -s ${ip}/32 -j REJECT --reject-with icmp-port-unreachable`;
-    this.executeCommand(command);
-
-    this.bannedIps = this.bannedIps.filter((bannedIp) => bannedIp !== ip);
+    await this.executeCommand(command);
   }
 
   private async linkChain(): Promise<void> {
     const command = `iptables -I ${this.link} -j ${this.chain}`;
-    this.executeCommand(command);
+    await this.executeCommand(command);
   }
 
   private async unlinkChain(): Promise<void> {
     const command = `iptables-save | sed '/^-A ${this.link} -j ${this.chain}$/d' | iptables-restore`;
-    this.executeCommand(command);
+    await this.executeCommand(command);
   }
 
   private async createChain(): Promise<void> {
     const command = `iptables -N ${this.chain}`;
-    this.executeCommand(command);
+    await this.executeCommand(command);
   }
 
   private async deleteChain(): Promise<void> {
     const command = `iptables -X ${this.chain}`;
-    this.executeCommand(command);
+    await this.executeCommand(command);
   }
 
   private async flushChain(): Promise<void> {
     const command = `iptables -F ${this.chain}`;
-    this.executeCommand(command);
+    await this.executeCommand(command);
   }
 
   private async executeCommand(command: string): Promise<void> {

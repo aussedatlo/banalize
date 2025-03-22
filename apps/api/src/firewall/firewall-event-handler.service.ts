@@ -28,7 +28,6 @@ export class FirewallEventHandlerService {
 
   async deny(event: { ip: string }) {
     const { ip } = event;
-    this.logger.debug(`Adding firewall rule for IP: ${ip}`);
     await this.firewallService.denyIp(ip);
   }
 
@@ -43,7 +42,6 @@ export class FirewallEventHandlerService {
 
   async allow(event: { ip: string }) {
     const { ip } = event;
-    this.logger.debug(`Removing firewall rule for IP: ${ip}`);
     await this.firewallService.allowIp(ip);
   }
 }
