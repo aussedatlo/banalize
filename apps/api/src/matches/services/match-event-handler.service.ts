@@ -19,10 +19,15 @@ export class MatchEventHandlerService {
     private matchesService: MatchesService,
     private eventEmitter: EventEmitter2,
     private queueService: QueueService,
-  ) {}
+  ) {
+    this.logger.log("MatchEventHandlerService initialized");
+  }
 
   @OnEvent(Events.MATCH_CREATION_REQUESTED)
   handleMatchCreationRequested(event: MatchEvent) {
+    this.logger.log(
+      `Match creation requested for IP ${event.ip} with config ${event.config.name}`,
+    );
     this.queueService.enqueue<MatchEvent>(
       event,
       this.handleCacheAndImmediateCheck,
@@ -36,16 +41,17 @@ export class MatchEventHandlerService {
   // - If the IP should be banned, it will emit a FIREWALL_DENY event
   // - If the IP should not be banned, it will enqueue the next task
   handleCacheAndImmediateCheck = async (event: MatchEvent) => {
-    this.logger.debug(
-      `Handling cache and immediate check for event ${event.ip}`,
-    );
     const { ip, config } = event;
     const cacheKey = `${config._id}:${ip}`;
     let banned = false;
 
+    this.logger.debug(
+      `Processing event for IP ${ip} with config ${config.name} (ID: ${config._id})`,
+    );
+
     const ignored = isIpInList(ip, config.ignoreIps);
     if (ignored) {
-      this.logger.debug(`Match ignored, not checking for bans`);
+      this.logger.log(`IP ${ip} is in ignore list for config ${config.name}`);
       this.queueService.enqueue<MatchEvent>(
         { ...event, ignored: true, timestamp: Date.now(), banned },
         this.createMatch,
@@ -57,25 +63,35 @@ export class MatchEventHandlerService {
     // Fetch or initialize match count in cache
     const entry = this.matchCache.get(cacheKey);
     if (!entry) {
-      this.logger.debug(`Cache miss for ${cacheKey}, fetching from DB`);
+      this.logger.debug(
+        `Cache miss for ${ip} (config: ${config.name}), fetching from database`,
+      );
       const { totalCount } = await this.matchesService.findAll({
         configId: config._id,
         ip,
         limit: 0,
       });
+      this.logger.debug(
+        `Found ${totalCount} existing matches for ${ip} in database`,
+      );
       this.matchCache.set(cacheKey, totalCount);
     }
 
     // Increment match count in cache
     const count = this.matchCache.get(cacheKey)! + 1;
     this.matchCache.set(cacheKey, count);
-    this.logger.debug(`Matched ${count} times`);
+    this.logger.debug(
+      `IP ${ip} has matched ${count}/${config.maxMatches} times for config ${config.name}`,
+    );
 
     // Check if already banned in cache, if not, ban
     if (!this.bannedIps.has(ip) && count >= config.maxMatches) {
       banned = true;
-      this.logger.log(`Matched ${count} times, banning ${ip} (cache)`);
+      this.logger.warn(
+        `IP ${ip} exceeded threshold (${count}/${config.maxMatches}) for config ${config.name} - initiating ban`,
+      );
       this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
+      this.bannedIps.add(ip);
     }
 
     this.queueService.enqueue<MatchEvent>(
@@ -87,35 +103,46 @@ export class MatchEventHandlerService {
 
   // Medium-Priority Task: Create Match & Check for Ban
   createMatch = async (event: MatchEvent) => {
+    this.logger.debug("Clearing cache before match creation");
     this.bannedIps.clear();
     this.matchCache.clear();
 
     const { line, ip, config, ignored, timestamp, banned } = event;
     this.logger.log(
-      `Matched line: ${line}, ip: ${ip}, config: ${config.param}`,
+      `Creating match record - IP: ${ip}, Config: ${config.name}, Ignored: ${ignored}, Banned: ${banned}`,
     );
 
-    await this.matchesService.create({
-      line,
-      regex: config.regex,
-      ip,
-      timestamp,
-      configId: config._id,
-    });
+    try {
+      await this.matchesService.create({
+        line,
+        regex: config.regex,
+        ip,
+        timestamp,
+        configId: config._id,
+      });
+      this.logger.debug(`Successfully created match record for IP ${ip}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to create match record for IP ${ip}: ${error.message}`,
+      );
+      throw error;
+    }
 
     if (ignored) {
-      this.logger.debug(`Match ignored, not checking for bans`);
+      this.logger.debug(`Match for IP ${ip} was ignored, skipping ban check`);
       this.eventEmitter.emit(Events.MATCH_CREATION_DONE, event);
       return;
     }
 
     if (banned) {
+      this.logger.warn(`Requesting ban creation for IP ${ip}`);
       this.eventEmitter.emit(
         Events.BAN_CREATION_REQUESTED,
         new BanEvent(ip, config),
       );
     }
 
+    this.logger.debug(`Match creation process completed for IP ${ip}`);
     this.eventEmitter.emit(Events.MATCH_CREATION_DONE, event);
   };
 }
