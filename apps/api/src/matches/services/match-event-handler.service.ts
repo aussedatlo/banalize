@@ -1,27 +1,84 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import { BanEvent } from "src/bans/types/ban-event.types";
+import { ConfigsService } from "src/configs/configs.service";
 import { MatchEvent } from "src/matches/types/match-event.types";
 import { Events } from "src/shared/enums/events.enum";
 import { QueuePriority } from "src/shared/enums/priority.enum";
 import { QueueService } from "src/shared/services/queue.service";
 import { MatchesService } from "./matches.service";
 
+type MatchCache = {
+  timestamp: number;
+};
+
 @Injectable()
-export class MatchEventHandlerService {
+export class MatchEventHandlerService implements OnModuleInit {
   private readonly logger = new Logger(MatchEventHandlerService.name);
 
   // Local in-memory cache
-  private matchCache = new Map<string, number>();
-  private bannedIps = new Set<string>();
+  private matchesCache: Record<string, Record<string, MatchCache[]>> = {};
 
   constructor(
     private matchesService: MatchesService,
+    private configsService: ConfigsService,
     private eventEmitter: EventEmitter2,
     private queueService: QueueService,
   ) {
     this.logger.log("MatchEventHandlerService initialized");
   }
+
+  async onModuleInit() {
+    // Initialize the cache
+    const configs = await this.configsService.findAll();
+    for (const config of configs) {
+      const { matches } = await this.matchesService.findAll({
+        configId: config._id,
+        timestamp_gt: Date.now() - config.findTime * 1000,
+        limit: config.maxMatches,
+      });
+
+      this.matchesCache[config._id] = {};
+      for (const match of matches) {
+        if (!this.matchesCache[config._id][match.ip]) {
+          this.matchesCache[config._id][match.ip] = [];
+        }
+        this.matchesCache[config._id][match.ip].push({
+          timestamp: match.timestamp,
+        });
+      }
+
+      this.logger.log(
+        `Initialized cache for config ${config.name} with ${matches.length} matches`,
+      );
+    }
+  }
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  async handleCron() {
+    this.queueService.enqueue(undefined, this.cleanupCache, QueuePriority.LOW);
+  }
+
+  cleanupCache = async () => {
+    const configs = await this.configsService.findAll();
+    for (const config of configs) {
+      const ipMatches = this.matchesCache[config._id] ?? {};
+
+      for (const ip in ipMatches) {
+        const matches = ipMatches[ip];
+        const newMatches = matches.filter(
+          (match) => Date.now() - match.timestamp < config.findTime * 1000,
+        );
+
+        if (newMatches.length > 0) {
+          this.matchesCache[config._id][ip] = newMatches;
+        } else {
+          delete this.matchesCache[config._id][ip];
+        }
+      }
+    }
+  };
 
   @OnEvent(Events.MATCH_CREATION_REQUESTED)
   handleMatchCreationRequested(event: MatchEvent) {
@@ -42,60 +99,37 @@ export class MatchEventHandlerService {
   // - If the IP should not be banned, it will enqueue the next task
   handleCacheAndImmediateCheck = async (event: MatchEvent) => {
     const { ip, config } = event;
-    const cacheKey = `${config._id}:${ip}`;
     let banned = false;
+    const timestamp = Date.now();
 
     this.logger.debug(
       `Processing event for IP ${ip} with config ${config.name} (ID: ${config._id})`,
     );
 
-    const ignored = isIpInList(ip, config.ignoreIps);
-    if (ignored) {
-      this.logger.log(`IP ${ip} is in ignore list for config ${config.name}`);
-      this.queueService.enqueue<MatchEvent>(
-        { ...event, ignored: true, timestamp: Date.now(), banned },
-        this.createMatch,
-        QueuePriority.MEDIUM,
-      );
-      return;
+    if (!this.matchesCache[config._id]) {
+      this.matchesCache[config._id] = {};
     }
 
-    // Fetch or initialize match count in cache
-    const entry = this.matchCache.get(cacheKey);
-    if (!entry) {
-      this.logger.debug(
-        `Cache miss for ${ip} (config: ${config.name}), fetching from database`,
-      );
-      const { totalCount } = await this.matchesService.findAll({
-        configId: config._id,
-        ip,
-        limit: 0,
-      });
-      this.logger.debug(
-        `Found ${totalCount} existing matches for ${ip} in database`,
-      );
-      this.matchCache.set(cacheKey, totalCount);
+    if (!this.matchesCache[config._id][ip]) {
+      this.matchesCache[config._id][ip] = [];
     }
 
-    // Increment match count in cache
-    const count = this.matchCache.get(cacheKey)! + 1;
-    this.matchCache.set(cacheKey, count);
-    this.logger.debug(
-      `IP ${ip} has matched ${count}/${config.maxMatches} times for config ${config.name}`,
-    );
+    const newMatch = { timestamp };
+    this.matchesCache[config._id][ip] = [
+      newMatch,
+      ...this.matchesCache[config._id][ip],
+    ];
 
-    // Check if already banned in cache, if not, ban
-    if (!this.bannedIps.has(ip) && count >= config.maxMatches) {
+    if (this.matchesCache[config._id][ip].length >= config.maxMatches) {
       banned = true;
       this.logger.warn(
-        `IP ${ip} exceeded threshold (${count}/${config.maxMatches}) for config ${config.name} - initiating ban`,
+        `IP ${ip} has exceeded the max matches for config ${config.name}`,
       );
       this.eventEmitter.emit(Events.FIREWALL_DENY, { ip });
-      this.bannedIps.add(ip);
     }
 
     this.queueService.enqueue<MatchEvent>(
-      { ...event, timestamp: Date.now(), ignored: false, banned },
+      { ...event, timestamp, banned },
       this.createMatch,
       QueuePriority.MEDIUM,
     );
@@ -103,30 +137,20 @@ export class MatchEventHandlerService {
 
   // Medium-Priority Task: Create Match & Check for Ban
   createMatch = async (event: MatchEvent) => {
-    this.logger.debug("Clearing cache before match creation");
-    this.bannedIps.clear();
-    this.matchCache.clear();
-
-    const { line, ip, config, ignored, timestamp, banned } = event;
+    const { line, ip, config, timestamp, banned } = event;
+    const ignored = isIpInList(ip, config.ignoreIps);
     this.logger.log(
       `Creating match record - IP: ${ip}, Config: ${config.name}, Ignored: ${ignored}, Banned: ${banned}`,
     );
 
-    try {
-      await this.matchesService.create({
-        line,
-        regex: config.regex,
-        ip,
-        timestamp,
-        configId: config._id,
-      });
-      this.logger.debug(`Successfully created match record for IP ${ip}`);
-    } catch (error) {
-      this.logger.error(
-        `Failed to create match record for IP ${ip}: ${error.message}`,
-      );
-      throw error;
-    }
+    await this.matchesService.create({
+      line,
+      regex: config.regex,
+      ip,
+      timestamp,
+      configId: config._id,
+    });
+    this.logger.debug(`Successfully created match record for IP ${ip}`);
 
     if (ignored) {
       this.logger.debug(`Match for IP ${ip} was ignored, skipping ban check`);
