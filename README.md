@@ -11,17 +11,24 @@ Banalize is a security-focused tool similar to Fail2Ban, designed to monitor log
 
 ## Installation
 
-Ensure you have [pnpm](https://pnpm.io/) installed:
+This project uses [prototools](https://moonrepo.dev/docs/proto/install) to manage Node.js and package manager versions.
 
-```sh
-npm install -g pnpm
-```
-
-Then, clone the repository and install dependencies:
+Clone the repository and install dependencies:
 
 ```sh
 git clone https://github.com/your-username/banalize.git
 cd banalize
+```
+
+Then install the correct toolchain and package managers:
+
+```sh
+proto use
+```
+
+Next, install all project dependencies:
+
+```sh
 pnpm install
 ```
 
