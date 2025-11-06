@@ -39,7 +39,7 @@
     "maxmind": "^4.3.22",
     "mongoose": "^8.6.1",
     "nest-test": "link:",
-    "nodemailer": "^6.9.15",
+    "nodemailer": "^7.0.7",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
