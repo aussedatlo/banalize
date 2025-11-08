@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "main": "main.js",
   "dependencies": {
-    "stylelint-config-standard": "^36.0.1",
-    "stylelint-prettier": "^5.0.2"
+    "stylelint-config-standard": "catalog:",
+    "stylelint-prettier": "catalog:"
   },
   "publishConfig": {
     "access": "public"

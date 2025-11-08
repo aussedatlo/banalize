@@ -23,12 +23,12 @@
     "@banalize/eslint-config": "workspace:*",
     "@banalize/stylelint-config": "workspace:*",
     "@banalize/typescript-config": "workspace:*",
-    "gitmoji-cli": "^9.4.0",
-    "prettier": "^3.3.3",
-    "prettier-plugin-organize-imports": "^4.0.0",
-    "turbo": "2.0.9"
+    "gitmoji-cli": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "turbo": "catalog:"
   },
-  "packageManager": "pnpm@9.1.1",
+  "packageManager": "pnpm@10.17.0",
   "engines": {
     "node": ">=18"
   }
