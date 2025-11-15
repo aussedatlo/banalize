@@ -19,7 +19,7 @@ regex = "1.10"
 
 # Watchers
 linemux = "0.3"
-thread-priority = "0.3"
+thread-priority = "3.0"
 
 # Fast inter-thread communication
 crossbeam-channel = "0.5"
