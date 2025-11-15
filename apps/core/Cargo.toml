@@ -45,7 +45,7 @@ thiserror = "1.0"
 ipnet = "2.9"
 
 # Command execution
-which = "5.0"
+which = "8.0"
 
 # UUID generation for event IDs
 uuid = { version = "1.6", features = ["v4"] }
