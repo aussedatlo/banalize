@@ -13,7 +13,7 @@ catalog:
   "@nestjs/cli": "^10.4.9"
   "@nestjs/common": "^11.0.7"
   "@nestjs/config": "^4.0.2"
-  "@nestjs/core": "^11.1.8"
+  "@nestjs/core": "^11.1.9"
   "@nestjs/event-emitter": "^2.1.1"
   "@nestjs/mongoose": "^10.1.0"
   "@nestjs/platform-express": "^11.0.7"
