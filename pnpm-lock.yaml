@@ -94,8 +94,8 @@ catalogs:
       specifier: ^1.7.7
       version: 1.7.9
     babel-loader:
-      specifier: ^9.1.3
-      version: 9.2.1
+      specifier: ^10.0.0
+      version: 10.0.0
     class-transformer:
       specifier: ^0.5.1
       version: 0.5.1
@@ -347,7 +347,7 @@ importers:
         version: 8.22.0(eslint@8.57.1)(typescript@5.5.2)
       '@vitest/coverage-v8':
         specifier: 'catalog:'
-        version: 3.0.5(vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6))
+        version: 3.0.5(vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6))
       eslint:
         specifier: 'catalog:'
         version: 8.57.1
@@ -383,10 +383,10 @@ importers:
         version: 1.5.1(@swc/core@1.10.14(@swc/helpers@0.5.15))(rollup@4.34.3)
       vite-tsconfig-paths:
         specifier: 'catalog:'
-        version: 5.1.4(typescript@5.5.2)(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6))
+        version: 5.1.4(typescript@5.5.2)(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6))
       vitest:
         specifier: 'catalog:'
-        version: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+        version: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
 
   apps/cli:
     dependencies:
@@ -495,7 +495,7 @@ importers:
         version: 18.3.3
       babel-loader:
         specifier: 'catalog:'
-        version: 9.2.1(@babel/core@7.26.7)(webpack@5.97.1)
+        version: 10.0.0(@babel/core@7.26.7)(webpack@5.97.1)
       eslint:
         specifier: 'catalog:'
         version: 8.57.1
@@ -2152,12 +2152,12 @@ packages:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
     engines: {node: '>= 0.4'}
 
-  babel-loader@9.2.1:
-    resolution: {integrity: sha512-fqe8naHt46e0yIdkjUZYqddSXfej3AHajX+CSO5X7oy0EmPc6o5Xh+RClNoHjnieWz9AW4kZxW9yyFMhVB1QLA==}
-    engines: {node: '>= 14.15.0'}
+  babel-loader@10.0.0:
+    resolution: {integrity: sha512-z8jt+EdS61AMw22nSfoNJAZ0vrtmhPRVi6ghL3rCeRZI8cdNYFiV5xeV3HbE7rlZZNmGH8BVccwWt8/ED0QOHA==}
+    engines: {node: ^18.20.0 || ^20.10.0 || >=22.0.0}
     peerDependencies:
       '@babel/core': ^7.12.0
-      webpack: '>=5'
+      webpack: '>=5.61.0'
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -2369,9 +2369,6 @@ packages:
   comment-json@4.2.5:
     resolution: {integrity: sha512-bKw/r35jR3HGt5PEPm1ljsQQGyCrR8sFGNiN5L+ykDHdpO8Smxkrkla9Yi6NkQyUrb8V54PGhfMs6NrIwtxtdw==}
     engines: {node: '>= 6'}
-
-  common-path-prefix@3.0.0:
-    resolution: {integrity: sha512-QE33hToZseCH3jS0qN96O/bSh3kaw/h+Tq7ngyY9eWDUnTlTNUyqfqvCXioLe5Na5jFsL78ra/wuBU4iuEgd4w==}
 
   component-emitter@1.3.1:
     resolution: {integrity: sha512-T0+barUSQRTUQASh8bx02dl+DhF54GtIDY13Y3m9oWTklKbb3Wv974meRpeZ3lp1JpLVECWWNHC4vaG2XHXouQ==}
@@ -3077,17 +3074,9 @@ packages:
     resolution: {integrity: sha512-MX6Zo2adDViYh+GcxxB1dpO43eypOGUOL12rLCOTMQv/DfIbpSJUy4oQIIZhVZkH9e+bZWKMon0XHFEju16tkQ==}
     engines: {node: '>= 0.8'}
 
-  find-cache-dir@4.0.0:
-    resolution: {integrity: sha512-9ZonPT4ZAK4a+1pUPVPZJapbi7O5qbbJPdYw/NOQWZZbVLdDTYM3A4R9z/DpAM08IDaFGsvPgiGZ82WEwUDWjg==}
-    engines: {node: '>=14.16'}
-
   find-up@5.0.0:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
     engines: {node: '>=10'}
-
-  find-up@6.3.0:
-    resolution: {integrity: sha512-v2ZsoEuVHYy8ZIlYqwPe/39Cy+cFDzp4dXPaxNvkEuouymu+2Jbz0PxpKarJHYJTmv2HWT3O382qY8l4jMWthw==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   flat-cache@3.2.0:
     resolution: {integrity: sha512-CYcENa+FtcUKLmhhqyctpclsq7QF38pKjZHsGNiSQF5r4FtoKDWabFDl3hzaEQMvT1LHEysw5twgLvpYYb4vbw==}
@@ -3763,10 +3752,6 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  locate-path@7.2.0:
-    resolution: {integrity: sha512-gvVijfZvn7R+2qyPX8mAuKcFGDf6Nc61GdvGafQsHL0sBIxfKzA+usWn4GFC/bk+QdwPUD4kWFJLhElipq+0VA==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-
   lodash.camelcase@4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
 
@@ -4151,17 +4136,9 @@ packages:
     resolution: {integrity: sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==}
     engines: {node: '>=10'}
 
-  p-limit@4.0.0:
-    resolution: {integrity: sha512-5b0R4txpzjPWVw/cXXUResoD4hb6U/x9BH08L7nw+GN1sezDzPdxeRvpc9c433fZhBan/wusjbCsqwqm4EIBIQ==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-
   p-locate@5.0.0:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
-
-  p-locate@6.0.0:
-    resolution: {integrity: sha512-wPrq66Llhl7/4AGC6I+cqxT07LhXvWL08LNXz1fENOw0Ap4sRZZ/gZpTTJ5jpurzzzfS2W/Ge9BY3LgLjCShcw==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   pac-proxy-agent@7.1.0:
     resolution: {integrity: sha512-Z5FnLVVZSnX7WjBg0mhDtydeRZ1xMcATZThjySQUHqr+0ksP8kqaw23fNKkaaN/Z8gwLUs/W7xdl0I75eP2Xyw==}
@@ -4252,10 +4229,6 @@ packages:
   picomatch@4.0.2:
     resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
     engines: {node: '>=12'}
-
-  pkg-dir@7.0.0:
-    resolution: {integrity: sha512-Ie9z/WINcxxLp27BKOCHGde4ITq9UklYKDzVo1nhk5sqGEXU3FpkwP5GM2voTGJkGd9B3Otl+Q4uwSOeSUtOBA==}
-    engines: {node: '>=14.16'}
 
   pluralize@8.0.0:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
@@ -5516,10 +5489,6 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  yocto-queue@1.1.1:
-    resolution: {integrity: sha512-b4JR1PFR10y1mKjhHY9LaGo6tmrgjit7hxVIeAmyMw3jegXR4dhYqLaQF5zMXZxY7tLpMyJeLjr1C4rLmkVe8g==}
-    engines: {node: '>=12.20'}
-
   yoctocolors-cjs@2.1.2:
     resolution: {integrity: sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==}
     engines: {node: '>=18'}
@@ -6744,7 +6713,7 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@vitest/coverage-v8@3.0.5(vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6))':
+  '@vitest/coverage-v8@3.0.5(vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -6758,7 +6727,7 @@ snapshots:
       std-env: 3.8.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+      vitest: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
     transitivePeerDependencies:
       - supports-color
 
@@ -6769,13 +6738,13 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.0.5(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6))':
+  '@vitest/mocker@3.0.5(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6))':
     dependencies:
       '@vitest/spy': 3.0.5
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
 
   '@vitest/pretty-format@3.0.5':
     dependencies:
@@ -7087,11 +7056,10 @@ snapshots:
 
   axobject-query@4.1.0: {}
 
-  babel-loader@9.2.1(@babel/core@7.26.7)(webpack@5.97.1):
+  babel-loader@10.0.0(@babel/core@7.26.7)(webpack@5.97.1):
     dependencies:
       '@babel/core': 7.26.7
-      find-cache-dir: 4.0.0
-      schema-utils: 4.3.0
+      find-up: 5.0.0
       webpack: 5.97.1
 
   balanced-match@1.0.2: {}
@@ -7316,8 +7284,6 @@ snapshots:
       esprima: 4.0.1
       has-own-prop: 2.0.0
       repeat-string: 1.6.1
-
-  common-path-prefix@3.0.0: {}
 
   component-emitter@1.3.1: {}
 
@@ -8305,20 +8271,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  find-cache-dir@4.0.0:
-    dependencies:
-      common-path-prefix: 3.0.0
-      pkg-dir: 7.0.0
-
   find-up@5.0.0:
     dependencies:
       locate-path: 6.0.0
       path-exists: 4.0.0
-
-  find-up@6.3.0:
-    dependencies:
-      locate-path: 7.2.0
-      path-exists: 5.0.0
 
   flat-cache@3.2.0:
     dependencies:
@@ -9028,10 +8984,6 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  locate-path@7.2.0:
-    dependencies:
-      p-locate: 6.0.0
-
   lodash.camelcase@4.3.0: {}
 
   lodash.merge@4.6.2: {}
@@ -9394,17 +9346,9 @@ snapshots:
     dependencies:
       yocto-queue: 0.1.0
 
-  p-limit@4.0.0:
-    dependencies:
-      yocto-queue: 1.1.1
-
   p-locate@5.0.0:
     dependencies:
       p-limit: 3.1.0
-
-  p-locate@6.0.0:
-    dependencies:
-      p-limit: 4.0.0
 
   pac-proxy-agent@7.1.0:
     dependencies:
@@ -9482,10 +9426,6 @@ snapshots:
   picomatch@4.0.1: {}
 
   picomatch@4.0.2: {}
-
-  pkg-dir@7.0.0:
-    dependencies:
-      find-up: 6.3.0
 
   pluralize@8.0.0: {}
 
@@ -10741,13 +10681,13 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vite-node@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6):
+  vite-node@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 2.0.2
-      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -10762,18 +10702,18 @@ snapshots:
       - tsx
       - yaml
 
-  vite-tsconfig-paths@5.1.4(typescript@5.5.2)(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)):
+  vite-tsconfig-paths@5.1.4(typescript@5.5.2)(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)):
     dependencies:
       debug: 4.4.0
       globrex: 0.1.2
       tsconfck: 3.1.4(typescript@5.5.2)
     optionalDependencies:
-      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6):
+  vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.5.1
@@ -10785,10 +10725,10 @@ snapshots:
       terser: 5.37.0
       tsx: 4.20.6
 
-  vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6):
+  vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6):
     dependencies:
       '@vitest/expect': 3.0.5
-      '@vitest/mocker': 3.0.5(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6))
+      '@vitest/mocker': 3.0.5(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6))
       '@vitest/pretty-format': 3.0.5
       '@vitest/runner': 3.0.5
       '@vitest/snapshot': 3.0.5
@@ -10804,8 +10744,8 @@ snapshots:
       tinyexec: 0.3.2
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
-      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
-      vite-node: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
+      vite-node: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 20.17.16
@@ -11022,7 +10962,5 @@ snapshots:
   yn@3.1.1: {}
 
   yocto-queue@0.1.0: {}
-
-  yocto-queue@1.1.1: {}
 
   yoctocolors-cjs@2.1.2: {}
