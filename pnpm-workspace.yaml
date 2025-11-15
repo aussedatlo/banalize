@@ -53,7 +53,7 @@ catalog:
   "postcss-simple-vars": "^7.0.1"
   "prettier": "^3.3.3"
   "prettier-plugin-organize-imports": "^4.0.0"
-  "purify-ts": "^2.1.0"
+  "purify-ts": "^2.1.2"
   "react": "18.3.1"
   "react-dom": "18.3.1"
   "reflect-metadata": "^0.2.2"
