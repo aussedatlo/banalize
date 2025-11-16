@@ -4,14 +4,27 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "apps/core/target/release/banalize-core", "packages/grpc-types/dist/**"]
+      "outputs": [
+        "dist/**",
+        "apps/core/target/release/banalize-core",
+        "packages/grpc-types/dist/**"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/**/*.rs",
+        "proto/**/*.proto",
+        "*.toml",
+        "*.json",
+        "*.config.*"
+      ]
     },
     "clean": {
       "cache": false
