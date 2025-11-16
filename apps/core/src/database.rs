@@ -2,6 +2,10 @@ use crate::config::ConfigData;
 use std::path::PathBuf;
 use tracing::warn;
 
+// ============================================================================
+// Types
+// ============================================================================
+
 pub struct CoreDatabase {
     matches_tree: sled::Tree,
     bans_tree: sled::Tree,
@@ -21,6 +25,10 @@ pub struct BanRecord {
     pub timestamp: u64,
 }
 
+// ============================================================================
+// CoreDatabase - Initialization
+// ============================================================================
+
 impl CoreDatabase {
     pub fn new() -> anyhow::Result<Self> {
         let db_path = PathBuf::from("/tmp/banalize-core");
@@ -35,15 +43,16 @@ impl CoreDatabase {
             configs_tree,
         })
     }
+}
 
+// ============================================================================
+// CoreDatabase - Key Utilities
+// ============================================================================
+
+impl CoreDatabase {
     /// Create a match key: match:<config_id>:<ip>:<timestamp>
     fn make_match_key(config_id: &str, ip: &str, timestamp: u64) -> String {
         format!("match:{}:{}:{}", config_id, ip, timestamp)
-    }
-
-    /// Create a ban key: ban:<ip>:<timestamp>
-    fn make_ban_key(ip: &str, timestamp: u64) -> String {
-        format!("ban:{}:{}", ip, timestamp)
     }
 
     /// Parse a match key: match:<config_id>:<ip>:<timestamp>
@@ -63,6 +72,11 @@ impl CoreDatabase {
         Ok((config_id, ip, timestamp))
     }
 
+    /// Create a ban key: ban:<ip>:<timestamp>
+    fn make_ban_key(ip: &str, timestamp: u64) -> String {
+        format!("ban:{}:{}", ip, timestamp)
+    }
+
     /// Parse a ban key: ban:<ip>:<timestamp>
     fn parse_ban_key(key: &[u8]) -> anyhow::Result<(String, u64)> {
         let key_str = String::from_utf8_lossy(key);
@@ -78,7 +92,14 @@ impl CoreDatabase {
         
         Ok((ip, timestamp))
     }
+}
 
+// ============================================================================
+// CoreDatabase - Matches Operations
+// ============================================================================
+
+impl CoreDatabase {
+    /// Add a match record for a config and IP
     pub fn add_match(&self, config_id: &str, ip: &str, timestamp: u64) -> anyhow::Result<()> {
         let key = Self::make_match_key(config_id, ip, timestamp);
         self.matches_tree.insert(key, b"")?;
@@ -135,17 +156,41 @@ impl CoreDatabase {
         Ok(removed)
     }
 
+    /// Get all matches
+    pub fn get_all_matches(&self) -> anyhow::Result<Vec<MatchRecord>> {
+        let mut all_matches = Vec::new();
+
+        for result in self.matches_tree.iter() {
+            let (key, _) = result?;
+            if let Ok((config_id, ip, timestamp)) = Self::parse_match_key(&key) {
+                all_matches.push(MatchRecord { config_id, ip, timestamp });
+            }
+        }
+
+        all_matches.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+        Ok(all_matches)
+    }
+}
+
+// ============================================================================
+// CoreDatabase - Bans Operations
+// ============================================================================
+
+impl CoreDatabase {
+    /// Check if an IP is currently banned
     pub fn is_banned(&self, ip: &str) -> anyhow::Result<bool> {
         let prefix = format!("ban:{}:", ip);
         Ok(self.bans_tree.scan_prefix(prefix).next().is_some())
     }
 
+    /// Add a ban record for an IP
     pub fn add_ban(&self, ip: &str, timestamp: u64) -> anyhow::Result<()> {
         let key = Self::make_ban_key(ip, timestamp);
         self.bans_tree.insert(key, b"")?;
         Ok(())
     }
 
+    /// Remove a ban record for an IP
     pub fn remove_ban(&self, ip: &str, timestamp: u64) -> anyhow::Result<()> {
         let key = Self::make_ban_key(ip, timestamp);
         if self.bans_tree.remove(key)?.is_none() {
@@ -187,22 +232,13 @@ impl CoreDatabase {
         all_bans.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
         Ok(all_bans)
     }
+}
 
-    /// Get all matches
-    pub fn get_all_matches(&self) -> anyhow::Result<Vec<MatchRecord>> {
-        let mut all_matches = Vec::new();
+// ============================================================================
+// CoreDatabase - Configs Operations
+// ============================================================================
 
-        for result in self.matches_tree.iter() {
-            let (key, _) = result?;
-            if let Ok((config_id, ip, timestamp)) = Self::parse_match_key(&key) {
-                all_matches.push(MatchRecord { config_id, ip, timestamp });
-            }
-        }
-
-        all_matches.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
-        Ok(all_matches)
-    }
-
+impl CoreDatabase {
     /// Save a config to the database
     pub fn save_config(&self, config: &ConfigData) -> anyhow::Result<()> {
         let key = format!("config:{}", config.id);
@@ -233,4 +269,3 @@ impl CoreDatabase {
         Ok(())
     }
 }
-
