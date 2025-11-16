@@ -12,7 +12,7 @@
   "devDependencies": {
     "@banalize/eslint-config": "workspace:*",
     "@banalize/typescript-config": "workspace:*",
-    "eslint": "catalog:",
-    "typescript": "catalog:"
+    "eslint": "^8.57.0",
+    "typescript": "5.5.2"
   }
 }

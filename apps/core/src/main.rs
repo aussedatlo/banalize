@@ -5,7 +5,6 @@ mod event_emitter;
 mod events;
 mod file_watcher;
 mod firewall;
-mod grpc_server;
 mod ip_extract;
 mod ip_utils;
 mod time_utils;
@@ -16,13 +15,13 @@ use config_manager::ConfigManager;
 use database::CoreDatabase;
 use event_emitter::EventEmitter;
 use firewall::Firewall;
-use grpc_server::{create_core_server, create_events_server};
 use std::env;
 use std::sync::Arc;
 use std::sync::Mutex;
 #[cfg(unix)]
 use tokio::signal::unix::{signal as unix_signal, SignalKind};
-use tonic::transport::Server;
+#[cfg(not(unix))]
+use tokio::signal;
 use tracing::{error, info};
 
 /// Format duration in milliseconds to human-readable string
@@ -122,9 +121,8 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Initialize event emitter
-    let (event_emitter, event_receiver) = EventEmitter::new();
+    let (event_emitter, _event_receiver) = EventEmitter::new();
     let event_emitter = Arc::new(event_emitter);
-    let event_receiver = Arc::new(Mutex::new(event_receiver));
     info!("Event emitter initialized");
 
     // Initialize config manager (loads configs from database)
@@ -201,82 +199,52 @@ async fn main() -> anyhow::Result<()> {
         }
     });
 
-    // Event receiver is now used by the gRPC events service
-    // No need for a separate event processor task
-
-    // Get gRPC server address
-    let addr = env::var("BANALIZE_CORE_GRPC_ADDR")
-        .unwrap_or_else(|_| "0.0.0.0:50051".to_string())
-        .parse()
-        .map_err(|e| anyhow::anyhow!("Invalid gRPC address: {}", e))?;
-
-    info!("Starting gRPC server on {}", addr);
-
-    // Create and start gRPC servers
-    let core_server = create_core_server(
-        config_manager.clone(),
-        watcher_manager.clone(),
-        database.clone(),
-        firewall.clone(),
-    );
-
-    let events_server = create_events_server(event_receiver.clone());
-
     // Setup graceful shutdown handler
     let firewall_clone = firewall.clone();
     let watcher_manager_clone = watcher_manager.clone();
     let config_manager_clone = config_manager.clone();
     
-    // Run server with graceful shutdown
-    let server_result = Server::builder()
-        .add_service(core_server)
-        .add_service(events_server)
-        .serve_with_shutdown(addr, async {
-            // Wait for shutdown signal (SIGINT or SIGTERM)
-            // Docker sends SIGTERM on stop, Ctrl+C sends SIGINT
-            #[cfg(unix)]
-            {
-                let mut sigterm = unix_signal(SignalKind::terminate())
-                    .expect("Failed to register SIGTERM handler");
-                let mut sigint = unix_signal(SignalKind::interrupt())
-                    .expect("Failed to register SIGINT handler");
-                
-                tokio::select! {
-                    _ = sigterm.recv() => {
-                        info!("Received SIGTERM, cleaning up...");
-                    }
-                    _ = sigint.recv() => {
-                        info!("Received SIGINT, cleaning up...");
-                    }
-                }
+    // Wait for shutdown signal (SIGINT or SIGTERM)
+    // Docker sends SIGTERM on stop, Ctrl+C sends SIGINT
+    #[cfg(unix)]
+    {
+        let mut sigterm = unix_signal(SignalKind::terminate())
+            .expect("Failed to register SIGTERM handler");
+        let mut sigint = unix_signal(SignalKind::interrupt())
+            .expect("Failed to register SIGINT handler");
+        
+        tokio::select! {
+            _ = sigterm.recv() => {
+                info!("Received SIGTERM, cleaning up...");
             }
-            #[cfg(not(unix))]
-            {
-                let _ = signal::ctrl_c().await;
-                info!("Received shutdown signal, cleaning up...");
+            _ = sigint.recv() => {
+                info!("Received SIGINT, cleaning up...");
             }
-            
-            // Stop all watchers
-            let configs = config_manager_clone.list_configs();
-            for config in configs {
-                watcher_manager_clone.stop_watcher(&config.id).await;
-            }
-            
-            // Cleanup firewall
-            if let Ok(fw) = firewall_clone.lock() {
-                if let Err(e) = fw.cleanup() {
-                    error!("Failed to cleanup firewall: {}", e);
-                }
-            }
-            
-            info!("Cleanup complete, shutting down...");
-        })
-        .await;
-
-    // Cleanup on exit (fallback if server exits unexpectedly)
+        }
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = signal::ctrl_c().await;
+        info!("Received shutdown signal, cleaning up...");
+    }
+    
+    // Stop all watchers
+    let configs = config_manager_clone.list_configs();
+    for config in configs {
+        watcher_manager_clone.stop_watcher(&config.id).await;
+    }
+    
+    // Cleanup firewall
+    if let Ok(fw) = firewall_clone.lock() {
+        if let Err(e) = fw.cleanup() {
+            error!("Failed to cleanup firewall: {}", e);
+        }
+    }
+    
+    // Cleanup on exit
     cleaner_handle.abort();
-
-    server_result?;
+    
+    info!("Cleanup complete, shutting down...");
     Ok(())
 }
 

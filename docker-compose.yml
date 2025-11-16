@@ -13,48 +13,7 @@ services:
       - NET_RAW
     environment:
       BANALIZE_CORE_API_FIREWALL_CHAIN: FORWARD
-      BANALIZE_CORE_GRPC_ADDR: 0.0.0.0:50051
       BANALIZE_CORE_LOG_LEVEL: INFO
-
-  mongodb:
-    image: mongo:latest
-    container_name: banalize-mongodb
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: pass
-      MONGO_INITDB_DATABASE: admin
-    volumes:
-      - mongodb-data:/data/db
-
-  api:
-    image: banalize-api:0.0.1-beta
-    container_name: banalize-api
-    restart: unless-stopped
-    network_mode: "host"
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    depends_on:
-      - mongodb
-    environment:
-      BANALIZE_API_MONGO_URI: mongodb://admin:pass@localhost:27017/admin
-      BANALIZE_API_SERVER_PORT: 5040
-      BANALIZE_API_FIREWALL_TYPE: iptables
-      BANALIZE_API_FIREWALL_CHAIN: FORWARD
-      BANALIZE_API_LOG_DEBUG: false
-    volumes:
-      # Mount the docker socket to the container
-      # if you want to use the docker watcher
-      - /var/run/docker.sock:/var/run/docker.sock
-      # Mount any file or directory to the container
-      # if you want to use the file watcher
-      # - ./path/to/file/or/directory:/path/to/file/or/directory
 
   web:
     image: banalize-web:0.0.1-beta

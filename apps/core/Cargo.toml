@@ -6,7 +6,6 @@ edition = "2021"
 [dependencies]
 # Async runtime
 tokio = { version = "1.35", features = ["full"] }
-tokio-stream = "0.1"
 
 # Database
 sled = "0.34"
@@ -19,12 +18,6 @@ linemux = "0.3"
 
 # Fast inter-thread communication
 crossbeam-channel = "0.5"
-
-# gRPC
-tonic = "0.14"
-tonic-prost = "0.14"
-prost = "0.14"
-prost-types = "0.14"
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
@@ -42,7 +35,4 @@ ipnet = "2.9"
 
 # UUID generation for event IDs
 uuid = { version = "1.6", features = ["v4"] }
-
-[build-dependencies]
-tonic-prost-build = "0.14"
 

@@ -222,18 +222,6 @@ impl CoreDatabase {
         Ok(bans)
     }
 
-    /// Remove bans by their records
-    pub fn remove_bans(&self, bans: &[BanRecord]) -> anyhow::Result<usize> {
-        let mut removed = 0;
-        for record in bans {
-            let key = Self::make_ban_key(&record.config_id, &record.ip, record.timestamp);
-            if self.bans_tree.remove(key).is_ok() {
-                removed += 1;
-            }
-        }
-        Ok(removed)
-    }
-
     /// Get all active bans (not expired)
     pub fn get_all_bans(&self) -> anyhow::Result<Vec<BanRecord>> {
         let mut all_bans = Vec::new();

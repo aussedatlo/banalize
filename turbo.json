@@ -6,8 +6,7 @@
       "dependsOn": ["^build"],
       "outputs": [
         "dist/**",
-        "apps/core/target/release/banalize-core",
-        "packages/grpc-types/dist/**"
+        "apps/core/target/release/banalize-core"
       ]
     },
     "lint": {
@@ -20,7 +19,6 @@
         "src/**/*.ts",
         "src/**/*.tsx",
         "src/**/*.rs",
-        "proto/**/*.proto",
         "*.toml",
         "*.json",
         "*.config.*"

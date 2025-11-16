@@ -24,9 +24,6 @@ jobs:
           eval "$(proto activate)"
           echo "PATH=$PATH" >> $GITHUB_ENV
 
-      - name: Install protobuf compiler
-        run: sudo apt install -y protobuf-compiler
-
       - name: Install dependencies
         run: pnpm install
 
