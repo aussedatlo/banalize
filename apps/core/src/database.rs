@@ -188,6 +188,21 @@ impl CoreDatabase {
         Ok(all_bans)
     }
 
+    /// Get all matches
+    pub fn get_all_matches(&self) -> anyhow::Result<Vec<MatchRecord>> {
+        let mut all_matches = Vec::new();
+
+        for result in self.matches_tree.iter() {
+            let (key, _) = result?;
+            if let Ok((config_id, ip, timestamp)) = Self::parse_match_key(&key) {
+                all_matches.push(MatchRecord { config_id, ip, timestamp });
+            }
+        }
+
+        all_matches.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+        Ok(all_matches)
+    }
+
     /// Save a config to the database
     pub fn save_config(&self, config: &ConfigData) -> anyhow::Result<()> {
         let key = format!("config:{}", config.id);

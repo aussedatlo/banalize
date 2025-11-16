@@ -52,6 +52,10 @@ export type PingRequest = Record<string, never>;
 
 export type ListConfigRequest = Record<string, never>;
 
+export type ListCurrentBansRequest = Record<string, never>;
+
+export type ListCurrentMatchesRequest = Record<string, never>;
+
 export type StreamEventsRequest = Record<string, never>;
 
 // Response types
@@ -89,6 +93,25 @@ export interface ConfigStatus {
 
 export interface ListConfigResponse {
   configs: ConfigStatus[];
+}
+
+export interface BanRecord {
+  ip: string;
+  timestamp: number;
+}
+
+export interface ListCurrentBansResponse {
+  bans: BanRecord[];
+}
+
+export interface MatchRecord {
+  config_id: string;
+  ip: string;
+  timestamp: number;
+}
+
+export interface ListCurrentMatchesResponse {
+  matches: MatchRecord[];
 }
 
 // Event types
@@ -158,6 +181,20 @@ export interface BanalizeCoreClient {
     callback: (
       error: grpc.ServiceError | null,
       response: ListConfigResponse,
+    ) => void,
+  ): void;
+  listCurrentBans(
+    request: ListCurrentBansRequest,
+    callback: (
+      error: grpc.ServiceError | null,
+      response: ListCurrentBansResponse,
+    ) => void,
+  ): void;
+  listCurrentMatches(
+    request: ListCurrentMatchesRequest,
+    callback: (
+      error: grpc.ServiceError | null,
+      response: ListCurrentMatchesResponse,
     ) => void,
   ): void;
 }
