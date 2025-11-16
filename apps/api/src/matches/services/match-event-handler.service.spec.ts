@@ -2,6 +2,7 @@ import { ConfigSchema } from "@banalize/types";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import { BanEvent } from "src/bans/types/ban-event.types";
+import { ConfigsService } from "src/configs/configs.service";
 import { Events } from "src/shared/enums/events.enum";
 import { QueuePriority } from "src/shared/enums/priority.enum";
 import { QueueService } from "src/shared/services/queue.service";
@@ -29,6 +30,10 @@ describe("MatchEventHandlerService", () => {
     enqueue: vi.fn(),
   };
 
+  const mockConfigsService = {
+    findAll: vi.fn().mockResolvedValue([]),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -36,6 +41,10 @@ describe("MatchEventHandlerService", () => {
         {
           provide: MatchesService,
           useValue: mockMatchesService,
+        },
+        {
+          provide: ConfigsService,
+          useValue: mockConfigsService,
         },
         {
           provide: EventEmitter2,
@@ -100,15 +109,17 @@ describe("MatchEventHandlerService", () => {
 
       await service.handleCacheAndImmediateCheck(event);
 
+      // handleCacheAndImmediateCheck doesn't check for ignored IPs,
+      // it just enqueues the event. The ignored check happens in createMatch.
       expect(queueService.enqueue).toHaveBeenCalledWith(
-        expect.objectContaining({ ignored: true }),
+        expect.objectContaining({ banned: false }),
         service.createMatch,
         QueuePriority.MEDIUM,
       );
     });
 
     it("should handle cache miss and ban IP when threshold reached", async () => {
-      const event = new MatchEvent("test line", "192.168.1.1", {
+      const config = {
         _id: "123",
         name: "test",
         param: "test",
@@ -118,15 +129,26 @@ describe("MatchEventHandlerService", () => {
         ignoreIps: [],
         findTime: 1000,
         watcherType: "test",
-      } as ConfigSchema);
-      mockMatchesService.findAll.mockResolvedValue({ totalCount: 4 });
+      } as ConfigSchema;
 
-      await service.handleCacheAndImmediateCheck(event);
+      // The service uses in-memory cache, so we need to call handleCacheAndImmediateCheck
+      // 5 times (maxMatches) to trigger the ban
+      const event1 = new MatchEvent("test line 1", "192.168.1.1", config);
+      const event2 = new MatchEvent("test line 2", "192.168.1.1", config);
+      const event3 = new MatchEvent("test line 3", "192.168.1.1", config);
+      const event4 = new MatchEvent("test line 4", "192.168.1.1", config);
+      const event5 = new MatchEvent("test line 5", "192.168.1.1", config);
+
+      await service.handleCacheAndImmediateCheck(event1);
+      await service.handleCacheAndImmediateCheck(event2);
+      await service.handleCacheAndImmediateCheck(event3);
+      await service.handleCacheAndImmediateCheck(event4);
+      await service.handleCacheAndImmediateCheck(event5);
 
       expect(eventEmitter.emit).toHaveBeenCalledWith(Events.FIREWALL_DENY, {
         ip: "192.168.1.1",
       });
-      expect(queueService.enqueue).toHaveBeenCalledWith(
+      expect(queueService.enqueue).toHaveBeenLastCalledWith(
         expect.objectContaining({ banned: true }),
         service.createMatch,
         QueuePriority.MEDIUM,
@@ -210,10 +232,13 @@ describe("MatchEventHandlerService", () => {
         watcherType: "test",
       } as ConfigSchema;
 
+      // The service uses in-memory cache, not database
+      // To simulate "already one match on database", we add one match to the cache first
+      const event0 = new MatchEvent("test line 0", "192.168.1.1", config);
+      await service.handleCacheAndImmediateCheck(event0);
+
       const event1 = new MatchEvent("test line 1", "192.168.1.1", config);
       const event2 = new MatchEvent("test line 2", "192.168.1.1", config);
-
-      mockMatchesService.findAll.mockResolvedValue({ totalCount: 1 });
 
       await service.handleCacheAndImmediateCheck(event1);
       await service.handleCacheAndImmediateCheck(event2);
@@ -241,11 +266,15 @@ describe("MatchEventHandlerService", () => {
         watcherType: "test",
       } as ConfigSchema;
 
-      const event = new MatchEvent("test line 1", "192.168.1.1", config);
+      // The service uses in-memory cache, not database
+      // To simulate "already two matches on database", we add two matches to the cache first
+      const event0 = new MatchEvent("test line 0", "192.168.1.1", config);
+      const event1 = new MatchEvent("test line 1", "192.168.1.1", config);
+      await service.handleCacheAndImmediateCheck(event0);
+      await service.handleCacheAndImmediateCheck(event1);
 
-      mockMatchesService.findAll.mockResolvedValue({ totalCount: 2 });
-
-      await service.handleCacheAndImmediateCheck(event);
+      const event2 = new MatchEvent("test line 2", "192.168.1.1", config);
+      await service.handleCacheAndImmediateCheck(event2);
 
       expect(eventEmitter.emit).toHaveBeenCalledWith(Events.FIREWALL_DENY, {
         ip: "192.168.1.1",
@@ -270,10 +299,12 @@ describe("MatchEventHandlerService", () => {
         watcherType: "test",
       } as ConfigSchema;
 
+      // The service uses in-memory cache, not database
+      // To simulate "already one match on database", we add one match to the cache first
+      const event0 = new MatchEvent("test line 0", "192.168.1.1", config);
+      await service.handleCacheAndImmediateCheck(event0);
+
       const event = new MatchEvent("test line 1", "192.168.1.1", config);
-
-      mockMatchesService.findAll.mockResolvedValue({ totalCount: 1 });
-
       await service.handleCacheAndImmediateCheck(event);
 
       expect(eventEmitter.emit).not.toHaveBeenCalledWith(Events.FIREWALL_DENY, {
@@ -304,8 +335,7 @@ describe("MatchEventHandlerService", () => {
           watcherType: "test",
         } as ConfigSchema,
         Date.now(),
-        false,
-        true,
+        true, // banned
       );
 
       await service.createMatch(event);
@@ -332,11 +362,10 @@ describe("MatchEventHandlerService", () => {
           regex: "test",
           banTime: 3600,
           maxMatches: 5,
-          ignoreIps: [],
+          ignoreIps: ["192.168.1.1"], // IP is in ignore list
         } as ConfigSchema,
         Date.now(),
-        true,
-        false,
+        false, // banned (but will be ignored anyway)
       );
 
       await service.createMatch(event);
