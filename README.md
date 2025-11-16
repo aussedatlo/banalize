@@ -13,6 +13,23 @@ Banalize is a security-focused tool similar to Fail2Ban, designed to monitor log
 
 This project uses [prototools](https://moonrepo.dev/docs/proto/install) to manage Node.js and package manager versions.
 
+### Install protoc Compiler
+
+Before proceeding, ensure you have the Protocol Buffers compiler (`protoc`) installed.
+
+- **Ubuntu:**
+
+  ```sh
+  sudo apt-get install -y protobuf-compiler
+  ```
+
+- **Arch Linux:**
+  ```sh
+  sudo pacman -S protobuf
+  ```
+
+For other platforms or installation options, see the [official guide](https://grpc.io/docs/protoc-installation/).
+
 Clone the repository and install dependencies:
 
 ```sh
