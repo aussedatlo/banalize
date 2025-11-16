@@ -55,8 +55,8 @@ catalogs:
       specifier: ^10.2.3
       version: 10.2.3
     '@nestjs/swagger':
-      specifier: ^7.4.2
-      version: 7.4.2
+      specifier: ^11.2.2
+      version: 11.2.2
     '@nestjs/testing':
       specifier: ^10.4.15
       version: 10.4.15
@@ -280,7 +280,7 @@ importers:
         version: 4.1.2(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@11.1.8)
       '@nestjs/swagger':
         specifier: 'catalog:'
-        version: 7.4.2(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@11.1.8)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
+        version: 11.2.2(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@11.1.8)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
       axios:
         specifier: 'catalog:'
         version: 1.7.9
@@ -347,7 +347,7 @@ importers:
         version: 8.22.0(eslint@8.57.1)(typescript@5.5.2)
       '@vitest/coverage-v8':
         specifier: 'catalog:'
-        version: 3.0.5(vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6))
+        version: 3.0.5(vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6))
       eslint:
         specifier: 'catalog:'
         version: 8.57.1
@@ -383,10 +383,10 @@ importers:
         version: 1.5.1(@swc/core@1.10.14(@swc/helpers@0.5.15))(rollup@4.34.3)
       vite-tsconfig-paths:
         specifier: 'catalog:'
-        version: 5.1.4(typescript@5.5.2)(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6))
+        version: 5.1.4(typescript@5.5.2)(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6))
       vitest:
         specifier: 'catalog:'
-        version: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+        version: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
 
   apps/cli:
     dependencies:
@@ -1237,8 +1237,8 @@ packages:
     peerDependencies:
       react: ^18.x || ^19.x
 
-  '@microsoft/tsdoc@0.15.1':
-    resolution: {integrity: sha512-4aErSrCR/On/e5G2hDP0wjooqDdauzEbIq8hIkIe5pXV0rtWJZvdCEKL0ykZxex+IxIwBp0eGeV48hQN07dXtw==}
+  '@microsoft/tsdoc@0.16.0':
+    resolution: {integrity: sha512-xgAyonlVVS+q7Vc7qLW0UrJU7rSFcETRWsqdXZtjzRU8dF+6CkozTK4V4y1LwOX7j8r/vHphjDeMeGI4tNGeGA==}
 
   '@mongodb-js/saslprep@1.1.9':
     resolution: {integrity: sha512-tVkljjeEaAhCqTzajSdgbQ6gE6f3oneVwa3iXR6csiEwXXOFsiC6Uh9iAjAhXPtqa/XMDHWjjeNH/77m/Yq2dw==}
@@ -1299,10 +1299,10 @@ packages:
       '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0
       '@nestjs/core': ^8.0.0 || ^9.0.0 || ^10.0.0
 
-  '@nestjs/mapped-types@2.0.5':
-    resolution: {integrity: sha512-bSJv4pd6EY99NX9CjBIyn4TVDoSit82DUZlL4I3bqNfy5Gt+gXTa86i3I/i0iIV9P4hntcGM5GyO+FhZAhxtyg==}
+  '@nestjs/mapped-types@2.1.0':
+    resolution: {integrity: sha512-W+n+rM69XsFdwORF11UqJahn4J3xi4g/ZEOlJNL6KoW5ygWSmBB2p0S2BZ4FQeS/NDH72e6xIcu35SfJnE8bXw==}
     peerDependencies:
-      '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0
+      '@nestjs/common': ^10.0.0 || ^11.0.0
       class-transformer: ^0.4.0 || ^0.5.0
       class-validator: ^0.13.0 || ^0.14.0
       reflect-metadata: ^0.1.12 || ^0.2.0
@@ -1337,12 +1337,12 @@ packages:
     peerDependencies:
       typescript: '>=4.8.2'
 
-  '@nestjs/swagger@7.4.2':
-    resolution: {integrity: sha512-Mu6TEn1M/owIvAx2B4DUQObQXqo2028R2s9rSZ/hJEgBK95+doTwS0DjmVA2wTeZTyVtXOoN7CsoM5pONBzvKQ==}
+  '@nestjs/swagger@11.2.2':
+    resolution: {integrity: sha512-i16GRaZ7vlTHIqk8C1UvV/WwQYbWwQymocTvU8mr6QIUBZ6fJc1uGEsw0Mu/JWC0kaV3nbsTj1hZbXrc5Ui4NA==}
     peerDependencies:
-      '@fastify/static': ^6.0.0 || ^7.0.0
-      '@nestjs/common': ^9.0.0 || ^10.0.0
-      '@nestjs/core': ^9.0.0 || ^10.0.0
+      '@fastify/static': ^8.0.0
+      '@nestjs/common': ^11.0.1
+      '@nestjs/core': ^11.0.1
       class-transformer: '*'
       class-validator: '*'
       reflect-metadata: ^0.1.12 || ^0.2.0
@@ -1607,6 +1607,9 @@ packages:
 
   '@rushstack/eslint-patch@1.10.5':
     resolution: {integrity: sha512-kkKUDVlII2DQiKy7UstOR1ErJP8kUKAQ4oa+SQtM0K+lPdmmjj0YnnxBgtTVYH7mUKtbsxeFC9y0AmK7Yb78/A==}
+
+  '@scarf/scarf@1.4.0':
+    resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
 
   '@swc/core-darwin-arm64@1.10.14':
     resolution: {integrity: sha512-Dh4VyrhDDb05tdRmqJ/MucOPMTnrB4pRJol18HVyLlqu1HOT5EzonUniNTCdQbUXjgdv5UVJSTE1lYTzrp+myA==}
@@ -3657,6 +3660,10 @@ packages:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
     hasBin: true
 
+  js-yaml@4.1.1:
+    resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
+    hasBin: true
+
   jsbn@1.1.0:
     resolution: {integrity: sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A==}
 
@@ -4216,9 +4223,6 @@ packages:
   path-scurry@1.11.1:
     resolution: {integrity: sha512-Xa4Nw17FS9ApQFJ9umLiJS4orGjm7ZzwUrwamcGQuHSzDyth9boKDaycYdDcZDuqYATXw4HFXgaqWTctW/v1HA==}
     engines: {node: '>=16 || 14 >=14.18'}
-
-  path-to-regexp@3.3.0:
-    resolution: {integrity: sha512-qyCH421YQPS2WFDxDjftfc1ZR5WKQzVzqsp4n9M2kQhVOo/ByahFoUNJfl58kOcEGfQ//7weFTDhm+ss8Ecxgw==}
 
   path-to-regexp@8.2.0:
     resolution: {integrity: sha512-TdrF7fW9Rphjq4RjrW0Kp2AW0Ahwu9sRGTkS6bvDi0SCwZlEZYmcfDbEsTz8RVk0EHIS/Vd1bv3JhG+1xZuAyQ==}
@@ -4913,8 +4917,8 @@ packages:
   svg-tags@1.0.0:
     resolution: {integrity: sha512-ovssysQTa+luh7A5Weu3Rta6FJlFBBbInjOh722LIt6klpU2/HtdUbszju/G4devcvk8PGt7FCLv5wftu3THUA==}
 
-  swagger-ui-dist@5.17.14:
-    resolution: {integrity: sha512-CVbSfaLpstV65OnSjbXfVd6Sta3q3F7Cj/yYuvHMp1P90LztOLs6PfUnKEVAeiIVQt9u2SaPwv0LiH/OyMjHRw==}
+  swagger-ui-dist@5.30.2:
+    resolution: {integrity: sha512-HWCg1DTNE/Nmapt+0m2EPXFwNKNeKK4PwMjkwveN/zn1cV2Kxi9SURd+m0SpdcSgWEK/O64sf8bzXdtUhigtHA==}
 
   swr@2.3.0:
     resolution: {integrity: sha512-NyZ76wA4yElZWBHzSgEJc28a0u6QZvhb6w0azeL2k7+Q1gAzVK+IqQYXhVOC/mzi+HZIozrZvBVeSeOZNR2bqA==}
@@ -6086,7 +6090,7 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  '@microsoft/tsdoc@0.15.1': {}
+  '@microsoft/tsdoc@0.16.0': {}
 
   '@mongodb-js/saslprep@1.1.9':
     dependencies:
@@ -6159,7 +6163,7 @@ snapshots:
       '@nestjs/core': 11.1.8(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@11.0.7)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       eventemitter2: 6.4.9
 
-  '@nestjs/mapped-types@2.0.5(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)':
+  '@nestjs/mapped-types@2.1.0(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)':
     dependencies:
       '@nestjs/common': 11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       reflect-metadata: 0.2.2
@@ -6215,17 +6219,17 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@nestjs/swagger@7.4.2(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@11.1.8)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)':
+  '@nestjs/swagger@11.2.2(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@11.1.8)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)':
     dependencies:
-      '@microsoft/tsdoc': 0.15.1
+      '@microsoft/tsdoc': 0.16.0
       '@nestjs/common': 11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 11.1.8(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@11.0.7)(reflect-metadata@0.2.2)(rxjs@7.8.1)
-      '@nestjs/mapped-types': 2.0.5(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
-      js-yaml: 4.1.0
+      '@nestjs/mapped-types': 2.1.0(@nestjs/common@11.0.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
+      js-yaml: 4.1.1
       lodash: 4.17.21
-      path-to-regexp: 3.3.0
+      path-to-regexp: 8.3.0
       reflect-metadata: 0.2.2
-      swagger-ui-dist: 5.17.14
+      swagger-ui-dist: 5.30.2
     optionalDependencies:
       class-transformer: 0.5.1
       class-validator: 0.14.1
@@ -6397,6 +6401,8 @@ snapshots:
   '@rtsao/scc@1.1.0': {}
 
   '@rushstack/eslint-patch@1.10.5': {}
+
+  '@scarf/scarf@1.4.0': {}
 
   '@swc/core-darwin-arm64@1.10.14':
     optional: true
@@ -6744,7 +6750,7 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@vitest/coverage-v8@3.0.5(vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6))':
+  '@vitest/coverage-v8@3.0.5(vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -6758,7 +6764,7 @@ snapshots:
       std-env: 3.8.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+      vitest: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
     transitivePeerDependencies:
       - supports-color
 
@@ -6769,13 +6775,13 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.0.5(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6))':
+  '@vitest/mocker@3.0.5(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6))':
     dependencies:
       '@vitest/spy': 3.0.5
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
 
   '@vitest/pretty-format@3.0.5':
     dependencies:
@@ -8944,6 +8950,10 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
+  js-yaml@4.1.1:
+    dependencies:
+      argparse: 2.0.1
+
   jsbn@1.1.0: {}
 
   jsesc@3.1.0: {}
@@ -9463,8 +9473,6 @@ snapshots:
       lru-cache: 10.4.3
       minipass: 7.1.2
 
-  path-to-regexp@3.3.0: {}
-
   path-to-regexp@8.2.0: {}
 
   path-to-regexp@8.3.0: {}
@@ -9874,7 +9882,7 @@ snapshots:
       is-promise: 4.0.0
       methods: 1.1.2
       parseurl: 1.3.3
-      path-to-regexp: 8.2.0
+      path-to-regexp: 8.3.0
       setprototypeof: 1.2.0
       utils-merge: 1.0.1
 
@@ -10345,7 +10353,9 @@ snapshots:
 
   svg-tags@1.0.0: {}
 
-  swagger-ui-dist@5.17.14: {}
+  swagger-ui-dist@5.30.2:
+    dependencies:
+      '@scarf/scarf': 1.4.0
 
   swr@2.3.0(react@18.3.1):
     dependencies:
@@ -10741,13 +10751,13 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vite-node@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6):
+  vite-node@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 2.0.2
-      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -10762,18 +10772,18 @@ snapshots:
       - tsx
       - yaml
 
-  vite-tsconfig-paths@5.1.4(typescript@5.5.2)(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)):
+  vite-tsconfig-paths@5.1.4(typescript@5.5.2)(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)):
     dependencies:
       debug: 4.4.0
       globrex: 0.1.2
       tsconfck: 3.1.4(typescript@5.5.2)
     optionalDependencies:
-      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6):
+  vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.5.1
@@ -10785,10 +10795,10 @@ snapshots:
       terser: 5.37.0
       tsx: 4.20.6
 
-  vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6):
+  vitest@3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6):
     dependencies:
       '@vitest/expect': 3.0.5
-      '@vitest/mocker': 3.0.5(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6))
+      '@vitest/mocker': 3.0.5(vite@6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6))
       '@vitest/pretty-format': 3.0.5
       '@vitest/runner': 3.0.5
       '@vitest/snapshot': 3.0.5
@@ -10804,8 +10814,8 @@ snapshots:
       tinyexec: 0.3.2
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
-      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
-      vite-node: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.1))(terser@5.37.0)(tsx@4.20.6)
+      vite: 6.1.0(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
+      vite-node: 3.0.5(@types/node@20.17.16)(sugarss@4.0.1(postcss@8.5.6))(terser@5.37.0)(tsx@4.20.6)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 20.17.16
