@@ -22,6 +22,8 @@ use proto::{
     StreamEventsRequest, UnbanRequest, UnbanResponse, ConfigStatus,
     Event, MatchEvent as ProtoMatchEvent, BanEvent as ProtoBanEvent,
     UnbanEvent as ProtoUnbanEvent,
+    ListCurrentBansRequest, ListCurrentBansResponse, ListCurrentMatchesRequest,
+    ListCurrentMatchesResponse, BanRecord as ProtoBanRecord, MatchRecord as ProtoMatchRecord,
 };
 
 pub struct BanalizeCoreService {
@@ -246,6 +248,61 @@ impl BanalizeCore for BanalizeCoreService {
 
         Ok(Response::new(ListConfigResponse {
             configs: config_statuses,
+        }))
+    }
+
+    async fn list_current_bans(
+        &self,
+        _request: Request<ListCurrentBansRequest>,
+    ) -> Result<Response<ListCurrentBansResponse>, Status> {
+        info!("ListCurrentBans request received");
+
+        let bans = match self.database.get_all_bans() {
+            Ok(b) => b,
+            Err(e) => {
+                error!("Failed to get bans: {}", e);
+                return Err(Status::internal(format!("Failed to get bans: {}", e)));
+            }
+        };
+
+        let proto_bans: Vec<ProtoBanRecord> = bans
+            .into_iter()
+            .map(|ban| ProtoBanRecord {
+                ip: ban.ip,
+                timestamp: ban.timestamp,
+            })
+            .collect();
+
+        Ok(Response::new(ListCurrentBansResponse {
+            bans: proto_bans,
+        }))
+    }
+
+    async fn list_current_matches(
+        &self,
+        _request: Request<ListCurrentMatchesRequest>,
+    ) -> Result<Response<ListCurrentMatchesResponse>, Status> {
+        info!("ListCurrentMatches request received");
+
+        let matches = match self.database.get_all_matches() {
+            Ok(m) => m,
+            Err(e) => {
+                error!("Failed to get matches: {}", e);
+                return Err(Status::internal(format!("Failed to get matches: {}", e)));
+            }
+        };
+
+        let proto_matches: Vec<ProtoMatchRecord> = matches
+            .into_iter()
+            .map(|m| ProtoMatchRecord {
+                config_id: m.config_id,
+                ip: m.ip,
+                timestamp: m.timestamp,
+            })
+            .collect();
+
+        Ok(Response::new(ListCurrentMatchesResponse {
+            matches: proto_matches,
         }))
     }
 }

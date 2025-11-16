@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { createConfigCommand } from "./commands/create.js";
-import { listCommand } from "./commands/list.js";
-import { listenCommand } from "./commands/listen.js";
-import { pingCommand } from "./commands/ping.js";
-import { updateConfigCommand } from "./commands/update.js";
+import { createConfigCommand } from "src/commands/create";
+import { listCommand } from "src/commands/list";
+import { listBansCommand } from "src/commands/list-bans";
+import { listMatchesCommand } from "src/commands/list-matches";
+import { listenCommand } from "src/commands/listen";
+import { pingCommand } from "src/commands/ping";
+import { updateConfigCommand } from "src/commands/update";
 
 const program = new Command();
 
@@ -19,6 +21,8 @@ program.addCommand(createConfigCommand());
 program.addCommand(updateConfigCommand());
 program.addCommand(listenCommand());
 program.addCommand(listCommand());
+program.addCommand(listBansCommand());
+program.addCommand(listMatchesCommand());
 program.addCommand(pingCommand());
 
 program.parse();

@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "Banalize CLI tool",
   "license": "MIT",
-  "type": "module",
   "bin": {
     "banalize-cli": "./dist/index.js"
   },

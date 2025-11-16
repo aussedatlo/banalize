@@ -18,6 +18,12 @@ service BanalizeCore {
   
   // Return all current configs and their runtime state
   rpc ListConfig(ListConfigRequest) returns (ListConfigResponse);
+  
+  // Return all current bans
+  rpc ListCurrentBans(ListCurrentBansRequest) returns (ListCurrentBansResponse);
+  
+  // Return all current matches
+  rpc ListCurrentMatches(ListCurrentMatchesRequest) returns (ListCurrentMatchesResponse);
 }
 
 // Event streaming service
@@ -95,6 +101,29 @@ message ConfigStatus {
 }
 
 message StreamEventsRequest {}
+
+message ListCurrentBansRequest {}
+
+message ListCurrentBansResponse {
+  repeated BanRecord bans = 1;
+}
+
+message BanRecord {
+  string ip = 1;
+  uint64 timestamp = 2;
+}
+
+message ListCurrentMatchesRequest {}
+
+message ListCurrentMatchesResponse {
+  repeated MatchRecord matches = 1;
+}
+
+message MatchRecord {
+  string config_id = 1;
+  string ip = 2;
+  uint64 timestamp = 3;
+}
 
 message Event {
   oneof event_type {

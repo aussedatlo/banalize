@@ -4,11 +4,9 @@ import type {
 } from "@banalize/grpc-types";
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
+import { join } from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+declare const __dirname: string;
 
 // Resolve proto path relative to workspace root
 // When running from src: ../../../../packages/grpc-types/proto/banalize.proto

@@ -57,6 +57,8 @@ impl WatcherManager {
             }
         }
 
+        info!("Starting watcher for config: {}", config_id);
+
         // Create and start watcher
         let watcher = FileWatcher::new(
             config.clone(),
