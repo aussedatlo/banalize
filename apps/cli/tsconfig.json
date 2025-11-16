@@ -1,13 +1,9 @@
 {
   "extends": "@banalize/typescript-config/node.json",
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "resolveJsonModule": true,
-    "declarationMap": true,
-    "sourceMap": true
+    "baseUrl": ".",
+    "outDir": "dist",
+    "allowJs": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

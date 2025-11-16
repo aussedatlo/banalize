@@ -1,7 +1,7 @@
 import type { Event } from "@banalize/grpc-types";
 import chalk from "chalk";
 import { Command } from "commander";
-import { createEventsClient } from "../grpc/client.js";
+import { createEventsClient } from "src/grpc/client";
 
 export function listenCommand(): Command {
   const command = new Command("listen")

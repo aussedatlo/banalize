@@ -1,7 +1,7 @@
 import type { ConfigStatus } from "@banalize/grpc-types";
 import chalk from "chalk";
 import { Command } from "commander";
-import { createCoreClient } from "../grpc/client.js";
+import { createCoreClient } from "src/grpc/client";
 
 export function listCommand(): Command {
   const command = new Command("list")
