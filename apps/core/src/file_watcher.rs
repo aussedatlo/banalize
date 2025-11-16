@@ -1,8 +1,7 @@
 use crate::config::Config;
 use crate::database::CoreDatabase;
-use crate::events::{BanEvent, MatchEvent};
+use crate::events::{BanEvent, MatchEvent, EventEmitter};
 use crate::firewall::Firewall;
-use crate::event_emitter::EventEmitter;
 use crate::ip_extract::IpExtractor;
 use crate::ip_utils::is_ip_in_list;
 use crate::time_utils::get_millis_timestamp;
@@ -210,11 +209,15 @@ impl FileWatcher {
             .map_err(|e| anyhow::anyhow!("Failed to spawn file tailer thread: {}", e))?;
 
         // Wait for thread to finish (it should run indefinitely)
+        // Use tokio::time::sleep with cancellation support
         loop {
-            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-            if tailer_handle.is_finished() {
-                error!("File tailer thread has terminated!");
-                return Err(anyhow::anyhow!("File tailer thread terminated unexpectedly"));
+            tokio::select! {
+                _ = tokio::time::sleep(tokio::time::Duration::from_secs(1)) => {
+                    if tailer_handle.is_finished() {
+                        error!("File tailer thread has terminated!");
+                        return Err(anyhow::anyhow!("File tailer thread terminated unexpectedly"));
+                    }
+                }
             }
         }
     }

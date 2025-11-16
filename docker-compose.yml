@@ -14,6 +14,7 @@ services:
     environment:
       BANALIZE_CORE_API_FIREWALL_CHAIN: FORWARD
       BANALIZE_CORE_LOG_LEVEL: INFO
+      BANALIZE_CORE_DATABASE_PATH: /tmp/banalize-core
 
   web:
     image: banalize-web:0.0.1-beta

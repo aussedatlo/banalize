@@ -1,4 +1,4 @@
-use crate::events::{BanEvent, MatchEvent, UnbanEvent};
+use crate::events::types::{BanEvent, MatchEvent, UnbanEvent};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use tracing::warn;
 

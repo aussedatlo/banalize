@@ -1,4 +1,5 @@
 use crate::config::ConfigData;
+use std::env;
 use std::path::PathBuf;
 use tracing::warn;
 
@@ -32,7 +33,9 @@ pub struct BanRecord {
 
 impl CoreDatabase {
     pub fn new() -> anyhow::Result<Self> {
-        let db_path = PathBuf::from("/tmp/banalize-core");
+        let db_path = env::var("BANALIZE_CORE_DATABASE_PATH")
+            .unwrap_or_else(|_| "/tmp/banalize-core".to_string());
+        let db_path = PathBuf::from(db_path);
         let db = sled::open(&db_path)?;
         let matches_tree = db.open_tree("matches")?;
         let bans_tree = db.open_tree("bans")?;

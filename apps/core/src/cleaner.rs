@@ -1,8 +1,7 @@
 use crate::config::Config;
 use crate::database::CoreDatabase;
-use crate::events::UnbanEvent;
+use crate::events::{UnbanEvent, EventEmitter};
 use crate::firewall::Firewall;
-use crate::event_emitter::EventEmitter;
 use crate::time_utils::get_millis_timestamp;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};

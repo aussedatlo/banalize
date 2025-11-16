@@ -28,13 +28,19 @@ cargo build --release
 
 - `BANALIZE_CORE_LOG_LEVEL`: Log level (INFO, DEBUG, ERROR) - default: INFO
 - `BANALIZE_CORE_API_FIREWALL_CHAIN`: iptables chain to link to - default: INPUT
+- `BANALIZE_CORE_DATABASE_PATH`: Base path for database storage - default: `/tmp/banalize-core`
 
 ## Database
 
-Uses Sled database stored in `/tmp/banalize-core/` with the following key formats:
+Uses two databases:
 
-- Matches: `match:<config_id>:<ip>:<timestamp>`
-- Bans: `ban:<ip>:<timestamp>`
+- **Sled database**: Stored in the path specified by `BANALIZE_CORE_DATABASE_PATH` (default: `/tmp/banalize-core/`) with the following key formats:
+  - Matches: `match:<config_id>:<ip>:<timestamp>`
+  - Bans: `ban:<config_id>:<ip>:<timestamp>`
+  - Configs: `config:<config_id>`
+
+- **SQLite database**: Events database stored at `<BANALIZE_CORE_DATABASE_PATH>/events.db` (default: `/tmp/banalize-core/events.db`)
+  - Stores match events, ban events, and unban events
 
 ## Architecture
 

@@ -1,7 +1,6 @@
 mod config;
 mod config_manager;
 mod database;
-mod event_emitter;
 mod events;
 mod file_watcher;
 mod firewall;
@@ -12,8 +11,8 @@ mod watcher_manager;
 mod cleaner;
 
 use config_manager::ConfigManager;
-use database::CoreDatabase;
-use event_emitter::EventEmitter;
+use database::{CoreDatabase, EventDatabase};
+use events::{EventEmitter, EventStorageService};
 use firewall::Firewall;
 use std::env;
 use std::sync::Arc;
@@ -121,9 +120,24 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Initialize event emitter
-    let (event_emitter, _event_receiver) = EventEmitter::new();
+    let (event_emitter, event_receiver) = EventEmitter::new();
     let event_emitter = Arc::new(event_emitter);
+    let event_receiver = Arc::new(Mutex::new(event_receiver));
     info!("Event emitter initialized");
+
+    // Initialize event database
+    let event_db = Arc::new(EventDatabase::new()?);
+    info!("Event database initialized");
+
+    // Start event storage service
+    let event_storage = Arc::new(EventStorageService::new(event_receiver.clone(), event_db.clone()));
+    let event_storage_for_task = event_storage.clone();
+    let event_storage_handle = tokio::spawn(async move {
+        if let Err(e) = event_storage_for_task.start().await {
+            error!("Event storage service stopped with error: {:?}", e);
+        }
+    });
+    info!("Event storage service started");
 
     // Initialize config manager (loads configs from database)
     let config_manager = Arc::new(ConfigManager::new(database.clone())?);
@@ -203,6 +217,7 @@ async fn main() -> anyhow::Result<()> {
     let firewall_clone = firewall.clone();
     let watcher_manager_clone = watcher_manager.clone();
     let config_manager_clone = config_manager.clone();
+    let event_storage_clone = event_storage.clone();
     
     // Wait for shutdown signal (SIGINT or SIGTERM)
     // Docker sends SIGTERM on stop, Ctrl+C sends SIGINT
@@ -228,21 +243,32 @@ async fn main() -> anyhow::Result<()> {
         info!("Received shutdown signal, cleaning up...");
     }
     
+    info!("Shutting down services...");
+    
+    // Signal event storage to shutdown
+    event_storage_clone.shutdown();
+    
     // Stop all watchers
     let configs = config_manager_clone.list_configs();
     for config in configs {
         watcher_manager_clone.stop_watcher(&config.id).await;
     }
+    info!("All watchers stopped");
+    
+    // Abort background tasks (give them a moment to finish gracefully)
+    tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+    cleaner_handle.abort();
+    event_storage_handle.abort();
+    info!("Background tasks aborted");
     
     // Cleanup firewall
     if let Ok(fw) = firewall_clone.lock() {
         if let Err(e) = fw.cleanup() {
             error!("Failed to cleanup firewall: {}", e);
+        } else {
+            info!("Firewall cleaned up");
         }
     }
-    
-    // Cleanup on exit
-    cleaner_handle.abort();
     
     info!("Cleanup complete, shutting down...");
     Ok(())

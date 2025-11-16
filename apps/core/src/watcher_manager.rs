@@ -2,7 +2,7 @@ use crate::config_manager::ConfigManager;
 use crate::database::CoreDatabase;
 use crate::file_watcher::FileWatcher;
 use crate::firewall::Firewall;
-use crate::event_emitter::EventEmitter;
+use crate::events::EventEmitter;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use tokio::task::JoinHandle;
