@@ -15,7 +15,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - uses: pnpm/action-setup@v4
+      - name: Setup proto tools
+        uses: "moonrepo/setup-proto@v0"
+
+      - name: Use proto tools and persist environment
+        run: |
+          proto use
+          eval "$(proto activate)"
+          echo "PATH=$PATH" >> $GITHUB_ENV
+
+      - name: Install protobuf compiler
+        run: sudo apt install -y protobuf-compiler
 
       - name: Install dependencies
         run: pnpm install
