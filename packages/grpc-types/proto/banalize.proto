@@ -1,0 +1,158 @@
+syntax = "proto3";
+
+package banalize;
+
+// Core service for managing watchers and configs
+service BanalizeCore {
+  // Create a new configuration and immediately start its watcher task
+  rpc AddConfig(AddConfigRequest) returns (AddConfigResponse);
+  
+  // Modify an existing configuration
+  rpc EditConfig(EditConfigRequest) returns (EditConfigResponse);
+  
+  // Manual override to remove a ban before its expiration
+  rpc Unban(UnbanRequest) returns (UnbanResponse);
+  
+  // Health check
+  rpc Ping(PingRequest) returns (PingResponse);
+  
+  // Return all current configs and their runtime state
+  rpc ListConfig(ListConfigRequest) returns (ListConfigResponse);
+  
+  // Return all current bans
+  rpc ListCurrentBans(ListCurrentBansRequest) returns (ListCurrentBansResponse);
+  
+  // Return all current matches
+  rpc ListCurrentMatches(ListCurrentMatchesRequest) returns (ListCurrentMatchesResponse);
+}
+
+// Event streaming service
+service BanalizeEvents {
+  // Stream events (match, ban, unban)
+  rpc StreamEvents(StreamEventsRequest) returns (stream Event);
+}
+
+// Request/Response types
+message AddConfigRequest {
+  string id = 1;
+  string name = 2;
+  string param = 3;         // file or resource to watch
+  string regex = 4;          // must contain <IP> placeholder
+  uint64 ban_time = 5;       // ms
+  uint64 find_time = 6;      // ms
+  uint32 max_matches = 7;
+  repeated string ignore_ips = 8; // list of CIDRs
+}
+
+message AddConfigResponse {
+  bool success = 1;
+  string error = 2;
+}
+
+message EditConfigRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string param = 3;
+  optional string regex = 4;
+  optional uint64 ban_time = 5;
+  optional uint64 find_time = 6;
+  optional uint32 max_matches = 7;
+  repeated string ignore_ips = 8;
+}
+
+message EditConfigResponse {
+  bool success = 1;
+  string error = 2;
+}
+
+message UnbanRequest {
+  string event_id = 1;
+  string ip = 2;
+}
+
+message UnbanResponse {
+  bool success = 1;
+  string error = 2;
+}
+
+message PingRequest {}
+
+message PingResponse {
+  string message = 1;
+}
+
+message ListConfigRequest {}
+
+message ListConfigResponse {
+  repeated ConfigStatus configs = 1;
+}
+
+message ConfigStatus {
+  string id = 1;
+  string name = 2;
+  string param = 3;
+  string regex = 4;
+  uint64 ban_time = 5;
+  uint64 find_time = 6;
+  uint32 max_matches = 7;
+  repeated string ignore_ips = 8;
+  bool running = 9;
+  string error = 10;
+}
+
+message StreamEventsRequest {}
+
+message ListCurrentBansRequest {}
+
+message ListCurrentBansResponse {
+  repeated BanRecord bans = 1;
+}
+
+message BanRecord {
+  string ip = 1;
+  uint64 timestamp = 2;
+}
+
+message ListCurrentMatchesRequest {}
+
+message ListCurrentMatchesResponse {
+  repeated MatchRecord matches = 1;
+}
+
+message MatchRecord {
+  string config_id = 1;
+  string ip = 2;
+  uint64 timestamp = 3;
+}
+
+message Event {
+  oneof event_type {
+    MatchEvent match = 1;
+    BanEvent ban = 2;
+    UnbanEvent unban = 3;
+  }
+}
+
+message MatchEvent {
+  string event_id = 1;
+  string line = 2;
+  string regex = 3;
+  string ip = 4;
+  uint64 timestamp = 5; // unix epoch ms
+  string config_id = 6;
+}
+
+message BanEvent {
+  string event_id = 1;
+  string ip = 2;
+  uint64 timestamp = 3;
+  string config_id = 4;
+}
+
+message UnbanEvent {
+  string event_id = 1;
+  string ip = 2;
+  uint64 timestamp = 3;
+  string config_id = 4;
+}
+

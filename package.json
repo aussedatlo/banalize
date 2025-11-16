@@ -4,7 +4,12 @@
   "license": "MIT",
   "scripts": {
     "api": "pnpm --filter api",
+    "core": "pnpm --filter=@banalize/core",
+    "cli": "pnpm --filter=@banalize/cli",
+    "cli:run": "pnpm --filter=@banalize/cli dev",
+    "grpc-types": "pnpm --filter=@banalize/grpc-types",
     "build": "turbo build",
+    "build:packages": "turbo build --filter={./packages/*}",
     "build:api": "turbo build --filter=@banalize/api --filter={./packages/*}",
     "build:web": "turbo build --filter=@banalize/web --filter={./packages/*}",
     "clean": "turbo clean",
