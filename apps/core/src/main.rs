@@ -5,6 +5,7 @@ mod database;
 mod events;
 mod firewall;
 mod ip_extract;
+mod restore;
 mod watcher;
 mod watcher_manager;
 
@@ -14,6 +15,7 @@ use config::ConfigMap;
 use database::{SqliteDatabase, SledDatabase};
 use events::EventEmitter;
 use firewall::Firewall;
+use restore::restore_bans;
 use std::env;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -34,7 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Starting banalize-core");
 
     // Get configuration from environment
-    let firewall_chain = env::var("BANALIZE_CORE_API_FIREWALL_CHAIN")
+    let firewall_chain = env::var("BANALIZE_CORE_FIREWALL_CHAIN")
         .unwrap_or_else(|_| "INPUT".to_string());
     let database_path = env::var("BANALIZE_CORE_DATABASE_PATH")
         .unwrap_or_else(|_| "/tmp/banalize-core".to_string());
@@ -113,6 +115,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             config_map.insert(config_record.id, config);
         }
     }
+
+    // Restore firewall bans from database
+    restore_bans(sled_db.clone(), firewall.clone(), configs.clone()).await?;
 
     // Initialize watcher manager
     let watcher_manager = Arc::new(watcher_manager::WatcherManager::new(

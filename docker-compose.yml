@@ -12,24 +12,10 @@ services:
       - NET_ADMIN
       - NET_RAW
     environment:
-      BANALIZE_CORE_API_FIREWALL_CHAIN: FORWARD
+      BANALIZE_CORE_FIREWALL_CHAIN: FORWARD
       BANALIZE_CORE_LOG_LEVEL: INFO
       BANALIZE_CORE_DATABASE_PATH: /tmp/banalize-core
       BANALIZE_CORE_API_ADDR: 0.0.0.0:5040
-
-  web:
-    image: banalize-web:0.0.1-beta
-    container_name: banalize-web
-    restart: unless-stopped
-    network_mode: "host"
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    depends_on:
-      - api
-    environment:
-      BANALIZE_WEB_API_SERVER_URL: http://localhost:5040
-      BANALIZE_WEB_PORT: 5041
 
 volumes:
   mongodb-data:

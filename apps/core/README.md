@@ -27,7 +27,7 @@ cargo build --release
 ### Environment Variables
 
 - `BANALIZE_CORE_LOG_LEVEL`: Log level (INFO, DEBUG, ERROR) - default: INFO
-- `BANALIZE_CORE_API_FIREWALL_CHAIN`: iptables chain to link to - default: INPUT
+- `BANALIZE_CORE_FIREWALL_CHAIN`: iptables chain to link to - default: INPUT
 - `BANALIZE_CORE_DATABASE_PATH`: Base path for database storage - default: `/tmp/banalize-core`
 - `BANALIZE_CORE_API_ADDR`: Address and port for the REST API server - default: `0.0.0.0:5040`
 
