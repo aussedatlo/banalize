@@ -21,7 +21,7 @@ linemux = "0.3"
 crossbeam-channel = "0.5"
 
 # gRPC
-tonic = "0.11"
+tonic = "0.14"
 prost = "0.12"
 prost-types = "0.12"
 
