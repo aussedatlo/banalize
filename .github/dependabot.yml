@@ -116,6 +116,11 @@ updates:
       - "dependencies"
       - "rust"
       - "core"
+    groups:
+      grpc-deps:
+        patterns:
+          - "tonic*"
+          - "prost*"
 
   # Docker dependencies
   - package-ecosystem: "docker"
