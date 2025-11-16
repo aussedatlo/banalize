@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", "apps/core/target/release/banalize-core", "packages/grpc-types/dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
