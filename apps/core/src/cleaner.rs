@@ -102,7 +102,8 @@ impl Cleaner {
                             } else {
                                 removed_count += 1;
                                 
-                                // Emit unban event using EventEmitter (handles DB insertion and firewall unban asynchronously)
+                                // Emit unban event using EventEmitter
+                                // Firewall handler will process this event and remove the firewall rule
                                 let event_emitter = self.event_emitter.clone();
                                 let config_id_clone = config_id.clone();
                                 let ip_str_clone = ip_str.clone();

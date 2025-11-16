@@ -1,6 +1,11 @@
+use crate::events::Event;
 use rusqlite::{Connection, Result as SqliteResult};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
+use std::sync::Arc;
+use tokio::sync::Mutex;
+use tracing::{error, info, warn};
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ConfigRecord {
@@ -314,6 +319,81 @@ impl SqliteDatabase {
         }
         
         Ok(events)
+    }
+
+    /// Handle Match event - insert into database
+    fn handle_match_event(&self, config_id: String, ip: String, timestamp: u64) -> Result<(), rusqlite::Error> {
+        let event = MatchEvent {
+            id: Uuid::new_v4().to_string(),
+            config_id: config_id.clone(),
+            ip: ip.clone(),
+            timestamp,
+        };
+        self.insert_match_event(&event)?;
+        info!("Inserted match event: {} -> {}", config_id, ip);
+        Ok(())
+    }
+
+    /// Handle Ban event - insert into database
+    fn handle_ban_event(&self, config_id: String, ip: String, timestamp: u64) -> Result<(), rusqlite::Error> {
+        let event = BanEvent {
+            id: Uuid::new_v4().to_string(),
+            config_id: config_id.clone(),
+            ip: ip.clone(),
+            timestamp,
+        };
+        self.insert_ban_event(&event)?;
+        info!("Inserted ban event: {} -> {}", config_id, ip);
+        Ok(())
+    }
+
+    /// Handle Unban event - insert into database
+    fn handle_unban_event(&self, config_id: String, ip: String, timestamp: u64) -> Result<(), rusqlite::Error> {
+        let event = UnbanEvent {
+            id: Uuid::new_v4().to_string(),
+            config_id: config_id.clone(),
+            ip: ip.clone(),
+            timestamp,
+        };
+        self.insert_unban_event(&event)?;
+        info!("Inserted unban event: {} -> {}", config_id, ip);
+        Ok(())
+    }
+
+    /// Start event handler loop
+    pub async fn handle_events(
+        db: Arc<Mutex<Self>>,
+        mut rx: tokio::sync::broadcast::Receiver<Event>,
+    ) {
+        loop {
+            match rx.recv().await {
+                Ok(Event::Match { config_id, ip, timestamp }) => {
+                    let db = db.lock().await;
+                    if let Err(e) = db.handle_match_event(config_id, ip, timestamp) {
+                        error!("Failed to handle match event: {}", e);
+                    }
+                }
+                Ok(Event::Ban { config_id, ip, timestamp }) => {
+                    let db = db.lock().await;
+                    if let Err(e) = db.handle_ban_event(config_id, ip, timestamp) {
+                        error!("Failed to handle ban event: {}", e);
+                    }
+                }
+                Ok(Event::Unban { config_id, ip, timestamp }) => {
+                    let db = db.lock().await;
+                    if let Err(e) = db.handle_unban_event(config_id, ip, timestamp) {
+                        error!("Failed to handle unban event: {}", e);
+                    }
+                }
+                Err(tokio::sync::broadcast::error::RecvError::Closed) => {
+                    info!("SQLite event handler shutting down");
+                    break;
+                }
+                Err(tokio::sync::broadcast::error::RecvError::Lagged(skipped)) => {
+                    warn!("SQLite event handler lagged, skipped {} events", skipped);
+                }
+            }
+        }
     }
 }
 

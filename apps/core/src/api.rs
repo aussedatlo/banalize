@@ -57,7 +57,7 @@ pub struct AppState {
     pub sled_db: Arc<SledDatabase>,
     pub configs: Arc<RwLock<ConfigMap>>,
     pub watcher_manager: Arc<WatcherManager>,
-    pub firewall: Arc<RwLock<Firewall>>,
+    pub event_emitter: Arc<EventEmitter>,
 }
 
 pub fn create_router(state: AppState) -> Router {
@@ -391,7 +391,7 @@ async fn disable_ban(
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         .ok_or(StatusCode::NOT_FOUND)?;
     
-    let ip: IpAddr = ban_event.ip.parse().map_err(|_| StatusCode::BAD_REQUEST)?;
+    let _ip: IpAddr = ban_event.ip.parse().map_err(|_| StatusCode::BAD_REQUEST)?;
     let config_id = ban_event.config_id.clone();
     
     drop(db);
@@ -421,8 +421,7 @@ async fn disable_ban(
     }
 
     // Emit unban event using EventEmitter (handles DB insertion and firewall unban asynchronously)
-    let event_emitter = EventEmitter::new(state.sqlite_events_db.clone(), state.firewall.clone());
-    event_emitter
+    state.event_emitter
         .emit(crate::events::Event::Unban {
             config_id: config_id.clone(),
             ip: ban_event.ip.clone(),

@@ -1,5 +1,8 @@
+use crate::events::Event;
 use iptables;
 use std::net::IpAddr;
+use std::sync::Arc;
+use tokio::sync::RwLock;
 use tracing::{error, info, warn};
 
 const TABLE: &str = "filter";
@@ -137,6 +140,41 @@ impl Firewall {
             Err(e) => {
                 warn!("Failed to remove firewall rule for IP {}: {}", ip, e);
                 Err(format!("Failed to allow IP: {}", e))
+            }
+        }
+    }
+
+    /// Handle Unban event - remove firewall rule
+    pub fn handle_unban_event(&self, ip: &str) {
+        if let Ok(ip_addr) = ip.parse::<IpAddr>() {
+            if let Err(e) = self.allow_ip_sync(&ip_addr) {
+                warn!("Failed to remove firewall rule for unban {}: {}", ip, e);
+                // Continue anyway, firewall errors should not block the event
+            }
+        }
+    }
+
+    /// Start event handler loop
+    pub async fn handle_events(
+        firewall: Arc<RwLock<Self>>,
+        mut rx: tokio::sync::broadcast::Receiver<Event>,
+    ) {
+        loop {
+            match rx.recv().await {
+                Ok(Event::Unban { ip, .. }) => {
+                    let fw = firewall.read().await;
+                    fw.handle_unban_event(&ip);
+                }
+                Ok(_) => {
+                    // Ignore other event types
+                }
+                Err(tokio::sync::broadcast::error::RecvError::Closed) => {
+                    info!("Firewall event handler shutting down");
+                    break;
+                }
+                Err(tokio::sync::broadcast::error::RecvError::Lagged(skipped)) => {
+                    warn!("Firewall event handler lagged, skipped {} events", skipped);
+                }
             }
         }
     }

@@ -182,14 +182,18 @@ impl Watcher {
             return Err(format!("Failed to add ban: {}", e));
         }
 
-        // Call firewall (synchronous, blocking, but in critical path)
-        let firewall = self.firewall.read().await;
-        if let Err(e) = firewall.deny_ip_sync(ip) {
-            // According to spec: firewall error: do nothing
-            warn!("Firewall error (ignored): {}", e);
+        // Call firewall immediately (synchronous, blocking, but in critical path)
+        // This ensures the IP is blocked as soon as possible
+        {
+            let firewall = self.firewall.read().await;
+            if let Err(e) = firewall.deny_ip_sync(ip) {
+                // According to spec: firewall error: do nothing, but log it
+                warn!("Firewall error (ignored): {}", e);
+            }
         }
 
-        // Emit ban event (async, non-blocking)
+        // Emit ban event (async, non-blocking) for logging and other handlers
+        // The firewall handler will also process this, but the rule is already added above
         self.event_emitter
             .emit(Event::Ban {
                 config_id: self.config.id.clone(),

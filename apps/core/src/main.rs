@@ -72,7 +72,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let firewall = Arc::new(RwLock::new(firewall));
 
     // Initialize event emitter
-    let event_emitter = Arc::new(EventEmitter::new(sqlite_events_db.clone(), firewall.clone()));
+    let (event_emitter, event_rx) = EventEmitter::new();
+    let event_emitter = Arc::new(event_emitter);
+    
+    // Spawn SQLite event handler
+    let sqlite_events_db_handler = sqlite_events_db.clone();
+    let sqlite_rx = event_rx.resubscribe();
+    tokio::spawn(async move {
+        SqliteDatabase::handle_events(sqlite_events_db_handler, sqlite_rx).await;
+    });
+    
+    // Spawn firewall event handler
+    let firewall_handler = firewall.clone();
+    let firewall_rx = event_rx.resubscribe();
+    tokio::spawn(async move {
+        Firewall::handle_events(firewall_handler, firewall_rx).await;
+    });
 
     // Initialize config map
     let configs: Arc<RwLock<ConfigMap>> = Arc::new(RwLock::new(ConfigMap::new()));
@@ -176,7 +191,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         sled_db: sled_db.clone(),
         configs: configs.clone(),
         watcher_manager: watcher_manager.clone(),
-        firewall: firewall.clone(),
+        event_emitter: event_emitter.clone(),
     };
 
     // Create API router
