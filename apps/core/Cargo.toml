@@ -31,9 +31,17 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # Error handling
 anyhow = "1.0"
 
+# Web framework
+axum = "0.8.7"
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors"] }
+
 # IP address handling
 ipnet = "2.9"
 
 # UUID generation for event IDs
 uuid = { version = "1.6", features = ["v4"] }
+
+# Firewall
+iptables = "0.5"
 

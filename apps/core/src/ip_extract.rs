@@ -1,43 +1,42 @@
 use regex::Regex;
-use std::collections::HashMap;
+use std::net::IpAddr;
 
-const IP_REGEX: &str = r"\b(?:\d{1,3}\.){3}\d{1,3}\b";
-
-pub struct IpExtractor {
-    regex_cache: HashMap<String, Regex>,
-}
-
-impl IpExtractor {
-    pub fn new() -> Self {
-        Self {
-            regex_cache: HashMap::new(),
-        }
-    }
-
-    pub fn extract_ip(&mut self, pattern: &str, line: &str) -> Option<String> {
-        // Get or compile regex
-        let regex = self.regex_cache.entry(pattern.to_string()).or_insert_with(|| {
-            let ip_regex = IP_REGEX;
-            let final_pattern = pattern.replace("<IP>", ip_regex);
-            Regex::new(&final_pattern).expect("Invalid regex pattern")
-        });
-
-        // Find match
-        if let Some(captures) = regex.captures(line) {
-            // Extract IP from the match
-            let ip_regex = Regex::new(IP_REGEX).unwrap();
-            if let Some(ip_match) = ip_regex.find(captures.get(0)?.as_str()) {
-                return Some(ip_match.as_str().to_string());
+/// Extract IP address from a line using a regex pattern that contains <IP> placeholder
+pub fn extract_ip(regex_pattern: &str, line: &str) -> Option<IpAddr> {
+    // Replace <IP> with IPv4 regex pattern
+    let ip_regex = r"(\b(?:\d{1,3}\.){3}\d{1,3}\b)";
+    let final_pattern = regex_pattern.replace("<IP>", ip_regex);
+    
+    let re = match Regex::new(&final_pattern) {
+        Ok(re) => re,
+        Err(_) => return None,
+    };
+    
+    if let Some(captures) = re.captures(line) {
+        // Find the IP capture group (should be the first capture group)
+        for i in 1..captures.len() {
+            if let Some(ip_str) = captures.get(i) {
+                if let Ok(ip) = ip_str.as_str().parse::<IpAddr>() {
+                    return Some(ip);
+                }
             }
         }
-
-        None
     }
+    
+    None
 }
 
-impl Default for IpExtractor {
-    fn default() -> Self {
-        Self::new()
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_extract_ip() {
+        let pattern = ".*<IP>.*";
+        let line = "Connection from 192.168.1.1";
+        let ip = extract_ip(pattern, line);
+        assert!(ip.is_some());
+        assert_eq!(ip.unwrap().to_string(), "192.168.1.1");
     }
 }
 

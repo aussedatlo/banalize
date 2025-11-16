@@ -1,214 +1,143 @@
-use std::process::Command;
-use tracing::{info, warn};
+use iptables;
+use std::net::IpAddr;
+use tracing::{error, info, warn};
 
-const IPTABLES_CHAIN: &str = "banalize";
-const DEFAULT_LINK_CHAIN: &str = "INPUT";
+const TABLE: &str = "filter";
+const CHAIN_NAME: &str = "banalize";
 
 pub struct Firewall {
-    chain: String,
-    link_chain: String,
-    banned_ips: std::collections::HashSet<String>,
+    ipt: iptables::IPTables,
+    link_chain: String, // The chain to link to (e.g., INPUT, FORWARD)
 }
 
 impl Firewall {
-    pub fn new() -> Self {
-        let link_chain = std::env::var("BANALIZE_CORE_API_FIREWALL_CHAIN")
-            .unwrap_or_else(|_| DEFAULT_LINK_CHAIN.to_string());
-        
+    pub fn new(link_chain: String) -> Self {
         Self {
-            chain: IPTABLES_CHAIN.to_string(),
+            ipt: iptables::new(false).expect("Failed to create iptables instance"),
             link_chain,
-            banned_ips: std::collections::HashSet::new(),
         }
     }
 
-    /// Initialize firewall: create chain, link it, and flush it
-    pub fn init(&self) -> anyhow::Result<()> {
-        info!("Initializing firewall");
-        
-        self.create_chain()?;
-        self.link_chain()?;
-        self.flush_chain()?;
-        
-        info!("Firewall initialized successfully");
-        Ok(())
-    }
+    /// Initialize the firewall: create chain, link chain, flush chain
+    pub fn init(&mut self) -> Result<(), String> {
+        info!("Initializing firewall chain: {}", CHAIN_NAME);
 
-    /// Create the iptables chain (ignores error if chain already exists)
-    fn create_chain(&self) -> anyhow::Result<()> {
-        let command = format!("iptables -N {}", self.chain);
-        match self.execute_command_sync(&command) {
-            Ok(_) => {
-                info!("Created iptables chain: {}", self.chain);
-                Ok(())
-            }
+        // Create chain (ignore error if it already exists)
+        let create_cmd = format!("-N {}", CHAIN_NAME);
+        match self.ipt.execute(TABLE, &create_cmd) {
+            Ok(_) => info!("Created chain: {}", CHAIN_NAME),
             Err(e) => {
-                // Chain might already exist, check if it's actually there
-                let check_command = format!("iptables -L {} -n", self.chain);
-                if self.execute_command_sync(&check_command).is_ok() {
-                    info!("Iptables chain {} already exists", self.chain);
-                    Ok(())
+                let err_str = e.to_string();
+                if err_str.contains("already exists") || err_str.contains("File exists") {
+                    info!("Chain {} already exists", CHAIN_NAME);
                 } else {
-                    Err(anyhow::anyhow!("Failed to create chain: {}", e))
+                    warn!("Failed to create chain (may already exist): {}", e);
                 }
             }
         }
-    }
 
-    /// Link the chain to the link chain (e.g., INPUT)
-    /// Ignores error if already linked (will fail silently if link already exists)
-    fn link_chain(&self) -> anyhow::Result<()> {
-        let command = format!("iptables -I {} -j {}", self.link_chain, self.chain);
-        match self.execute_command_sync(&command) {
-            Ok(_) => {
-                info!("Linked chain {} to {}", self.chain, self.link_chain);
-                Ok(())
-            }
+        // Link chain (insert jump rule at the beginning)
+        let rule = format!("-j {}", CHAIN_NAME);
+        match self.ipt.insert_unique(TABLE, &self.link_chain, &rule, 1) {
+            Ok(_) => info!("Linked chain {} to {}", CHAIN_NAME, self.link_chain),
             Err(e) => {
-                // Link might already exist, that's okay
-                warn!("Could not link chain (might already be linked): {}", e);
-                info!("Chain {} should be linked to {}", self.chain, self.link_chain);
-                Ok(())
+                // Check if rule already exists
+                if let Ok(exists) = self.ipt.exists(TABLE, &self.link_chain, &rule) {
+                    if exists {
+                        info!("Chain {} already linked to {}", CHAIN_NAME, self.link_chain);
+                    } else {
+                        // Try append as fallback
+                        if let Err(e2) = self.ipt.append(TABLE, &self.link_chain, &rule) {
+                            return Err(format!("Failed to link chain: {} / {}", e, e2));
+                        } else {
+                            info!("Linked chain {} to {} (via append)", CHAIN_NAME, self.link_chain);
+                        }
+                    }
+                } else {
+                    return Err(format!("Failed to link chain: {}", e));
+                }
             }
         }
-    }
 
-    /// Flush the chain (remove all rules)
-    fn flush_chain(&self) -> anyhow::Result<()> {
-        let command = format!("iptables -F {}", self.chain);
-        self.execute_command_sync(&command)
-            .map_err(|e| anyhow::anyhow!("Failed to flush chain: {}", e))?;
-        info!("Flushed iptables chain: {}", self.chain);
+        // Flush chain (clear existing rules)
+        let flush_cmd = format!("-F {}", CHAIN_NAME);
+        match self.ipt.execute(TABLE, &flush_cmd) {
+            Ok(_) => info!("Flushed chain: {}", CHAIN_NAME),
+            Err(e) => {
+                warn!("Failed to flush chain (may be empty): {}", e);
+            }
+        }
+
         Ok(())
     }
 
-    /// Unlink the chain from the link chain
-    pub fn unlink_chain(&self) -> anyhow::Result<()> {
-        let command = format!("iptables -D {} -j {}", self.link_chain, self.chain);
-        match self.execute_command_sync(&command) {
-            Ok(_) => {
-                info!("Unlinked chain {} from {}", self.chain, self.link_chain);
-                Ok(())
-            }
-            Err(e) => {
-                // Link might not exist, that's okay
-                warn!("Could not unlink chain (might not be linked): {}", e);
-                Ok(())
-            }
-        }
-    }
+    /// Cleanup: flush chain, unlink chain, delete chain
+    pub fn cleanup(&mut self) -> Result<(), String> {
+        info!("Cleaning up firewall chain: {}", CHAIN_NAME);
 
-    /// Delete the chain
-    pub fn delete_chain(&self) -> anyhow::Result<()> {
-        let command = format!("iptables -X {}", self.chain);
-        match self.execute_command_sync(&command) {
-            Ok(_) => {
-                info!("Deleted iptables chain: {}", self.chain);
-                Ok(())
-            }
-            Err(e) => {
-                // Chain might not exist, that's okay
-                warn!("Could not delete chain (might not exist): {}", e);
-                Ok(())
-            }
-        }
-    }
-
-    /// Cleanup firewall: flush, unlink, and delete chain
-    pub fn cleanup(&self) -> anyhow::Result<()> {
-        info!("Cleaning up firewall rules");
-        self.flush_chain()?;
-        self.unlink_chain()?;
-        self.delete_chain()?;
-        info!("Firewall rules cleaned up");
-        Ok(())
-    }
-
-    /// Restore bans from a list of IPs
-    pub fn restore_bans(&mut self, ips: &[String]) -> anyhow::Result<()> {
-        if ips.is_empty() {
-            info!("No bans to restore");
-            return Ok(());
+        // Flush chain
+        let flush_cmd = format!("-F {}", CHAIN_NAME);
+        if let Err(e) = self.ipt.execute(TABLE, &flush_cmd) {
+            warn!("Failed to flush chain: {}", e);
         }
 
-        info!("Restoring {} ban(s): {}", ips.len(), ips.join(", "));
-        for ip in ips {
-            if let Err(e) = self.deny_ip_sync(ip) {
-                warn!("Failed to restore ban for IP {}: {}", ip, e);
-            }
-        }
-        Ok(())
-    }
-
-    /// Build iptables command to deny an IP
-    fn build_deny_command(&self, ip: &str) -> String {
-        format!(
-            "iptables -A {} -s {}/32 -j REJECT --reject-with icmp-port-unreachable",
-            self.chain, ip
-        )
-    }
-
-    /// Build iptables command to allow an IP
-    fn build_allow_command(&self, ip: &str) -> String {
-        format!(
-            "iptables -D {} -s {}/32 -j REJECT --reject-with icmp-port-unreachable",
-            self.chain, ip
-        )
-    }
-
-    /// Synchronous version for critical path (high-priority thread)
-    pub fn deny_ip_sync(&mut self, ip: &str) -> anyhow::Result<()> {
-        if self.banned_ips.contains(ip) {
-            return Ok(());
-        }
-
-        let command = self.build_deny_command(ip);
-        // Firewall errors should be ignored per spec
-        if let Err(e) = self.execute_command_sync(&command) {
-            warn!("Firewall error (ignored): {}", e);
+        // Unlink chain (remove jump rule)
+        let rule = format!("-j {}", CHAIN_NAME);
+        // Try to delete the rule
+        if let Err(e) = self.ipt.delete(TABLE, &self.link_chain, &rule) {
+            warn!("Failed to unlink chain: {}", e);
         } else {
-            self.banned_ips.insert(ip.to_string());
-            info!("Banned IP: {}", ip);
+            info!("Unlinked chain {} from {}", CHAIN_NAME, self.link_chain);
         }
+
+        // Delete chain
+        let delete_cmd = format!("-X {}", CHAIN_NAME);
+        match self.ipt.execute(TABLE, &delete_cmd) {
+            Ok(_) => info!("Deleted chain: {}", CHAIN_NAME),
+            Err(e) => {
+                warn!("Failed to delete chain: {}", e);
+            }
+        }
+
         Ok(())
     }
 
-    /// Synchronous version for blocking operations
-    pub fn allow_ip_sync(&mut self, ip: &str) -> anyhow::Result<()> {
-        if !self.banned_ips.contains(ip) {
-            return Ok(());
+    /// Deny an IP address (synchronous, blocking)
+    pub fn deny_ip_sync(&self, ip: &IpAddr) -> Result<(), String> {
+        let rule = format!("-s {} -j DROP", ip);
+        
+        // Check if rule already exists
+        if let Ok(exists) = self.ipt.exists(TABLE, CHAIN_NAME, &rule) {
+            if exists {
+                return Ok(()); // Rule already exists
+            }
         }
 
-        let command = self.build_allow_command(ip);
-        // Firewall errors should be ignored per spec
-        if let Err(e) = self.execute_command_sync(&command) {
-            warn!("Firewall error (ignored): {}", e);
-        } else {
-            self.banned_ips.remove(ip);
-            info!("Unbanned IP: {}", ip);
+        match self.ipt.append(TABLE, CHAIN_NAME, &rule) {
+            Ok(_) => {
+                info!("Added firewall rule to deny IP: {}", ip);
+                Ok(())
+            }
+            Err(e) => {
+                error!("Failed to add firewall rule for IP {}: {}", ip, e);
+                Err(format!("Failed to deny IP: {}", e))
+            }
         }
-        Ok(())
     }
 
-    /// Execute iptables command synchronously
-    fn execute_command_sync(&self, command: &str) -> anyhow::Result<()> {
-        let output = Command::new("sh")
-            .arg("-c")
-            .arg(command)
-            .output()?;
-
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            return Err(anyhow::anyhow!("Command failed: {}", stderr));
+    /// Remove a deny rule for an IP address
+    pub fn allow_ip_sync(&self, ip: &IpAddr) -> Result<(), String> {
+        let rule = format!("-s {} -j DROP", ip);
+        
+        match self.ipt.delete(TABLE, CHAIN_NAME, &rule) {
+            Ok(_) => {
+                info!("Removed firewall rule for IP: {}", ip);
+                Ok(())
+            }
+            Err(e) => {
+                warn!("Failed to remove firewall rule for IP {}: {}", ip, e);
+                Err(format!("Failed to allow IP: {}", e))
+            }
         }
-
-        Ok(())
     }
 }
-
-impl Default for Firewall {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-

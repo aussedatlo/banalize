@@ -1,276 +1,225 @@
+mod api;
+mod cleaner;
 mod config;
-mod config_manager;
 mod database;
 mod events;
-mod file_watcher;
 mod firewall;
 mod ip_extract;
-mod ip_utils;
-mod time_utils;
+mod watcher;
 mod watcher_manager;
-mod cleaner;
 
-use config_manager::ConfigManager;
-use database::{CoreDatabase, EventDatabase};
-use events::{EventEmitter, EventStorageService};
+use api::{create_router, AppState};
+use cleaner::Cleaner;
+use config::ConfigMap;
+use database::{SqliteDatabase, SledDatabase};
+use events::EventEmitter;
 use firewall::Firewall;
 use std::env;
+use std::path::PathBuf;
 use std::sync::Arc;
-use std::sync::Mutex;
-#[cfg(unix)]
-use tokio::signal::unix::{signal as unix_signal, SignalKind};
-#[cfg(not(unix))]
-use tokio::signal;
-use tracing::{error, info};
-
-/// Format duration in milliseconds to human-readable string
-fn format_duration(ms: u64) -> String {
-    if ms < 1000 {
-        format!("{} ms", ms)
-    } else if ms < 60_000 {
-        let seconds = ms / 1000;
-        format!("{} second{}", seconds, if seconds == 1 { "" } else { "s" })
-    } else if ms < 3_600_000 {
-        let minutes = ms / 60_000;
-        let seconds = (ms % 60_000) / 1000;
-        if seconds == 0 {
-            format!("{} minute{}", minutes, if minutes == 1 { "" } else { "s" })
-        } else {
-            format!(
-                "{} minute{} {} second{}",
-                minutes,
-                if minutes == 1 { "" } else { "s" },
-                seconds,
-                if seconds == 1 { "" } else { "s" }
-            )
-        }
-    } else {
-        let hours = ms / 3_600_000;
-        let minutes = (ms % 3_600_000) / 60_000;
-        if minutes == 0 {
-            format!("{} hour{}", hours, if hours == 1 { "" } else { "s" })
-        } else {
-            format!(
-                "{} hour{} {} minute{}",
-                hours,
-                if hours == 1 { "" } else { "s" },
-                minutes,
-                if minutes == 1 { "" } else { "s" }
-            )
-        }
-    }
-}
+use tokio::sync::{broadcast, RwLock};
+use tower::ServiceBuilder;
+use tower_http::cors::CorsLayer;
+use tracing::{error, info, warn};
+use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    // Initialize tracing
-    let log_level = env::var("BANALIZE_CORE_LOG_LEVEL")
-        .unwrap_or_else(|_| "INFO".to_string())
-        .to_uppercase();
-    
-    let env_filter = match log_level.as_str() {
-        "INFO" => tracing_subscriber::EnvFilter::new("info"),
-        "DEBUG" => tracing_subscriber::EnvFilter::new("debug"),
-        "ERROR" => tracing_subscriber::EnvFilter::new("error"),
-        _ => {
-            eprintln!("Invalid BANALIZE_CORE_LOG_LEVEL value: {}. Must be INFO, DEBUG, or ERROR. Defaulting to INFO.", log_level);
-            tracing_subscriber::EnvFilter::new("info")
-        }
-    };
-    
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Initialize logging
+    let log_level = env::var("BANALIZE_CORE_LOG_LEVEL").unwrap_or_else(|_| "INFO".to_string());
     tracing_subscriber::fmt()
-        .with_env_filter(env_filter)
+        .with_env_filter(EnvFilter::new(&log_level))
         .init();
 
     info!("Starting banalize-core");
 
-    // Initialize database
-    let database = Arc::new(CoreDatabase::new()?);
-    info!("Database initialized");
+    // Get configuration from environment
+    let firewall_chain = env::var("BANALIZE_CORE_API_FIREWALL_CHAIN")
+        .unwrap_or_else(|_| "INPUT".to_string());
+    let database_path = env::var("BANALIZE_CORE_DATABASE_PATH")
+        .unwrap_or_else(|_| "/tmp/banalize-core".to_string());
+    let api_addr = env::var("BANALIZE_CORE_API_ADDR")
+        .unwrap_or_else(|_| "0.0.0.0:5040".to_string());
+
+    // Create database paths
+    let sled_path = PathBuf::from(&database_path);
+    let sqlite_configs_path = PathBuf::from(&database_path).join("configs.db");
+    let sqlite_events_path = PathBuf::from(&database_path).join("events.db");
+
+    // Ensure database directory exists
+    std::fs::create_dir_all(&sled_path)?;
+
+    // Initialize databases
+    info!("Opening sled database at: {:?}", sled_path);
+    let sled_db = Arc::new(SledDatabase::open(&sled_path)?);
+
+    info!("Opening SQLite configs database at: {:?}", sqlite_configs_path);
+    let sqlite_configs_db = Arc::new(tokio::sync::Mutex::new(SqliteDatabase::open(
+        &sqlite_configs_path,
+    )?));
+
+    info!("Opening SQLite events database at: {:?}", sqlite_events_path);
+    let sqlite_events_db = Arc::new(tokio::sync::Mutex::new(SqliteDatabase::open(
+        &sqlite_events_path,
+    )?));
 
     // Initialize firewall
-    let firewall = Arc::new(Mutex::new(Firewall::new()));
-    {
-        let fw = firewall.lock().unwrap();
-        if let Err(e) = fw.init() {
-            error!("Failed to initialize firewall: {:?}", e);
-            // Continue anyway - firewall errors are ignored per spec
-        } else {
-            info!("Firewall initialized");
-        }
+    info!("Initializing firewall with chain: {}", firewall_chain);
+    let mut firewall = Firewall::new(firewall_chain.clone());
+    if let Err(e) = firewall.init() {
+        warn!("Failed to initialize firewall (continuing anyway): {}", e);
     }
-
-    // Restore bans from database on startup
-    {
-        let bans = match database.get_all_bans() {
-            Ok(b) => b,
-            Err(e) => {
-                error!("Failed to get bans for restore: {}", e);
-                Vec::new()
-            }
-        };
-        
-        if !bans.is_empty() {
-            let ips: Vec<String> = bans.iter().map(|b| b.ip.clone()).collect();
-            let mut fw = firewall.lock().unwrap();
-            if let Err(e) = fw.restore_bans(&ips) {
-                error!("Failed to restore bans: {}", e);
-            }
-        }
-    }
+    let firewall = Arc::new(RwLock::new(firewall));
 
     // Initialize event emitter
-    let (event_emitter, event_receiver) = EventEmitter::new();
-    let event_emitter = Arc::new(event_emitter);
-    let event_receiver = Arc::new(Mutex::new(event_receiver));
-    info!("Event emitter initialized");
+    let event_emitter = Arc::new(EventEmitter::new(sqlite_events_db.clone()));
 
-    // Initialize event database
-    let event_db = Arc::new(EventDatabase::new()?);
-    info!("Event database initialized");
+    // Initialize config map
+    let configs: Arc<RwLock<ConfigMap>> = Arc::new(RwLock::new(ConfigMap::new()));
 
-    // Start event storage service
-    let event_storage = Arc::new(EventStorageService::new(event_receiver.clone(), event_db.clone()));
-    let event_storage_for_task = event_storage.clone();
-    let event_storage_handle = tokio::spawn(async move {
-        if let Err(e) = event_storage_for_task.start().await {
-            error!("Event storage service stopped with error: {:?}", e);
+    // Load existing configs from SQLite
+    {
+        let db = sqlite_configs_db.lock().await;
+        let existing_configs = db.get_all_configs()?;
+        let mut config_map = configs.write().await;
+        for config_record in existing_configs {
+            let ignore_ips: Vec<String> =
+                serde_json::from_str(&config_record.ignore_ips).unwrap_or_default();
+            let config = config::Config {
+                id: config_record.id.clone(),
+                name: config_record.name,
+                param: config_record.param,
+                regex: config_record.regex,
+                ban_time: config_record.ban_time,
+                find_time: config_record.find_time,
+                max_matches: config_record.max_matches,
+                ignore_ips,
+            };
+            config_map.insert(config_record.id, config);
         }
-    });
-    info!("Event storage service started");
-
-    // Initialize config manager (loads configs from database)
-    let config_manager = Arc::new(ConfigManager::new(database.clone())?);
-    info!("Config manager initialized");
+    }
 
     // Initialize watcher manager
     let watcher_manager = Arc::new(watcher_manager::WatcherManager::new(
-        config_manager.clone(),
-        database.clone(),
-        firewall.clone(),
+        sled_db.clone(),
         event_emitter.clone(),
+        firewall.clone(),
     ));
-    info!("Watcher manager initialized");
 
-    // Start watchers for all loaded configs
-    let configs = config_manager.list_configs();
-    let config_count = configs.len();
-    
-    // Log all configs with human-readable values
-    if config_count > 0 {
-        info!("Loaded {} configuration(s):", config_count);
-        for config in &configs {
-            let ban_time_str = format_duration(config.ban_time);
-            let find_time_str = format_duration(config.find_time);
-            let ignore_ips_str = if config.ignore_ips.is_empty() {
-                "none".to_string()
-            } else {
-                config.ignore_ips.join(", ")
-            };
-            
-            info!(
-                "  Config: {} (ID: {})\n    Path: {}\n    Regex: {}\n    Ban Time: {} ({} ms)\n    Find Time: {} ({} ms)\n    Max Matches: {}\n    Ignore IPs: {}",
-                config.name,
-                config.id,
-                config.param,
-                config.regex,
-                ban_time_str,
-                config.ban_time,
-                find_time_str,
-                config.find_time,
-                config.max_matches,
-                ignore_ips_str
-            );
-        }
-    }
-    
-    for config in configs {
-        let config_id = config.id.clone();
-        let watcher_manager_clone = watcher_manager.clone();
-        tokio::spawn(async move {
-            if let Err(e) = watcher_manager_clone.start_watcher(&config_id).await {
-                error!("Failed to start watcher for config {}: {}", config_id, e);
+    // Start watchers for existing configs
+    {
+        let configs_read = configs.read().await;
+        for (_, config) in configs_read.iter() {
+            if let Err(e) = watcher_manager.start_watcher(config.clone()).await {
+                warn!("Failed to start watcher for config {}: {}", config.id, e);
             }
-        });
-    }
-    if config_count > 0 {
-        info!("Starting {} watcher(s) for loaded configs", config_count);
+        }
     }
 
     // Initialize cleaner
-    let cleaner = cleaner::Cleaner::new(
-        config_manager.get_configs_arc(),
-        database.clone(),
-        firewall.clone(),
-        event_emitter.clone(),
-    );
-    info!("Cleaner initialized");
+    let cleaner = Arc::new(Cleaner::new(sled_db.clone(), configs.clone(), 60)); // Run every 60 seconds
 
-    // Start cleaner in background
-    let cleaner_handle = tokio::spawn(async move {
-        if let Err(e) = cleaner.start().await {
-            error!("Cleaner stopped with error: {:?}", e);
+    // Setup signal handling
+    let (shutdown_tx, _shutdown_rx) = broadcast::channel::<()>(16);
+    let shutdown_tx_cleaner = shutdown_tx.clone();
+
+    // Spawn cleaner task
+    let cleaner_handle = {
+        let cleaner = cleaner.clone();
+        let shutdown_rx_cleaner = shutdown_tx_cleaner.subscribe();
+        tokio::spawn(async move {
+            cleaner.run(shutdown_rx_cleaner).await;
+        })
+    };
+
+    // Setup graceful shutdown
+    let shutdown_tx_api = shutdown_tx.clone();
+    tokio::spawn(async move {
+        let ctrl_c = async {
+            tokio::signal::ctrl_c()
+                .await
+                .expect("Failed to install Ctrl+C handler");
+        };
+
+        #[cfg(unix)]
+        let terminate = async {
+            tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+                .expect("Failed to install signal handler")
+                .recv()
+                .await;
+        };
+
+        #[cfg(not(unix))]
+        let terminate = std::future::pending::<()>();
+
+        tokio::select! {
+            _ = ctrl_c => {
+                info!("Received Ctrl+C, shutting down...");
+            }
+            _ = terminate => {
+                info!("Received SIGTERM, shutting down...");
+            }
         }
+
+        let _ = shutdown_tx_api.send(());
     });
 
-    // Setup graceful shutdown handler
-    let firewall_clone = firewall.clone();
-    let watcher_manager_clone = watcher_manager.clone();
-    let config_manager_clone = config_manager.clone();
-    let event_storage_clone = event_storage.clone();
-    
-    // Wait for shutdown signal (SIGINT or SIGTERM)
-    // Docker sends SIGTERM on stop, Ctrl+C sends SIGINT
-    #[cfg(unix)]
-    {
-        let mut sigterm = unix_signal(SignalKind::terminate())
-            .expect("Failed to register SIGTERM handler");
-        let mut sigint = unix_signal(SignalKind::interrupt())
-            .expect("Failed to register SIGINT handler");
-        
-        tokio::select! {
-            _ = sigterm.recv() => {
-                info!("Received SIGTERM, cleaning up...");
-            }
-            _ = sigint.recv() => {
-                info!("Received SIGINT, cleaning up...");
-            }
-        }
-    }
-    #[cfg(not(unix))]
-    {
-        let _ = signal::ctrl_c().await;
-        info!("Received shutdown signal, cleaning up...");
-    }
-    
-    info!("Shutting down services...");
-    
-    // Signal event storage to shutdown
-    event_storage_clone.shutdown();
-    
+    // Create app state
+    let app_state = AppState {
+        sqlite_configs_db: sqlite_configs_db.clone(),
+        sqlite_events_db: sqlite_events_db.clone(),
+        sled_db: sled_db.clone(),
+        configs: configs.clone(),
+        watcher_manager: watcher_manager.clone(),
+    };
+
+    // Create API router
+    let app = create_router(app_state).layer(
+        ServiceBuilder::new()
+            .layer(CorsLayer::permissive())
+            .into_inner(),
+    );
+
+    // Start API server
+    info!("Starting API server on {}", api_addr);
+    let shutdown_rx_server = shutdown_tx.subscribe();
+    let server_handle = tokio::spawn(async move {
+        let listener = tokio::net::TcpListener::bind(&api_addr).await?;
+        let mut shutdown_rx = shutdown_rx_server;
+        axum::serve(listener, app)
+            .with_graceful_shutdown(async move {
+                shutdown_rx.recv().await.ok();
+            })
+            .await?;
+        Ok::<(), Box<dyn std::error::Error + Send + Sync>>(())
+    });
+
+    // Wait for shutdown signal
+    let mut shutdown_rx_main = shutdown_tx.subscribe();
+    let _ = shutdown_rx_main.recv().await;
+
+    info!("Shutting down...");
+
     // Stop all watchers
-    let configs = config_manager_clone.list_configs();
-    for config in configs {
-        watcher_manager_clone.stop_watcher(&config.id).await;
-    }
-    info!("All watchers stopped");
-    
-    // Abort background tasks (give them a moment to finish gracefully)
-    tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-    cleaner_handle.abort();
-    event_storage_handle.abort();
-    info!("Background tasks aborted");
-    
+    watcher_manager.stop_all().await;
+
+    // Stop cleaner
+    let _ = shutdown_tx.send(());
+
     // Cleanup firewall
-    if let Ok(fw) = firewall_clone.lock() {
+    {
+        let mut fw = firewall.write().await;
         if let Err(e) = fw.cleanup() {
-            error!("Failed to cleanup firewall: {}", e);
-        } else {
-            info!("Firewall cleaned up");
+            warn!("Firewall cleanup error: {}", e);
         }
     }
-    
-    info!("Cleanup complete, shutting down...");
+
+    // Wait for tasks to complete
+    let _ = tokio::time::timeout(tokio::time::Duration::from_secs(10), cleaner_handle).await;
+    let _ = tokio::time::timeout(tokio::time::Duration::from_secs(5), server_handle).await;
+
+    info!("Shutdown complete");
+
     Ok(())
 }
 
