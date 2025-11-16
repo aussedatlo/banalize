@@ -1,6 +1,134 @@
 version: 2
 updates:
+  # Root package.json (monorepo root)
   - package-ecosystem: "npm"
     directory: "/"
+    target-branch: "main"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "@banalize/*"
+          - "prettier*"
+          - "turbo"
+          - "gitmoji*"
+          - "eslint*"
+          - "typescript*"
+
+  # API app
+  - package-ecosystem: "npm"
+    directory: "/apps/api"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "api"
+
+  # Web app
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "web"
+
+  # CLI app
+  - package-ecosystem: "npm"
+    directory: "/apps/cli"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "cli"
+
+  # Packages
+  - package-ecosystem: "npm"
+    directory: "/packages"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "packages"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "@banalize/*"
+          - "eslint*"
+          - "typescript*"
+          - "stylelint*"
+
+  # Rust/Cargo dependencies
+  - package-ecosystem: "cargo"
+    directory: "/apps/core"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+      - "core"
+
+  # Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "docker"

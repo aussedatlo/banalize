@@ -60,3 +60,6 @@ coverage
 # docker overrides
 docker-compose.override.yml
 docker-compose.override.yaml
+
+# rust
+**/target/
