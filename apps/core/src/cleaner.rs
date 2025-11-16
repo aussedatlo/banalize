@@ -63,49 +63,55 @@ impl Cleaner {
     ) -> Result<()> {
         let now = get_millis_timestamp();
 
-        // Cleanup old matches for each config (older than find_time)
         let configs_snapshot = configs.lock().unwrap().clone();
         for (config_id, config) in configs_snapshot.iter() {
-            if let Ok(removed) = database.remove_old_matches(config_id, config.find_time) {
+            let cutoff = now.saturating_sub(config.find_time);
+            let matches = database.get_matches_for_config(config_id)?;
+            
+            // filter matches to remove older than cutoff
+            let matches_to_remove: Vec<_> = matches
+                .into_iter()
+                .filter(|m| m.timestamp < cutoff)
+                .collect();
+            
+            // remove old matches
+            if !matches_to_remove.is_empty() {
+                let removed = database.remove_matches(&matches_to_remove)?;
                 if removed > 0 {
                     info!("Removed {} old match(es) for config {}", removed, config_id);
                 }
             }
-        }
 
-        // Cleanup expired bans (older than ban_time from any config)
-        // We need to find the maximum ban_time across all configs
-        let max_ban_time = configs_snapshot
-            .values()
-            .map(|c| c.ban_time)
-            .max()
-            .unwrap_or(86400000); // Default 24 hours if no configs
-
-        let expired_bans = database.get_expired_bans(max_ban_time)?;
-        for ban in expired_bans {
-            info!("Removing expired ban for {}, timestamp {}", ban.ip, ban.timestamp);
-            database.remove_ban(&ban.ip, ban.timestamp)?;
+            // Cleanup expired bans for this config (older than ban_time)
+            let ban_cutoff = now.saturating_sub(config.ban_time);
+            let bans = database.get_bans_for_config(config_id)?;
             
-            // Use spawn_blocking for firewall operations (non-critical, low priority)
-            let firewall_clone = firewall.clone();
-            let ip = ban.ip.clone();
-            tokio::task::spawn_blocking(move || {
-                if let Ok(mut fw) = firewall_clone.lock() {
-                    if let Err(e) = fw.allow_ip_sync(&ip) {
-                        error!("Failed to allow IP in firewall: {}", e);
+            // filter bans to remove older than cutoff
+            let bans_to_remove: Vec<_> = bans
+                .into_iter()
+                .filter(|b| b.timestamp < ban_cutoff)
+                .collect();
+            
+            // process each expired ban (need individual processing for unban events)
+            for ban in bans_to_remove {
+                info!("Removing expired ban for {}, timestamp {}", ban.ip, ban.timestamp);
+                database.remove_ban(&ban.config_id, &ban.ip, ban.timestamp)?;
+                
+                // Use spawn_blocking for firewall operations (non-critical, low priority)
+                let firewall_clone = firewall.clone();
+                let ip = ban.ip.clone();
+                tokio::task::spawn_blocking(move || {
+                    if let Ok(mut fw) = firewall_clone.lock() {
+                        if let Err(e) = fw.allow_ip_sync(&ip) {
+                            error!("Failed to allow IP in firewall: {}", e);
+                        }
                     }
-                }
-            }).await?;
+                }).await?;
 
-            // Emit unban event (non-blocking, low priority)
-            // We need to find which config this ban belongs to
-            // For simplicity, we'll use the first config or a default
-            let config_id = configs_snapshot.keys().next()
-                .map(|k| k.clone())
-                .unwrap_or_else(|| "unknown".to_string());
-            
-            let unban_event = UnbanEvent::new(ban.ip.clone(), now, config_id);
-            event_emitter.emit_unban(unban_event);
+                // Emit unban event
+                let unban_event = UnbanEvent::new(ban.ip.clone(), now, ban.config_id.clone());
+                event_emitter.emit_unban(unban_event);
+            }
         }
 
         Ok(())

@@ -26,7 +26,8 @@ export function listBansCommand(): Command {
         response.bans.forEach((ban: BanRecord) => {
           const timestamp = Number(ban.timestamp);
           const date = isNaN(timestamp) ? null : new Date(timestamp);
-          console.log(chalk.bold(`IP: ${ban.ip}`));
+          console.log(chalk.bold(`Config: ${ban.config_id}`));
+          console.log(`  IP: ${ban.ip}`);
           console.log(`  Timestamp: ${ban.timestamp}`);
           console.log(
             `  Date: ${date && !isNaN(date.getTime()) ? date.toISOString() : "Invalid date"}`,

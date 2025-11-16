@@ -177,7 +177,7 @@ impl BanalizeCore for BanalizeCoreService {
         let mut found = false;
         for ban in bans {
             if ban.ip == req.ip {
-                if let Err(e) = self.database.remove_ban(&ban.ip, ban.timestamp) {
+                if let Err(e) = self.database.remove_ban(&ban.config_id, &ban.ip, ban.timestamp) {
                     error!("Failed to remove ban: {}", e);
                     return Ok(Response::new(UnbanResponse {
                         success: false,
@@ -268,6 +268,7 @@ impl BanalizeCore for BanalizeCoreService {
         let proto_bans: Vec<ProtoBanRecord> = bans
             .into_iter()
             .map(|ban| ProtoBanRecord {
+                config_id: ban.config_id,
                 ip: ban.ip,
                 timestamp: ban.timestamp,
             })

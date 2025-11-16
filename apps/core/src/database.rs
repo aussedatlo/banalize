@@ -21,6 +21,7 @@ pub struct MatchRecord {
 
 #[derive(Debug, Clone)]
 pub struct BanRecord {
+    pub config_id: String,
     pub ip: String,
     pub timestamp: u64,
 }
@@ -51,7 +52,7 @@ impl CoreDatabase {
 
 impl CoreDatabase {
     /// Create a match key: match:<config_id>:<ip>:<timestamp>
-    fn make_match_key(config_id: &str, ip: &str, timestamp: u64) -> String {
+    pub fn make_match_key(config_id: &str, ip: &str, timestamp: u64) -> String {
         format!("match:{}:{}:{}", config_id, ip, timestamp)
     }
 
@@ -72,25 +73,26 @@ impl CoreDatabase {
         Ok((config_id, ip, timestamp))
     }
 
-    /// Create a ban key: ban:<ip>:<timestamp>
-    fn make_ban_key(ip: &str, timestamp: u64) -> String {
-        format!("ban:{}:{}", ip, timestamp)
+    /// Create a ban key: ban:<config_id>:<ip>:<timestamp>
+    pub fn make_ban_key(config_id: &str, ip: &str, timestamp: u64) -> String {
+        format!("ban:{}:{}:{}", config_id, ip, timestamp)
     }
 
-    /// Parse a ban key: ban:<ip>:<timestamp>
-    fn parse_ban_key(key: &[u8]) -> anyhow::Result<(String, u64)> {
+    /// Parse a ban key: ban:<config_id>:<ip>:<timestamp>
+    fn parse_ban_key(key: &[u8]) -> anyhow::Result<(String, String, u64)> {
         let key_str = String::from_utf8_lossy(key);
         let parts: Vec<&str> = key_str.split(':').collect();
         
-        if parts.len() != 3 || parts[0] != "ban" {
+        if parts.len() != 4 || parts[0] != "ban" {
             return Err(anyhow::anyhow!("Invalid ban key format: {}", key_str));
         }
         
-        let ip = parts[1].to_string();
-        let timestamp = parts[2].parse::<u64>()
+        let config_id = parts[1].to_string();
+        let ip = parts[2].to_string();
+        let timestamp = parts[3].parse::<u64>()
             .map_err(|e| anyhow::anyhow!("Invalid timestamp in key: {}", e))?;
         
-        Ok((ip, timestamp))
+        Ok((config_id, ip, timestamp))
     }
 }
 
@@ -126,33 +128,31 @@ impl CoreDatabase {
         Ok(count)
     }
 
-    /// Remove old matches for a config_id (older than find_time)
-    pub fn remove_old_matches(&self, config_id: &str, find_time: u64) -> anyhow::Result<usize> {
-        let now = crate::time_utils::get_millis_timestamp();
-        let cutoff = now.saturating_sub(find_time);
-        
-        let mut removed = 0;
+
+    /// Get all matches for a specific config_id
+    pub fn get_matches_for_config(&self, config_id: &str) -> anyhow::Result<Vec<MatchRecord>> {
+        let mut matches = Vec::new();
         let prefix = format!("match:{}:", config_id);
 
-        let keys_to_remove: Vec<Vec<u8>> = self.matches_tree
-            .scan_prefix(prefix)
-            .filter_map(|result| {
-                let (key, _) = result.ok()?;
-                if let Ok((_, _, timestamp)) = Self::parse_match_key(&key) {
-                    if timestamp < cutoff {
-                        return Some(key.to_vec());
-                    }
-                }
-                None
-            })
-            .collect();
+        for result in self.matches_tree.scan_prefix(prefix) {
+            let (key, _) = result?;
+            if let Ok((config_id, ip, timestamp)) = Self::parse_match_key(&key) {
+                matches.push(MatchRecord { config_id, ip, timestamp });
+            }
+        }
 
-        for key in keys_to_remove {
+        Ok(matches)
+    }
+
+    /// Remove matches by their records
+    pub fn remove_matches(&self, matches: &[MatchRecord]) -> anyhow::Result<usize> {
+        let mut removed = 0;
+        for record in matches {
+            let key = Self::make_match_key(&record.config_id, &record.ip, record.timestamp);
             if self.matches_tree.remove(key).is_ok() {
                 removed += 1;
             }
         }
-
         Ok(removed)
     }
 
@@ -177,45 +177,61 @@ impl CoreDatabase {
 // ============================================================================
 
 impl CoreDatabase {
-    /// Check if an IP is currently banned
+    /// Check if an IP is currently banned (in any config)
     pub fn is_banned(&self, ip: &str) -> anyhow::Result<bool> {
-        let prefix = format!("ban:{}:", ip);
-        Ok(self.bans_tree.scan_prefix(prefix).next().is_some())
+        // Scan all bans and check if any match the IP
+        for result in self.bans_tree.iter() {
+            let (key, _) = result?;
+            if let Ok((_, ban_ip, _)) = Self::parse_ban_key(&key) {
+                if ban_ip == ip {
+                    return Ok(true);
+                }
+            }
+        }
+        Ok(false)
     }
 
-    /// Add a ban record for an IP
-    pub fn add_ban(&self, ip: &str, timestamp: u64) -> anyhow::Result<()> {
-        let key = Self::make_ban_key(ip, timestamp);
+    /// Add a ban record for an IP and config
+    pub fn add_ban(&self, config_id: &str, ip: &str, timestamp: u64) -> anyhow::Result<()> {
+        let key = Self::make_ban_key(config_id, ip, timestamp);
         self.bans_tree.insert(key, b"")?;
         Ok(())
     }
 
-    /// Remove a ban record for an IP
-    pub fn remove_ban(&self, ip: &str, timestamp: u64) -> anyhow::Result<()> {
-        let key = Self::make_ban_key(ip, timestamp);
+    /// Remove a ban record for an IP and config
+    pub fn remove_ban(&self, config_id: &str, ip: &str, timestamp: u64) -> anyhow::Result<()> {
+        let key = Self::make_ban_key(config_id, ip, timestamp);
         if self.bans_tree.remove(key)?.is_none() {
             warn!("Ban not found");
         }
         Ok(())
     }
 
-    /// Get all bans older than ban_time
-    pub fn get_expired_bans(&self, ban_time: u64) -> anyhow::Result<Vec<BanRecord>> {
-        let now = crate::time_utils::get_millis_timestamp();
-        let cutoff = now.saturating_sub(ban_time);
-        
-        let mut expired_bans = Vec::new();
+    /// Get all bans for a specific config_id
+    pub fn get_bans_for_config(&self, config_id: &str) -> anyhow::Result<Vec<BanRecord>> {
+        let mut bans = Vec::new();
+        let prefix = format!("ban:{}:", config_id);
 
-        for result in self.bans_tree.iter() {
+        for result in self.bans_tree.scan_prefix(prefix) {
             let (key, _) = result?;
-            if let Ok((ip, timestamp)) = Self::parse_ban_key(&key) {
-                if timestamp < cutoff {
-                    expired_bans.push(BanRecord { ip, timestamp });
-                }
+            if let Ok((config_id, ip, timestamp)) = Self::parse_ban_key(&key) {
+                bans.push(BanRecord { config_id, ip, timestamp });
             }
         }
 
-        Ok(expired_bans)
+        Ok(bans)
+    }
+
+    /// Remove bans by their records
+    pub fn remove_bans(&self, bans: &[BanRecord]) -> anyhow::Result<usize> {
+        let mut removed = 0;
+        for record in bans {
+            let key = Self::make_ban_key(&record.config_id, &record.ip, record.timestamp);
+            if self.bans_tree.remove(key).is_ok() {
+                removed += 1;
+            }
+        }
+        Ok(removed)
     }
 
     /// Get all active bans (not expired)
@@ -224,8 +240,8 @@ impl CoreDatabase {
 
         for result in self.bans_tree.iter() {
             let (key, _) = result?;
-            if let Ok((ip, timestamp)) = Self::parse_ban_key(&key) {
-                all_bans.push(BanRecord { ip, timestamp });
+            if let Ok((config_id, ip, timestamp)) = Self::parse_ban_key(&key) {
+                all_bans.push(BanRecord { config_id, ip, timestamp });
             }
         }
 

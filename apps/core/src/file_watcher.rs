@@ -93,7 +93,7 @@ impl FileWatcher {
         info!("Banning IP: {} at timestamp: {}", ip, timestamp);
 
         // Add ban to database
-        if let Err(e) = database.add_ban(ip, timestamp) {
+        if let Err(e) = database.add_ban(&config.id, ip, timestamp) {
             error!("Failed to add ban to database: {}", e);
             return;
         }

@@ -109,8 +109,9 @@ message ListCurrentBansResponse {
 }
 
 message BanRecord {
-  string ip = 1;
-  uint64 timestamp = 2;
+  string config_id = 1;
+  string ip = 2;
+  uint64 timestamp = 3;
 }
 
 message ListCurrentMatchesRequest {}
