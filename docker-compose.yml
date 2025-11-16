@@ -1,4 +1,21 @@
 services:
+  core:
+    image: banalize-core:0.0.1-beta
+    container_name: banalize-core
+    restart: unless-stopped
+    network_mode: "host"
+    stop_grace_period: 30s
+    build:
+      context: .
+      dockerfile: apps/core/Dockerfile
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      BANALIZE_CORE_API_FIREWALL_CHAIN: FORWARD
+      BANALIZE_CORE_GRPC_ADDR: 0.0.0.0:50051
+      BANALIZE_CORE_LOG_LEVEL: INFO
+
   mongodb:
     image: mongo:latest
     container_name: banalize-mongodb
