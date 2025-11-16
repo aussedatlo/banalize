@@ -245,6 +245,20 @@ impl SqliteDatabase {
         })
     }
 
+    pub fn get_ban_event_by_id(&self, id: &str) -> SqliteResult<Option<BanEvent>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id, config_id, ip, timestamp FROM ban_events WHERE id = ?1"
+        )?;
+        
+        let mut rows = stmt.query_map(rusqlite::params![id], Self::map_ban_event)?;
+        
+        if let Some(row) = rows.next() {
+            Ok(Some(row?))
+        } else {
+            Ok(None)
+        }
+    }
+
     pub fn get_ban_events(&self, config_id: Option<&str>) -> SqliteResult<Vec<BanEvent>> {
         let mut events = Vec::new();
         

@@ -140,13 +140,12 @@ impl Watcher {
             .await;
 
         // Check if we need to ban
-        let find_time_start = timestamp.saturating_sub(self.config.find_time);
         match self
             .sled_db
-            .count_matches_in_window(&self.config.id, &ip, find_time_start, timestamp)
+            .get_matches_for_config(&self.config.id)
         {
-            Ok(count) => {
-                if count >= self.config.max_matches as u32 {
+            Ok(matches) => {
+                if matches.len() >= self.config.max_matches as usize {
                     // Check if already banned
                     match self.sled_db.is_banned(&self.config.id, &ip) {
                         Ok(true) => {

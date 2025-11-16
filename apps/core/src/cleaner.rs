@@ -1,12 +1,14 @@
 use crate::config::ConfigMap;
 use crate::database::SledDatabase;
+use crate::events::EventEmitter;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 pub struct Cleaner {
     sled_db: Arc<SledDatabase>,
     configs: Arc<RwLock<ConfigMap>>,
+    event_emitter: Arc<EventEmitter>,
     interval_secs: u64,
 }
 
@@ -14,11 +16,13 @@ impl Cleaner {
     pub fn new(
         sled_db: Arc<SledDatabase>,
         configs: Arc<RwLock<ConfigMap>>,
+        event_emitter: Arc<EventEmitter>,
         interval_secs: u64,
     ) -> Self {
         Self {
             sled_db,
             configs,
+            event_emitter,
             interval_secs,
         }
     }
@@ -44,6 +48,7 @@ impl Cleaner {
     }
 
     async fn cleanup(&self) -> Result<(), String> {
+        debug!("Cleaning up...");
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
@@ -54,24 +59,28 @@ impl Cleaner {
         // Clean matches: remove entries older than find_time for each config
         for (config_id, config) in configs.iter() {
             let cutoff = now.saturating_sub(config.find_time);
-            match self.sled_db.get_old_matches(cutoff) {
-                Ok(old_matches) => {
-                    let mut count = 0;
-                    for (match_config_id, _, key, _) in old_matches {
-                        if match_config_id == *config_id {
+            match self.sled_db.get_matches_for_config(config_id) {
+                Ok(matches) => {
+                    debug!("Matches: {:?}", matches);
+                    let mut removed_count = 0;
+                    for (ip_str, timestamp) in matches {
+                        if timestamp < cutoff {
+                            // Reconstruct the key to remove it
+                            // Key format: match:<config_id>:<ip>:<timestamp>
+                            let key = format!("match:{}:{}:{}", config_id, ip_str, timestamp);
                             if let Err(e) = self.sled_db.remove_match_by_key(&key) {
                                 warn!("Failed to remove old match {}: {}", key, e);
                             } else {
-                                count += 1;
+                                removed_count += 1;
                             }
                         }
                     }
-                    if count > 0 {
-                        info!("Cleaned {} old matches for config {}", count, config_id);
+                    if removed_count > 0 {
+                        info!("Cleaned {} old matches for config {}", removed_count, config_id);
                     }
                 }
                 Err(e) => {
-                    warn!("Failed to get old matches for config {}: {}", config_id, e);
+                    warn!("Failed to get matches for config {}: {}", config_id, e);
                 }
             }
         }
@@ -79,30 +88,41 @@ impl Cleaner {
         // Clean bans: remove entries older than ban_time for each config
         for (config_id, config) in configs.iter() {
             let cutoff = now.saturating_sub(config.ban_time);
-            match self.sled_db.get_old_bans(cutoff) {
-                Ok(old_bans) => {
-                    let mut count = 0;
-                    for (ban_config_id, ip_str, key, _) in old_bans {
-                        if ban_config_id == *config_id {
+            match self.sled_db.get_bans_for_config(config_id) {
+                Ok(bans) => {
+                    debug!("Bans: {:?}", bans);
+                    let mut removed_count = 0;
+                    for (ip_str, timestamp) in bans {
+                        if timestamp < cutoff {
+                            // Reconstruct the key to remove it
+                            // Key format: ban:<config_id>:<ip>:<timestamp>
+                            let key = format!("ban:{}:{}:{}", config_id, ip_str, timestamp);
                             if let Err(e) = self.sled_db.remove_ban_by_key(&key) {
                                 warn!("Failed to remove old ban {}: {}", key, e);
                             } else {
-                                count += 1;
-                                // Also remove from firewall
-                                if let Ok(ip) = ip_str.parse::<std::net::IpAddr>() {
-                                    // Note: We'd need firewall access here, but for now we'll just log
-                                    // The firewall rules will be cleaned up separately if needed
-                                    info!("Ban expired for IP {} in config {}", ip, config_id);
-                                }
+                                removed_count += 1;
+                                
+                                // Emit unban event using EventEmitter (handles DB insertion and firewall unban asynchronously)
+                                let event_emitter = self.event_emitter.clone();
+                                let config_id_clone = config_id.clone();
+                                let ip_str_clone = ip_str.clone();
+                                let unban_timestamp = now;
+                                event_emitter
+                                    .emit(crate::events::Event::Unban {
+                                        config_id: config_id_clone,
+                                        ip: ip_str_clone,
+                                        timestamp: unban_timestamp,
+                                    })
+                                    .await;
                             }
                         }
                     }
-                    if count > 0 {
-                        info!("Cleaned {} old bans for config {}", count, config_id);
+                    if removed_count > 0 {
+                        info!("Cleaned {} old bans for config {}", removed_count, config_id);
                     }
                 }
                 Err(e) => {
-                    warn!("Failed to get old bans for config {}: {}", config_id, e);
+                    warn!("Failed to get bans for config {}: {}", config_id, e);
                 }
             }
         }

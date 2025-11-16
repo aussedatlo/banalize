@@ -2,8 +2,8 @@ use sled::Db;
 use std::net::IpAddr;
 use std::path::Path;
 
-const MATCH_PREFIX: &str = "match:";
-const BAN_PREFIX: &str = "ban:";
+const MATCH_PREFIX: &str = "match";
+const BAN_PREFIX: &str = "ban";
 
 pub struct SledDatabase {
     db: Db,
@@ -63,82 +63,11 @@ impl SledDatabase {
         Ok(())
     }
 
-    /// Get all matches for a config_id and ip within a time window
-    /// Returns count of matches
-    pub fn count_matches_in_window(
-        &self,
-        config_id: &str,
-        ip: &IpAddr,
-        start_time: u64,
-        end_time: u64,
-    ) -> Result<u32, sled::Error> {
-        let prefix = format!("{}:{}:{}:", MATCH_PREFIX, config_id, ip);
-        let start_key = format!("{}{}", prefix, start_time);
-        let end_key = format!("{}{}", prefix, end_time);
-
-        let mut count = 0;
-        for item in self.db.range(start_key.as_bytes()..=end_key.as_bytes()) {
-            let _ = item?;
-            count += 1;
-        }
-        Ok(count)
-    }
-
     /// Check if an IP is currently banned for a config
     pub fn is_banned(&self, config_id: &str, ip: &IpAddr) -> Result<bool, sled::Error> {
         let prefix = format!("{}:{}:{}:", BAN_PREFIX, config_id, ip);
         let mut iter = self.db.scan_prefix(prefix.as_bytes());
         Ok(iter.next().is_some())
-    }
-
-    /// Get all match entries older than a timestamp (for cleanup)
-    pub fn get_old_matches(&self, before_timestamp: u64) -> Result<Vec<(String, String, String, u64)>, sled::Error> {
-        let mut results = Vec::new();
-        let prefix = MATCH_PREFIX.as_bytes();
-        
-        for item in self.db.scan_prefix(prefix) {
-            let (key, _) = item?;
-            let key_str = String::from_utf8_lossy(&key);
-            let parts: Vec<&str> = key_str.split(':').collect();
-            if parts.len() >= 4 {
-                if let Ok(ts) = parts[3].parse::<u64>() {
-                    if ts < before_timestamp {
-                        results.push((
-                            parts[1].to_string(), // config_id
-                            parts[2].to_string(), // ip
-                            key_str.to_string(),   // full key
-                            ts,
-                        ));
-                    }
-                }
-            }
-        }
-        Ok(results)
-    }
-
-    /// Get all ban entries older than a timestamp (for cleanup)
-    pub fn get_old_bans(&self, before_timestamp: u64) -> Result<Vec<(String, String, String, u64)>, sled::Error> {
-        let mut results = Vec::new();
-        let prefix = BAN_PREFIX.as_bytes();
-        
-        for item in self.db.scan_prefix(prefix) {
-            let (key, _) = item?;
-            let key_str = String::from_utf8_lossy(&key);
-            let parts: Vec<&str> = key_str.split(':').collect();
-            if parts.len() >= 4 {
-                if let Ok(ts) = parts[3].parse::<u64>() {
-                    if ts < before_timestamp {
-                        results.push((
-                            parts[1].to_string(), // config_id
-                            parts[2].to_string(), // ip
-                            key_str.to_string(),   // full key
-                            ts,
-                        ));
-                    }
-                }
-            }
-        }
-        Ok(results)
     }
 
     /// Remove a match by full key

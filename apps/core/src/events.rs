@@ -1,7 +1,9 @@
 use crate::database::{BanEvent, MatchEvent, SqliteDatabase, UnbanEvent};
+use crate::firewall::Firewall;
+use std::net::IpAddr;
 use std::sync::Arc;
-use tokio::sync::Mutex;
-use tracing::{error, info};
+use tokio::sync::{Mutex, RwLock};
+use tracing::{error, info, warn};
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
@@ -25,18 +27,23 @@ pub enum Event {
 
 pub struct EventEmitter {
     sqlite_db: Arc<Mutex<SqliteDatabase>>,
+    firewall: Arc<RwLock<Firewall>>,
 }
 
 impl EventEmitter {
-    pub fn new(sqlite_db: Arc<Mutex<SqliteDatabase>>) -> Self {
-        Self { sqlite_db }
+    pub fn new(
+        sqlite_db: Arc<Mutex<SqliteDatabase>>,
+        firewall: Arc<RwLock<Firewall>>,
+    ) -> Self {
+        Self { sqlite_db, firewall }
     }
 
     /// Emit an event asynchronously (non-blocking)
     pub async fn emit(&self, event: Event) {
         let db = self.sqlite_db.clone();
+        let firewall = self.firewall.clone();
         tokio::spawn(async move {
-            if let Err(e) = Self::handle_event(db, event).await {
+            if let Err(e) = Self::handle_event(db, firewall, event).await {
                 error!("Failed to handle event: {}", e);
             }
         });
@@ -44,6 +51,7 @@ impl EventEmitter {
 
     async fn handle_event(
         db: Arc<Mutex<SqliteDatabase>>,
+        firewall: Arc<RwLock<Firewall>>,
         event: Event,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         match event {
@@ -82,6 +90,15 @@ impl EventEmitter {
                 ip,
                 timestamp,
             } => {
+                // Remove firewall rule first
+                if let Ok(ip_addr) = ip.parse::<IpAddr>() {
+                    let fw = firewall.read().await;
+                    if let Err(e) = fw.allow_ip_sync(&ip_addr) {
+                        warn!("Failed to remove firewall rule for unban {}: {}", ip, e);
+                        // Continue anyway, we'll still create the unban event
+                    }
+                }
+                
                 let event = UnbanEvent {
                     id: Uuid::new_v4().to_string(),
                     config_id,

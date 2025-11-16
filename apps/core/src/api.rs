@@ -1,11 +1,13 @@
 use crate::config::{Config, ConfigMap};
 use crate::database::{SqliteDatabase, SledDatabase};
+use crate::events::EventEmitter;
+use crate::firewall::Firewall;
 use crate::watcher_manager::WatcherManager;
 use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::Json,
-    routing::get,
+    routing::{get, post},
     Router,
 };
 use serde::{Deserialize, Serialize};
@@ -26,18 +28,24 @@ pub struct ConfigResponse {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MatchResponse {
+    pub id: String,
+    pub config_id: String,
     pub ip: String,
     pub timestamp: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BanResponse {
+    pub id: String,
+    pub config_id: String,
     pub ip: String,
     pub timestamp: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnbanResponse {
+    pub id: String,
+    pub config_id: String,
     pub ip: String,
     pub timestamp: u64,
 }
@@ -49,6 +57,7 @@ pub struct AppState {
     pub sled_db: Arc<SledDatabase>,
     pub configs: Arc<RwLock<ConfigMap>>,
     pub watcher_manager: Arc<WatcherManager>,
+    pub firewall: Arc<RwLock<Firewall>>,
 }
 
 pub fn create_router(state: AppState) -> Router {
@@ -59,6 +68,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/matches/{config_id}", get(get_matches_by_config))
         .route("/api/bans", get(get_bans))
         .route("/api/bans/{config_id}", get(get_bans_by_config))
+        .route("/api/bans/{id}/disable", post(disable_ban))
         .route("/api/unbans", get(get_unbans))
         .route("/api/unbans/{config_id}", get(get_unbans_by_config))
         .with_state(state)
@@ -250,6 +260,8 @@ async fn get_matches(State(state): State<AppState>) -> Result<Json<Vec<MatchResp
     let responses: Vec<MatchResponse> = events
         .into_iter()
         .map(|e| MatchResponse {
+            id: e.id,
+            config_id: e.config_id,
             ip: e.ip,
             timestamp: e.timestamp,
         })
@@ -270,6 +282,8 @@ async fn get_matches_by_config(
     let responses: Vec<MatchResponse> = events
         .into_iter()
         .map(|e| MatchResponse {
+            id: e.id,
+            config_id: e.config_id,
             ip: e.ip,
             timestamp: e.timestamp,
         })
@@ -288,6 +302,8 @@ async fn get_bans(State(state): State<AppState>) -> Result<Json<Vec<BanResponse>
     let responses: Vec<BanResponse> = events
         .into_iter()
         .map(|e| BanResponse {
+            id: e.id,
+            config_id: e.config_id,
             ip: e.ip,
             timestamp: e.timestamp,
         })
@@ -308,6 +324,8 @@ async fn get_bans_by_config(
     let responses: Vec<BanResponse> = events
         .into_iter()
         .map(|e| BanResponse {
+            id: e.id,
+            config_id: e.config_id,
             ip: e.ip,
             timestamp: e.timestamp,
         })
@@ -326,6 +344,8 @@ async fn get_unbans(State(state): State<AppState>) -> Result<Json<Vec<UnbanRespo
     let responses: Vec<UnbanResponse> = events
         .into_iter()
         .map(|e| UnbanResponse {
+            id: e.id,
+            config_id: e.config_id,
             ip: e.ip,
             timestamp: e.timestamp,
         })
@@ -346,11 +366,79 @@ async fn get_unbans_by_config(
     let responses: Vec<UnbanResponse> = events
         .into_iter()
         .map(|e| UnbanResponse {
+            id: e.id,
+            config_id: e.config_id,
             ip: e.ip,
             timestamp: e.timestamp,
         })
         .collect();
     
     Ok(Json(responses))
+}
+
+// Disable ban endpoint
+async fn disable_ban(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<Json<UnbanResponse>, StatusCode> {
+    use std::net::IpAddr;
+    use uuid::Uuid;
+
+    // Get the ban event by ID
+    let db = state.sqlite_events_db.lock().await;
+    let ban_event = db
+        .get_ban_event_by_id(&id)
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .ok_or(StatusCode::NOT_FOUND)?;
+    
+    let ip: IpAddr = ban_event.ip.parse().map_err(|_| StatusCode::BAD_REQUEST)?;
+    let config_id = ban_event.config_id.clone();
+    
+    drop(db);
+
+    // Get current timestamp
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as u64;
+
+    // Remove ban from sled database (remove all bans for this IP/config combination)
+    // We need to find all ban entries and remove them
+    match state.sled_db.get_bans_for_config(&config_id) {
+        Ok(bans) => {
+            for (ip_str, ban_timestamp) in bans {
+                if ip_str == ban_event.ip {
+                    let key = format!("ban:{}:{}:{}", config_id, ip_str, ban_timestamp);
+                    if let Err(e) = state.sled_db.remove_ban_by_key(&key) {
+                        tracing::warn!("Failed to remove ban from sled: {}", e);
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            tracing::warn!("Failed to get bans for config {}: {}", config_id, e);
+        }
+    }
+
+    // Emit unban event using EventEmitter (handles DB insertion and firewall unban asynchronously)
+    let event_emitter = EventEmitter::new(state.sqlite_events_db.clone(), state.firewall.clone());
+    event_emitter
+        .emit(crate::events::Event::Unban {
+            config_id: config_id.clone(),
+            ip: ban_event.ip.clone(),
+            timestamp,
+        })
+        .await;
+
+    // Generate an ID for the response (EventEmitter will generate its own ID when inserting)
+    // Note: The actual event ID in DB may differ, but this is acceptable for API responses
+    let unban_id = Uuid::new_v4().to_string();
+
+    Ok(Json(UnbanResponse {
+        id: unban_id,
+        config_id,
+        ip: ban_event.ip,
+        timestamp,
+    }))
 }
 

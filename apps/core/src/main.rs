@@ -20,7 +20,7 @@ use std::sync::Arc;
 use tokio::sync::{broadcast, RwLock};
 use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
-use tracing::{error, info, warn};
+use tracing::{info, warn};
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
@@ -72,7 +72,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let firewall = Arc::new(RwLock::new(firewall));
 
     // Initialize event emitter
-    let event_emitter = Arc::new(EventEmitter::new(sqlite_events_db.clone()));
+    let event_emitter = Arc::new(EventEmitter::new(sqlite_events_db.clone(), firewall.clone()));
 
     // Initialize config map
     let configs: Arc<RwLock<ConfigMap>> = Arc::new(RwLock::new(ConfigMap::new()));
@@ -117,7 +117,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Initialize cleaner
-    let cleaner = Arc::new(Cleaner::new(sled_db.clone(), configs.clone(), 60)); // Run every 60 seconds
+    let cleaner = Arc::new(Cleaner::new(
+        sled_db.clone(),
+        configs.clone(),
+        event_emitter.clone(),
+        30,
+    )); // Run every 30 seconds
 
     // Setup signal handling
     let (shutdown_tx, _shutdown_rx) = broadcast::channel::<()>(16);
@@ -171,6 +176,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         sled_db: sled_db.clone(),
         configs: configs.clone(),
         watcher_manager: watcher_manager.clone(),
+        firewall: firewall.clone(),
     };
 
     // Create API router
