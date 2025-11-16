@@ -8,9 +8,6 @@ edition = "2021"
 tokio = { version = "1.35", features = ["full"] }
 tokio-stream = "0.1"
 
-# File watching
-notify = "6.1"
-
 # Database
 sled = "0.34"
 
@@ -38,13 +35,9 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Error handling
 anyhow = "1.0"
-thiserror = "1.0"
 
 # IP address handling
 ipnet = "2.9"
-
-# Command execution
-which = "5.0"
 
 # UUID generation for event IDs
 uuid = { version = "1.6", features = ["v4"] }
