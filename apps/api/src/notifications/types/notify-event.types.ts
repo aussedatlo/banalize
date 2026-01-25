@@ -5,5 +5,6 @@ export class NotifyEvent {
     readonly type: EventType,
     readonly title: string,
     readonly message: string,
+    readonly html?: string,
   ) {}
 }

@@ -162,7 +162,7 @@ export class MatchEventHandlerService implements OnModuleInit {
       this.logger.warn(`Requesting ban creation for IP ${ip}`);
       this.eventEmitter.emit(
         Events.BAN_CREATION_REQUESTED,
-        new BanEvent(ip, config),
+        new BanEvent(ip, config, line, totalCount),
       );
     }
 

@@ -6,5 +6,6 @@ import { IpInfosService } from "./services/ip-infos.service";
   imports: [],
   controllers: [IpInfosController],
   providers: [IpInfosService],
+  exports: [IpInfosService],
 })
 export class IpInfosModule {}
