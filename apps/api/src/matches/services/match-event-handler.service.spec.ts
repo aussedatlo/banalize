@@ -2,6 +2,7 @@ import { ConfigSchema } from "@banalize/types";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import { BanEvent } from "src/bans/types/ban-event.types";
+import { ConfigsService } from "src/configs/configs.service";
 import { Events } from "src/shared/enums/events.enum";
 import { QueuePriority } from "src/shared/enums/priority.enum";
 import { QueueService } from "src/shared/services/queue.service";
@@ -17,8 +18,12 @@ describe("MatchEventHandlerService", () => {
   let queueService: QueueService;
 
   const mockMatchesService = {
-    findAll: vi.fn(),
+    findAll: vi.fn().mockResolvedValue({ matches: [], totalCount: 0 }),
     create: vi.fn(),
+  };
+
+  const mockConfigsService = {
+    findAll: vi.fn().mockResolvedValue([]),
   };
 
   const mockEventEmitter = {
@@ -36,6 +41,10 @@ describe("MatchEventHandlerService", () => {
         {
           provide: MatchesService,
           useValue: mockMatchesService,
+        },
+        {
+          provide: ConfigsService,
+          useValue: mockConfigsService,
         },
         {
           provide: EventEmitter2,
@@ -85,7 +94,7 @@ describe("MatchEventHandlerService", () => {
   });
 
   describe("handleCacheAndImmediateCheck", () => {
-    it("should handle ignored IPs", async () => {
+    it("should not ban if below threshold", async () => {
       const event = new MatchEvent("test line", "192.168.1.1", {
         _id: "123",
         name: "test",
@@ -101,25 +110,24 @@ describe("MatchEventHandlerService", () => {
       await service.handleCacheAndImmediateCheck(event);
 
       expect(queueService.enqueue).toHaveBeenCalledWith(
-        expect.objectContaining({ ignored: true }),
+        expect.objectContaining({ banned: false }),
         service.createMatch,
         QueuePriority.MEDIUM,
       );
     });
 
-    it("should handle cache miss and ban IP when threshold reached", async () => {
+    it("should ban when threshold reached in cache", async () => {
       const event = new MatchEvent("test line", "192.168.1.1", {
         _id: "123",
         name: "test",
         param: "test",
         regex: "test",
         banTime: 3600,
-        maxMatches: 5,
+        maxMatches: 1,
         ignoreIps: [],
         findTime: 1000,
         watcherType: "test",
       } as ConfigSchema);
-      mockMatchesService.findAll.mockResolvedValue({ totalCount: 4 });
 
       await service.handleCacheAndImmediateCheck(event);
 
@@ -197,14 +205,14 @@ describe("MatchEventHandlerService", () => {
       );
     });
 
-    it("should ban if 2 events arrive at the same time with already one match on database", async () => {
+    it("should ban if 2 events arrive for maxMatches=2", async () => {
       const config = {
         _id: "123",
         name: "test",
         param: "test",
         regex: "test",
         banTime: 3600,
-        maxMatches: 3,
+        maxMatches: 2,
         ignoreIps: [],
         findTime: 1000,
         watcherType: "test",
@@ -212,8 +220,6 @@ describe("MatchEventHandlerService", () => {
 
       const event1 = new MatchEvent("test line 1", "192.168.1.1", config);
       const event2 = new MatchEvent("test line 2", "192.168.1.1", config);
-
-      mockMatchesService.findAll.mockResolvedValue({ totalCount: 1 });
 
       await service.handleCacheAndImmediateCheck(event1);
       await service.handleCacheAndImmediateCheck(event2);
@@ -223,64 +229,6 @@ describe("MatchEventHandlerService", () => {
       });
       expect(queueService.enqueue).toHaveBeenLastCalledWith(
         expect.objectContaining({ banned: true }),
-        service.createMatch,
-        QueuePriority.MEDIUM,
-      );
-    });
-
-    it("should ban if 1 event arrive at the same time with already two matches on database", async () => {
-      const config = {
-        _id: "123",
-        name: "test",
-        param: "test",
-        regex: "test",
-        banTime: 3600,
-        maxMatches: 3,
-        ignoreIps: [],
-        findTime: 1000,
-        watcherType: "test",
-      } as ConfigSchema;
-
-      const event = new MatchEvent("test line 1", "192.168.1.1", config);
-
-      mockMatchesService.findAll.mockResolvedValue({ totalCount: 2 });
-
-      await service.handleCacheAndImmediateCheck(event);
-
-      expect(eventEmitter.emit).toHaveBeenCalledWith(Events.FIREWALL_DENY, {
-        ip: "192.168.1.1",
-      });
-      expect(queueService.enqueue).toHaveBeenLastCalledWith(
-        expect.objectContaining({ banned: true }),
-        service.createMatch,
-        QueuePriority.MEDIUM,
-      );
-    });
-
-    it("should not ban if 1 event arrive at the same time with already one match on database", async () => {
-      const config = {
-        _id: "123",
-        name: "test",
-        param: "test",
-        regex: "test",
-        banTime: 3600,
-        maxMatches: 3,
-        ignoreIps: [],
-        findTime: 1000,
-        watcherType: "test",
-      } as ConfigSchema;
-
-      const event = new MatchEvent("test line 1", "192.168.1.1", config);
-
-      mockMatchesService.findAll.mockResolvedValue({ totalCount: 1 });
-
-      await service.handleCacheAndImmediateCheck(event);
-
-      expect(eventEmitter.emit).not.toHaveBeenCalledWith(Events.FIREWALL_DENY, {
-        ip: "192.168.1.1",
-      });
-      expect(queueService.enqueue).toHaveBeenLastCalledWith(
-        expect.objectContaining({ banned: false }),
         service.createMatch,
         QueuePriority.MEDIUM,
       );
@@ -304,8 +252,7 @@ describe("MatchEventHandlerService", () => {
           watcherType: "test",
         } as ConfigSchema,
         Date.now(),
-        false,
-        true,
+        true, // banned
       );
 
       await service.createMatch(event);
@@ -332,11 +279,10 @@ describe("MatchEventHandlerService", () => {
           regex: "test",
           banTime: 3600,
           maxMatches: 5,
-          ignoreIps: [],
+          ignoreIps: ["192.168.1.1"], // ignored IP
         } as ConfigSchema,
         Date.now(),
-        true,
-        false,
+        true, // banned
       );
 
       await service.createMatch(event);
