@@ -13,7 +13,7 @@ export class EmailNotifierService implements Notifier {
     );
   }
 
-  async notify({ message, title }: Notification): Promise<boolean> {
+  async notify({ message, title, html }: Notification): Promise<boolean> {
     this.logger.debug(`EmailNotifierService: ${message}`);
     const { username, password, port, server, recipientEmail } =
       this.config.emailConfig;
@@ -34,6 +34,7 @@ export class EmailNotifierService implements Notifier {
         to: recipientEmail,
         subject: title,
         text: message,
+        html: html ?? undefined,
       });
       return true;
     } catch (_) {

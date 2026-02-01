@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { IpInfosModule } from "src/ip-infos/ip-infos.module";
 import { SharedModule } from "src/shared/shared.module";
 import { NotificationsController } from "./notifications.controller";
 import { NotifierFactory } from "./notifier-factory";
@@ -14,6 +15,7 @@ import { NotifierTestService } from "./services/notifier-test-service.service";
 
 @Module({
   imports: [
+    IpInfosModule,
     MongooseModule.forFeature([
       {
         name: NotifierConfigSchema.name,

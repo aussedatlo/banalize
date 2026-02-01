@@ -159,10 +159,11 @@ export class MatchEventHandlerService implements OnModuleInit {
     }
 
     if (banned) {
+      const totalCount = this.matchesCache[config._id]?.[ip]?.length ?? 0;
       this.logger.warn(`Requesting ban creation for IP ${ip}`);
       this.eventEmitter.emit(
         Events.BAN_CREATION_REQUESTED,
-        new BanEvent(ip, config),
+        new BanEvent(ip, config, line, totalCount),
       );
     }
 

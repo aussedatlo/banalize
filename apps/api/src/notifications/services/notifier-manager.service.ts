@@ -35,10 +35,10 @@ export class NotifierManager implements OnModuleInit {
     );
   }
 
-  async notify({ type, title, message }: NotifyEvent) {
+  async notify({ type, title, message, html }: NotifyEvent) {
     this.logger.debug(`Notifying ${type} with message: ${message}`);
     for (const notifier of this.notifiers[type]) {
-      notifier.notify(new Notification(title, message));
+      notifier.notify(new Notification(title, message, html));
     }
   }
 
