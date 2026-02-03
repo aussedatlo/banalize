@@ -47,7 +47,7 @@ catalog:
   "maxmind": "^4.3.22"
   "mongoose": "^8.6.1"
   "next": "14.2.4"
-  "nodemailer": "^6.9.15"
+  "nodemailer": "^7.0.11"
   "postcss": "^8.4.38"
   "postcss-preset-mantine": "1.17.0"
   "postcss-simple-vars": "^7.0.1"
