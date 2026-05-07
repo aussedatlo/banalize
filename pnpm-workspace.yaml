@@ -45,7 +45,7 @@ catalog:
   "eslint-plugin-prettier": "^5.0.0"
   "gitmoji-cli": "^9.4.0"
   "maxmind": "^4.3.22"
-  "mongoose": "^8.6.1"
+  "mongoose": "^8.22.1"
   "next": "14.2.4"
   "nodemailer": "^6.9.15"
   "postcss": "^8.4.38"
