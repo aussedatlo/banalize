@@ -43,7 +43,7 @@ ipnet = "2.9"
 uuid = { version = "1.6", features = ["v4"] }
 
 # Firewall
-iptables = "0.5"
+iptables = "0.6"
 
 # Log streaming
 tokio-stream = { version = "0.1", features = ["sync"] }
