@@ -7,8 +7,8 @@ on:
   pull_request:
 
 jobs:
-  run-tests:
-    name: Run tests
+  typecheck:
+    name: Typecheck
     runs-on: ubuntu-latest
 
     steps:
@@ -20,8 +20,30 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build dependencies
-        run: pnpm packages build
+      - name: Typecheck all packages
+        run: pnpm -r typecheck
 
-      - name: test packages
-        run: pnpm test:cov
+  rust-coverage:
+    name: Rust coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Run e2e tests with coverage
+        run: cargo llvm-cov --test e2e --lcov --output-path lcov.info
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-coverage
+          path: lcov.info

@@ -1,120 +1,180 @@
-use crate::config_manager::ConfigManager;
-use crate::database::CoreDatabase;
-use crate::file_watcher::FileWatcher;
-use crate::firewall::Firewall;
-use crate::event_emitter::EventEmitter;
+use crate::config::Config;
+use crate::detector::Detector;
+use crate::events::{EventEmitter, FirewallCommand};
+use crate::log_source::run_tailer;
+use crate::store::MemoryStore;
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+use tokio::sync::{broadcast, mpsc, RwLock};
 use tokio::task::JoinHandle;
-use tracing::{error, info};
+use tracing::{info, warn};
+
+/// Buffer for the tailer -> detector line channel. Bounded so a flood applies
+/// backpressure to the tailer rather than growing memory unboundedly.
+const LINE_CHANNEL_CAPACITY: usize = 1024;
+
+/// Buffer for the live-tail broadcast bus. Slow SSE subscribers that lag past
+/// this many lines miss the overflow instead of blocking the tailer.
+const LINE_BUS_CAPACITY: usize = 256;
+
+/// The two tasks backing one watched config: a tailer producing lines and a
+/// detector consuming them, joined by a private mpsc and a shared shutdown.
+struct WatcherTasks {
+    tailer: JoinHandle<()>,
+    detector: JoinHandle<()>,
+    shutdown_tx: broadcast::Sender<()>,
+    /// Fan-out of raw tailed lines for live API subscribers.
+    line_bus: broadcast::Sender<String>,
+}
 
 pub struct WatcherManager {
-    watchers: Arc<Mutex<HashMap<String, JoinHandle<()>>>>,
-    config_manager: Arc<ConfigManager>,
-    database: Arc<CoreDatabase>,
-    firewall: Arc<Mutex<Firewall>>,
+    store: Arc<MemoryStore>,
     event_emitter: Arc<EventEmitter>,
+    firewall_tx: mpsc::Sender<FirewallCommand>,
+    watchers: Arc<RwLock<HashMap<String, WatcherTasks>>>,
 }
 
 impl WatcherManager {
     pub fn new(
-        config_manager: Arc<ConfigManager>,
-        database: Arc<CoreDatabase>,
-        firewall: Arc<Mutex<Firewall>>,
+        store: Arc<MemoryStore>,
         event_emitter: Arc<EventEmitter>,
+        firewall_tx: mpsc::Sender<FirewallCommand>,
     ) -> Self {
         Self {
-            watchers: Arc::new(Mutex::new(HashMap::new())),
-            config_manager,
-            database,
-            firewall,
+            store,
             event_emitter,
+            firewall_tx,
+            watchers: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
-    /// Start a watcher for a config
-    pub async fn start_watcher(&self, config_id: &str) -> anyhow::Result<()> {
-        let config = self.config_manager.get_config(config_id)
-            .ok_or_else(|| anyhow::anyhow!("Config {} not found", config_id))?;
+    /// Start a tailer + detector pair for a config.
+    pub async fn start_watcher(&self, config: Config) -> Result<(), String> {
+        config.validate()?;
 
-        // Validate file path exists and is readable
-        if let Some(file_path) = config.file_path() {
-            if !file_path.exists() {
-                return Err(anyhow::anyhow!("File path does not exist: {:?}", file_path));
-            }
-            if !file_path.is_file() {
-                return Err(anyhow::anyhow!("Path is not a file: {:?}", file_path));
-            }
-        } else {
-            return Err(anyhow::anyhow!("Config param is not a valid file path"));
+        let config_id = config.id.clone();
+        let mut watchers = self.watchers.write().await;
+
+        if watchers.contains_key(&config_id) {
+            return Err(format!("Watcher for config {} already exists", config_id));
         }
 
-        // Check if watcher already exists
-        {
-            let watchers = self.watchers.lock().unwrap();
-            if watchers.contains_key(config_id) {
-                return Err(anyhow::anyhow!("Watcher for config {} already running", config_id));
-            }
-        }
-
-        info!("Starting watcher for config: {}", config_id);
-
-        // Create and start watcher
-        let watcher = FileWatcher::new(
+        // Detector owns the ban policy; create it up front so an invalid config
+        // fails fast before any task is spawned.
+        let detector = Detector::new(
             config.clone(),
-            self.database.clone(),
-            self.firewall.clone(),
+            self.store.clone(),
             self.event_emitter.clone(),
+            self.firewall_tx.clone(),
+        )?;
+
+        // One shutdown signal fans out to both tasks; one mpsc carries lines.
+        let (shutdown_tx, _) = broadcast::channel(16);
+        let (line_tx, line_rx) = mpsc::channel::<String>(LINE_CHANNEL_CAPACITY);
+        let (line_bus, _) = broadcast::channel::<String>(LINE_BUS_CAPACITY);
+
+        // Tailer task: read the file, forward lines.
+        let tailer = {
+            let param = config.param.clone();
+            let id = config_id.clone();
+            let bus = line_bus.clone();
+            let shutdown_rx = shutdown_tx.subscribe();
+            tokio::spawn(async move {
+                run_tailer(param, id, line_tx, bus, shutdown_rx).await;
+            })
+        };
+
+        // Detector task: apply policy to lines.
+        let detector_handle = {
+            let shutdown_rx = shutdown_tx.subscribe();
+            tokio::spawn(async move {
+                detector.run(line_rx, shutdown_rx).await;
+            })
+        };
+
+        watchers.insert(
+            config_id.clone(),
+            WatcherTasks {
+                tailer,
+                detector: detector_handle,
+                shutdown_tx,
+                line_bus,
+            },
         );
-
-        let config_id_clone = config_id.to_string();
-        let handle = tokio::spawn(async move {
-            if let Err(e) = watcher.start().await {
-                error!("Watcher for config {} stopped with error: {:?}", config_id_clone, e);
-            }
-        });
-
-        {
-            let mut watchers = self.watchers.lock().unwrap();
-            watchers.insert(config_id.to_string(), handle);
-        }
-
         info!("Started watcher for config: {}", config_id);
+
         Ok(())
     }
 
-    /// Stop a watcher for a config
-    pub async fn stop_watcher(&self, config_id: &str) -> bool {
-        let mut watchers = self.watchers.lock().unwrap();
-        if let Some(handle) = watchers.remove(config_id) {
-            handle.abort();
-            info!("Stopped watcher for config: {}", config_id);
-            true
+    /// Subscribe to the raw lines tailed for a config, starting from now.
+    /// `None` when no watcher is running for this config.
+    pub async fn subscribe_lines(
+        &self,
+        config_id: &str,
+    ) -> Option<broadcast::Receiver<String>> {
+        self.watchers
+            .read()
+            .await
+            .get(config_id)
+            .map(|tasks| tasks.line_bus.subscribe())
+    }
+
+    /// Stop the tailer + detector pair for a config.
+    pub async fn stop_watcher(&self, config_id: &str) -> Result<(), String> {
+        let mut watchers = self.watchers.write().await;
+
+        if let Some(tasks) = watchers.remove(config_id) {
+            stop_tasks(config_id, tasks).await;
+            Ok(())
         } else {
-            false
+            Err(format!("Watcher for config {} not found", config_id))
         }
     }
 
-    /// Restart a watcher (stop then start)
-    pub async fn restart_watcher(&self, config_id: &str) -> anyhow::Result<()> {
-        self.stop_watcher(config_id).await;
-        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-        self.start_watcher(config_id).await
+    /// Restart a watcher (stop and start).
+    pub async fn restart_watcher(&self, config: Config) -> Result<(), String> {
+        let config_id = config.id.clone();
+        if self.watchers.read().await.contains_key(&config_id) {
+            self.stop_watcher(&config_id).await?;
+        }
+        self.start_watcher(config).await
     }
 
-    /// Get watcher status for all configs
-    pub fn get_watcher_statuses(&self) -> HashMap<String, bool> {
-        let configs = self.config_manager.list_configs();
-        let watchers = self.watchers.lock().unwrap();
-        
-        configs.iter()
-            .map(|config| {
-                let running = watchers.get(&config.id)
-                    .map(|h| !h.is_finished())
-                    .unwrap_or(false);
-                (config.id.clone(), running)
-            })
-            .collect()
+    /// Stop all watchers.
+    pub async fn stop_all(&self) {
+        info!("Stopping all watchers");
+        let mut watchers = self.watchers.write().await;
+        let config_ids: Vec<String> = watchers.keys().cloned().collect();
+
+        for config_id in config_ids {
+            if let Some(tasks) = watchers.remove(&config_id) {
+                stop_tasks(&config_id, tasks).await;
+            }
+        }
     }
 }
 
+/// Signal both tasks to stop and wait for them (aborting on timeout).
+async fn stop_tasks(config_id: &str, tasks: WatcherTasks) {
+    let WatcherTasks {
+        tailer,
+        detector,
+        shutdown_tx,
+        line_bus: _,
+    } = tasks;
+
+    let _ = shutdown_tx.send(());
+    join_or_abort(config_id, "tailer", tailer).await;
+    join_or_abort(config_id, "detector", detector).await;
+    info!("Watcher {} stopped", config_id);
+}
+
+async fn join_or_abort(config_id: &str, kind: &str, mut handle: JoinHandle<()>) {
+    tokio::select! {
+        _ = &mut handle => {}
+        _ = tokio::time::sleep(tokio::time::Duration::from_secs(5)) => {
+            warn!("{} for {} did not stop within timeout, aborting", kind, config_id);
+            handle.abort();
+        }
+    }
+}

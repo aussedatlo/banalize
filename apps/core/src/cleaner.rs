@@ -1,111 +1,94 @@
-use crate::config::Config;
-use crate::database::CoreDatabase;
-use crate::events::UnbanEvent;
-use crate::firewall::Firewall;
-use crate::event_emitter::EventEmitter;
-use crate::time_utils::get_millis_timestamp;
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
-use anyhow::Result;
-use tracing::{error, info};
+use crate::config::ConfigMap;
+use crate::events::{EventEmitter, FirewallCommand};
+use crate::store::MemoryStore;
+use std::sync::Arc;
+use tokio::sync::{mpsc, RwLock};
+use tracing::{debug, info, warn};
 
 pub struct Cleaner {
-    configs: Arc<Mutex<HashMap<String, Arc<Config>>>>,
-    database: Arc<CoreDatabase>,
-    firewall: Arc<Mutex<Firewall>>,
+    store: Arc<MemoryStore>,
+    configs: Arc<RwLock<ConfigMap>>,
     event_emitter: Arc<EventEmitter>,
+    firewall_tx: mpsc::Sender<FirewallCommand>,
+    interval_secs: u64,
 }
 
 impl Cleaner {
     pub fn new(
-        configs: Arc<Mutex<HashMap<String, Arc<Config>>>>,
-        database: Arc<CoreDatabase>,
-        firewall: Arc<Mutex<Firewall>>,
+        store: Arc<MemoryStore>,
+        configs: Arc<RwLock<ConfigMap>>,
         event_emitter: Arc<EventEmitter>,
+        firewall_tx: mpsc::Sender<FirewallCommand>,
+        interval_secs: u64,
     ) -> Self {
         Self {
+            store,
             configs,
-            database,
-            firewall,
             event_emitter,
+            firewall_tx,
+            interval_secs,
         }
     }
 
-    pub async fn start(&self) -> Result<()> {
-        info!("Starting cleaner");
-
-        let configs = self.configs.clone();
-        let database = self.database.clone();
-        let firewall = self.firewall.clone();
-        let event_emitter = self.event_emitter.clone();
-
-        // Spawn a background task for cleaning matches and bans every second
-        tokio::spawn(async move {
-            loop {
-                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-                if let Err(e) = Self::cleanup(&configs, &database, &firewall, &event_emitter).await {
-                    error!("Error during cleanup: {:?}", e);
-                }
-            }
-        });
-
-        // Keep the cleaner alive indefinitely
+    pub async fn run(&self, mut shutdown_rx: tokio::sync::broadcast::Receiver<()>) {
+        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(self.interval_secs));
+        
         loop {
-            tokio::time::sleep(tokio::time::Duration::from_secs(60)).await;
-        }
-    }
-
-    async fn cleanup(
-        configs: &Arc<Mutex<HashMap<String, Arc<Config>>>>,
-        database: &CoreDatabase,
-        firewall: &Arc<Mutex<Firewall>>,
-        event_emitter: &Arc<EventEmitter>,
-    ) -> Result<()> {
-        let now = get_millis_timestamp();
-
-        // Cleanup old matches for each config (older than find_time)
-        let configs_snapshot = configs.lock().unwrap().clone();
-        for (config_id, config) in configs_snapshot.iter() {
-            if let Ok(removed) = database.remove_old_matches(config_id, config.find_time) {
-                if removed > 0 {
-                    info!("Removed {} old match(es) for config {}", removed, config_id);
+            tokio::select! {
+                _ = shutdown_rx.recv() => {
+                    info!("Cleaner received shutdown signal");
+                    break;
                 }
-            }
-        }
-
-        // Cleanup expired bans (older than ban_time from any config)
-        // We need to find the maximum ban_time across all configs
-        let max_ban_time = configs_snapshot
-            .values()
-            .map(|c| c.ban_time)
-            .max()
-            .unwrap_or(86400000); // Default 24 hours if no configs
-
-        let expired_bans = database.get_expired_bans(max_ban_time)?;
-        for ban in expired_bans {
-            info!("Removing expired ban for {}, timestamp {}", ban.ip, ban.timestamp);
-            database.remove_ban(&ban.ip, ban.timestamp)?;
-            
-            // Use spawn_blocking for firewall operations (non-critical, low priority)
-            let firewall_clone = firewall.clone();
-            let ip = ban.ip.clone();
-            tokio::task::spawn_blocking(move || {
-                if let Ok(mut fw) = firewall_clone.lock() {
-                    if let Err(e) = fw.allow_ip_sync(&ip) {
-                        error!("Failed to allow IP in firewall: {}", e);
+                _ = interval.tick() => {
+                    if let Err(e) = self.cleanup().await {
+                        warn!("Cleanup error: {}", e);
                     }
                 }
-            }).await?;
+            }
+        }
 
-            // Emit unban event (non-blocking, low priority)
-            // We need to find which config this ban belongs to
-            // For simplicity, we'll use the first config or a default
-            let config_id = configs_snapshot.keys().next()
-                .map(|k| k.clone())
-                .unwrap_or_else(|| "unknown".to_string());
-            
-            let unban_event = UnbanEvent::new(ban.ip.clone(), now, config_id);
-            event_emitter.emit_unban(unban_event);
+        info!("Cleaner stopped");
+    }
+
+    async fn cleanup(&self) -> Result<(), String> {
+        debug!("Cleaning up...");
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_millis() as u64;
+
+        let configs = self.configs.read().await;
+
+        // Prune match windows to reclaim memory (counting also prunes lazily).
+        for (config_id, config) in configs.iter() {
+            let cutoff = now.saturating_sub(config.find_time);
+            self.store.prune_matches(config_id, cutoff);
+        }
+
+        // Expire bans: take everything past ban_time and push the unban out to
+        // the firewall (lossless) and the audit log.
+        for (config_id, config) in configs.iter() {
+            let cutoff = now.saturating_sub(config.ban_time);
+            let expired = self.store.take_expired_bans(config_id, cutoff);
+            if expired.is_empty() {
+                continue;
+            }
+            debug!("Expiring {} bans for config {}", expired.len(), config_id);
+            for ip in expired {
+                let allow = FirewallCommand::Allow {
+                    config_id: config_id.clone(),
+                    ip,
+                };
+                let _ = self.firewall_tx.send(allow).await;
+                self.event_emitter
+                    .emit(crate::events::Event::Unban {
+                        config_id: config_id.clone(),
+                        ip: ip.to_string(),
+                        timestamp: now,
+                    })
+                    .await;
+            }
+            info!("Expired bans for config {}", config_id);
         }
 
         Ok(())

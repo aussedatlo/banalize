@@ -25,9 +25,9 @@ updates:
           - "eslint*"
           - "typescript*"
 
-  # API app
+  # UI app
   - package-ecosystem: "npm"
-    directory: "/apps/api"
+    directory: "/apps/ui"
     target-branch: "main"
     schedule:
       interval: "weekly"
@@ -40,41 +40,7 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-      - "api"
-
-  # Web app
-  - package-ecosystem: "npm"
-    directory: "/apps/web"
-    target-branch: "main"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-    open-pull-requests-limit: 10
-    commit-message:
-      prefix: "chore"
-      include: "scope"
-    labels:
-      - "dependencies"
-      - "npm"
-      - "web"
-
-  # CLI app
-  - package-ecosystem: "npm"
-    directory: "/apps/cli"
-    target-branch: "main"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-    open-pull-requests-limit: 10
-    commit-message:
-      prefix: "chore"
-      include: "scope"
-    labels:
-      - "dependencies"
-      - "npm"
-      - "cli"
+      - "ui"
 
   # Packages
   - package-ecosystem: "npm"
@@ -95,7 +61,6 @@ updates:
     groups:
       dev-dependencies:
         patterns:
-          - "@banalize/*"
           - "eslint*"
           - "typescript*"
           - "stylelint*"

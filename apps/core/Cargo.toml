@@ -1,15 +1,15 @@
 [package]
 name = "banalize-core"
-version = "0.1.0"
+version = "2.0.0"
 edition = "2021"
+default-run = "banalize-core"
 
 [dependencies]
 # Async runtime
 tokio = { version = "1.35", features = ["full"] }
-tokio-stream = "0.1"
 
 # Database
-sled = "0.34"
+rusqlite = { version = "0.31", features = ["bundled"] }
 
 # Regex
 regex = "1.10"
@@ -19,12 +19,6 @@ linemux = "0.3"
 
 # Fast inter-thread communication
 crossbeam-channel = "0.5"
-
-# gRPC
-tonic = "0.14"
-tonic-prost = "0.14"
-prost = "0.14"
-prost-types = "0.14"
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
@@ -37,12 +31,39 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # Error handling
 anyhow = "1.0"
 
+# Web framework
+axum = "0.8.7"
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors"] }
+
 # IP address handling
 ipnet = "2.9"
 
 # UUID generation for event IDs
 uuid = { version = "1.6", features = ["v4"] }
 
-[build-dependencies]
-tonic-prost-build = "0.14"
+# Firewall
+iptables = "0.5"
+
+# Log streaming
+tokio-stream = { version = "0.1", features = ["sync"] }
+futures-core = "0.3"
+
+# OpenAPI
+utoipa = { version = "5", features = ["axum_extras"] }
+
+# GeoIP country lookup (flags in the UI)
+maxminddb = "0.24"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+
+# Email notifications (rustls to match reqwest's TLS stack)
+lettre = { version = "0.11", default-features = false, features = ["builder", "hostname", "smtp-transport", "tokio1", "tokio1-rustls-tls"] }
+
+[dev-dependencies]
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+tempfile = "3"
+
+[[bin]]
+name = "fake-iptables"
+path = "src/bin/fake_iptables.rs"
 
