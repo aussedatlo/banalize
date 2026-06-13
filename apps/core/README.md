@@ -29,7 +29,7 @@ cargo build --release
 - `BANALIZE_CORE_LOG_LEVEL`: Log level (INFO, DEBUG, ERROR) - default: INFO
 - `BANALIZE_CORE_FIREWALL_CHAIN`: iptables chain to link to - default: INPUT
 - `BANALIZE_CORE_DATABASE_PATH`: Base path for database storage - default: `/tmp/banalize-core`
-- `BANALIZE_CORE_API_ADDR`: Address and port for the REST API server - default: `0.0.0.0:5040`
+- `BANALIZE_CORE_API_ADDR`: Address and port for the REST API server - default: `0.0.0.0:6040`
 
 ## REST API
 
@@ -47,7 +47,7 @@ The application exposes a REST API for managing configurations:
 
 **Create a config:**
 ```bash
-curl -X POST http://localhost:5040/api/configs \
+curl -X POST http://localhost:6040/api/configs \
   -H "Content-Type: application/json" \
   -d '{
     "id": "ssh-failed-login",
@@ -63,7 +63,7 @@ curl -X POST http://localhost:5040/api/configs \
 
 **Update a config:**
 ```bash
-curl -X PUT http://localhost:5040/api/configs/ssh-failed-login \
+curl -X PUT http://localhost:6040/api/configs/ssh-failed-login \
   -H "Content-Type: application/json" \
   -d '{
     "ban_time": 7200,
@@ -73,7 +73,7 @@ curl -X PUT http://localhost:5040/api/configs/ssh-failed-login \
 
 **Delete a config:**
 ```bash
-curl -X DELETE http://localhost:5040/api/configs/ssh-failed-login
+curl -X DELETE http://localhost:6040/api/configs/ssh-failed-login
 ```
 
 ## Database

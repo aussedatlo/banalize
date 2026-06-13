@@ -11,14 +11,14 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": "http://localhost:5040",
+      "/api": process.env.BANALIZE_UI_API_URL ?? "http://localhost:6040",
     },
   },
   preview: {
     host: true,
-    port: 5050,
+    port: Number(process.env.BANALIZE_UI_PORT ?? 6041),
     proxy: {
-      "/api": process.env.BANALIZE_UI_API_URL ?? "http://localhost:5040",
+      "/api": process.env.BANALIZE_UI_API_URL ?? "http://localhost:6040",
     },
   },
 });

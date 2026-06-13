@@ -1,0 +1,17 @@
+# Serves the built SPA and reverse-proxies the API to banalize-core.
+# BANALIZE_UI_PORT sets the listen port; BANALIZE_UI_API_URL the core target.
+# handle blocks are mutually exclusive, so /api/* reaches the proxy before the
+# SPA fallback (a bare try_files would rewrite /api/* to /index.html first).
+:{$BANALIZE_UI_PORT:6041} {
+	encode gzip
+
+	handle /api/* {
+		reverse_proxy {$BANALIZE_UI_API_URL:http://localhost:6040}
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

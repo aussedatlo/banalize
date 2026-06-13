@@ -54,7 +54,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let database_path = env::var("BANALIZE_CORE_DATABASE_PATH")
         .unwrap_or_else(|_| "/tmp/banalize-core".to_string());
     let api_addr = env::var("BANALIZE_CORE_API_ADDR")
-        .unwrap_or_else(|_| "0.0.0.0:5040".to_string());
+        .unwrap_or_else(|_| "0.0.0.0:6040".to_string());
 
     // Create database paths
     let db_dir = PathBuf::from(&database_path);

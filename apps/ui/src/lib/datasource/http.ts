@@ -27,7 +27,7 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-/** Talks to the banalize-core REST API (proxied to :5040 in dev). */
+/** Talks to the banalize-core REST API (proxied to :6040 in dev). */
 export class HttpDataSource implements DataSource {
   getConfigs() {
     return fetchJson<Config[]>("/api/configs");
