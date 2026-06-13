@@ -1,0 +1,12 @@
+{
+  "name": "@banalize/core",
+  "version": "2.0.0",
+  "scripts": {
+    "build": "cargo build --release",
+    "dev": "cargo run",
+    "start": "cargo run --release",
+    "test": "cargo test --test e2e",
+    "test:cov": "cargo llvm-cov --test e2e --html --output-dir coverage"
+  }
+}
+

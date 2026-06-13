@@ -3,30 +3,25 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "api": "pnpm --filter api",
+    "core": "pnpm --filter=@banalize/core",
+    "ui": "pnpm --filter=@banalize/ui",
     "build": "turbo build",
-    "build:api": "turbo build --filter=@banalize/api --filter={./packages/*}",
-    "build:web": "turbo build --filter=@banalize/web --filter={./packages/*}",
+    "build:packages": "turbo build --filter={./packages/*}",
     "clean": "turbo clean",
     "commit": "gitmoji -c",
     "dev": "turbo dev",
-    "docker:mongodb": "docker compose up mongodb",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo lint",
-    "web": "pnpm --filter web",
-    "types": "pnpm --filter types",
-    "packages": "pnpm --filter={./packages/*}",
-    "test": "pnpm --filter=@banalize/api test",
-    "test:cov": "pnpm --filter=@banalize/api test:cov"
+    "packages": "pnpm --filter={./packages/*}"
   },
   "devDependencies": {
     "@banalize/eslint-config": "workspace:*",
     "@banalize/stylelint-config": "workspace:*",
     "@banalize/typescript-config": "workspace:*",
-    "gitmoji-cli": "catalog:",
-    "prettier": "catalog:",
-    "prettier-plugin-organize-imports": "catalog:",
-    "turbo": "catalog:"
+    "gitmoji-cli": "^9.7.0",
+    "prettier": "^3.6.2",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "turbo": "2.0.9"
   },
   "packageManager": "pnpm@10.17.0",
   "engines": {
