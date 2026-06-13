@@ -9,7 +9,7 @@ default-run = "banalize-core"
 tokio = { version = "1.35", features = ["full"] }
 
 # Database
-rusqlite = { version = "0.31", features = ["bundled"] }
+rusqlite = { version = "0.40", features = ["bundled"] }
 
 # Regex
 regex = "1.10"
