@@ -45,7 +45,7 @@ function NotifierCard({
     : notifier.signal_config?.server;
 
   return (
-    <Card className="h-full">
+    <Card className="h-full" data-testid={`notifier-card-${notifier.id}`}>
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
         <div className="flex min-w-0 items-start gap-3">
           <div className="rounded-md bg-muted p-2">
@@ -63,6 +63,7 @@ function NotifierCard({
           size="icon"
           className="h-8 w-8 shrink-0"
           aria-label={`Delete notifier ${notifier.id}`}
+          data-testid={`notifier-delete-${notifier.id}`}
           onClick={onDelete}
         >
           <Trash2 className="h-4 w-4 text-destructive" />
@@ -80,19 +81,26 @@ function NotifierCard({
           <Button
             variant="outline"
             size="sm"
+            data-testid={`notifier-test-${notifier.id}`}
             disabled={testing}
             onClick={() => test()}
           >
             <Send className="mr-2 h-3.5 w-3.5" />
             {testing ? "Sending…" : "Test"}
           </Button>
-          <Button variant="outline" size="sm" onClick={onEdit}>
+          <Button
+            variant="outline"
+            size="sm"
+            data-testid={`notifier-edit-${notifier.id}`}
+            onClick={onEdit}
+          >
             <Pencil className="mr-2 h-3.5 w-3.5" />
             Edit
           </Button>
         </div>
         {testResult ? (
           <p
+            data-testid={`notifier-test-result-${notifier.id}`}
             className={cn(
               "text-xs",
               testResult.success ? "text-green-500" : "text-destructive",
@@ -132,6 +140,7 @@ export default function NotificationsPage() {
           </p>
         </div>
         <Button
+          data-testid="notifier-create-button"
           onClick={() => {
             setEditing(undefined);
             setOpen(true);
@@ -150,7 +159,10 @@ export default function NotificationsPage() {
       {isLoading ? (
         <p className="text-muted-foreground">Loading…</p>
       ) : notifiers.length === 0 ? (
-        <div className="rounded-md border p-10 text-center text-muted-foreground">
+        <div
+          data-testid="notifiers-empty"
+          className="rounded-md border p-10 text-center text-muted-foreground"
+        >
           No notifiers yet
         </div>
       ) : (

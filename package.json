@@ -10,6 +10,8 @@
     "clean": "turbo clean",
     "commit": "gitmoji -c",
     "dev": "turbo dev",
+    "e2e": "pnpm --filter=@banalize/e2e",
+    "e2e:ui": "pnpm --filter=@banalize/e2e test:ui",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo lint",
     "packages": "pnpm --filter={./packages/*}"

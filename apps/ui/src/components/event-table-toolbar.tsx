@@ -39,6 +39,7 @@ export default function EventTableToolbar({
         <Input
           type="search"
           className="pl-8"
+          data-testid="table-search"
           placeholder={searchPlaceholder}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}

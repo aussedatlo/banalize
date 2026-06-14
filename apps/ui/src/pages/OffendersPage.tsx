@@ -88,6 +88,7 @@ export default function OffendersPage() {
     <TableHead>
       <button
         type="button"
+        data-testid={`offenders-sort-${key}`}
         className="inline-flex items-center gap-1 hover:text-foreground"
         onClick={() => {
           if (sortKey === key) {
@@ -150,7 +151,11 @@ export default function OffendersPage() {
               </TableRow>
             ) : visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  data-testid="offenders-empty"
+                  className="text-center text-muted-foreground"
+                >
                   {stats.length === 0
                     ? "No activity recorded"
                     : "No IPs for the current filters"}
@@ -162,6 +167,7 @@ export default function OffendersPage() {
                 return (
                   <TableRow
                     key={s.ip}
+                    data-testid={`offenders-row-${s.ip}`}
                     className="cursor-pointer"
                     onClick={() =>
                       navigate(`/matches?q=${encodeURIComponent(s.ip)}`)
@@ -170,8 +176,18 @@ export default function OffendersPage() {
                     <TableCell className="whitespace-nowrap font-mono text-sm">
                       <IpFlag info={ipInfos[s.ip]} /> {s.ip}
                     </TableCell>
-                    <TableCell className="tabular-nums">{s.match_count}</TableCell>
-                    <TableCell className="tabular-nums">{s.ban_count}</TableCell>
+                    <TableCell
+                      className="tabular-nums"
+                      data-testid={`offenders-matches-${s.ip}`}
+                    >
+                      {s.match_count}
+                    </TableCell>
+                    <TableCell
+                      className="tabular-nums"
+                      data-testid={`offenders-bans-${s.ip}`}
+                    >
+                      {s.ban_count}
+                    </TableCell>
                     <TableCell className="max-w-48 truncate text-xs text-muted-foreground">
                       {s.config_ids.join(", ")}
                     </TableCell>

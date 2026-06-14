@@ -35,7 +35,7 @@ export default function ConfigsPage() {
           <h2 className="text-2xl font-bold">Configs</h2>
           <p className="text-muted-foreground">Manage log-watching configurations</p>
         </div>
-        <Button onClick={() => setOpen(true)}>
+        <Button data-testid="config-create-button" onClick={() => setOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           New config
         </Button>
@@ -45,7 +45,10 @@ export default function ConfigsPage() {
       {isLoading ? (
         <p className="text-muted-foreground">Loading…</p>
       ) : configs.length === 0 ? (
-        <div className="rounded-md border p-10 text-center text-muted-foreground">
+        <div
+          data-testid="configs-empty"
+          className="rounded-md border p-10 text-center text-muted-foreground"
+        >
           No configs yet
         </div>
       ) : (
@@ -54,6 +57,7 @@ export default function ConfigsPage() {
             <Link
               key={c.id}
               to={`/configs/${c.id}`}
+              data-testid={`config-card-${c.id}`}
               className="group rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Card className="h-full transition-colors hover:bg-accent">
@@ -67,6 +71,7 @@ export default function ConfigsPage() {
                     size="icon"
                     className="h-8 w-8 shrink-0"
                     aria-label={`Delete ${c.id}`}
+                    data-testid={`config-delete-${c.id}`}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();

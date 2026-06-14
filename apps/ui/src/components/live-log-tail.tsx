@@ -94,6 +94,7 @@ export default function LiveLogTail({
             lines.map((l, i) => (
               <div
                 key={i}
+                data-testid="live-log-line"
                 className="flex gap-3 rounded px-1 py-px hover:bg-muted/50"
               >
                 <span className="w-20 shrink-0 leading-relaxed tabular-nums text-muted-foreground">

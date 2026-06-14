@@ -109,7 +109,11 @@ export default function MatchesPage() {
               </TableRow>
             ) : visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={3}
+                  data-testid="matches-empty"
+                  className="text-center text-muted-foreground"
+                >
                   {matches.length === 0
                     ? "No matches recorded"
                     : "No matches for the current filters"}
@@ -120,6 +124,7 @@ export default function MatchesPage() {
                 <Fragment key={m.id}>
                   <TableRow
                     className="cursor-pointer"
+                    data-testid={`matches-row-${m.ip}`}
                     onClick={() => toggleExpanded(m.id)}
                   >
                     <TableCell className="whitespace-nowrap font-mono text-sm">

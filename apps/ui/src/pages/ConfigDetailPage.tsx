@@ -42,7 +42,9 @@ export default function ConfigDetailPage() {
         <>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold">{config.name}</h2>
+              <h2 className="text-2xl font-bold" data-testid="config-detail-name">
+                {config.name}
+              </h2>
               <p className="font-mono text-sm text-muted-foreground">
                 {config.param}
               </p>
@@ -55,7 +57,11 @@ export default function ConfigDetailPage() {
                 </span>
               </div>
             </div>
-            <Button variant="outline" onClick={() => setEditing(true)}>
+            <Button
+              variant="outline"
+              data-testid="config-detail-edit"
+              onClick={() => setEditing(true)}
+            >
               <Pencil className="mr-2 h-4 w-4" />
               Edit
             </Button>

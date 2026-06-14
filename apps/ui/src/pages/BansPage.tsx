@@ -120,7 +120,11 @@ export default function BansPage() {
               </TableRow>
             ) : visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  data-testid="bans-empty"
+                  className="text-center text-muted-foreground"
+                >
                   {bans.length === 0
                     ? "No bans recorded"
                     : "No bans for the current filters"}
@@ -134,7 +138,11 @@ export default function BansPage() {
                   ? ban.timestamp + configMap.get(ban.config_id)!.ban_time
                   : undefined;
                 return (
-                  <TableRow key={ban.id} className={active ? undefined : "text-muted-foreground"}>
+                  <TableRow
+                    key={ban.id}
+                    data-testid={`bans-row-${ban.ip}`}
+                    className={active ? undefined : "text-muted-foreground"}
+                  >
                     <TableCell>
                       <div className="flex items-center gap-1.5">
                         <IpFlag info={ipInfos[ban.ip]} />
@@ -154,7 +162,11 @@ export default function BansPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Badge variant={statusBadge[status].variant} className="font-normal">
+                        <Badge
+                          variant={statusBadge[status].variant}
+                          className="font-normal"
+                          data-testid={`bans-status-${ban.ip}`}
+                        >
                           {statusBadge[status].label}
                         </Badge>
                         {active && scheduledEnd !== undefined ? (
@@ -169,6 +181,7 @@ export default function BansPage() {
                         <Button
                           variant="outline"
                           size="sm"
+                          data-testid={`bans-unban-${ban.ip}`}
                           disabled={unbanning === ban.id}
                           onClick={() => unban(ban.id)}
                         >

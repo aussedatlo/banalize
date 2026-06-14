@@ -157,6 +157,7 @@ export default function NotifierFormDialog({
         </DialogHeader>
         <form
           className="grid gap-5"
+          data-testid="notifier-form"
           onSubmit={(e) => {
             e.preventDefault();
             submit();
@@ -169,6 +170,8 @@ export default function NotifierFormDialog({
                 <button
                   key={event}
                   type="button"
+                  data-testid={`notifier-event-${event}`}
+                  aria-pressed={form.events.includes(event)}
                   onClick={() => toggleEvent(event)}
                   className={cn(
                     "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
@@ -195,7 +198,7 @@ export default function NotifierFormDialog({
                 setForm((f) => ({ ...f, kind: kind as NotifierKind }))
               }
             >
-              <SelectTrigger>
+              <SelectTrigger aria-label="Channel">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -321,7 +324,11 @@ export default function NotifierFormDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending || form.events.length === 0}>
+            <Button
+              type="submit"
+              data-testid="notifier-form-submit"
+              disabled={isPending || form.events.length === 0}
+            >
               {isPending
                 ? "Saving…"
                 : initial

@@ -104,6 +104,7 @@ export default function ConfigFormDialog({
         </DialogHeader>
         <form
           className="grid gap-5"
+          data-testid="config-form"
           onSubmit={(e) => {
             e.preventDefault();
             save({ ...form, id });
@@ -227,7 +228,11 @@ export default function ConfigFormDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending || !id}>
+            <Button
+              type="submit"
+              data-testid="config-form-submit"
+              disabled={isPending || !id}
+            >
               {isPending
                 ? "Saving…"
                 : initial

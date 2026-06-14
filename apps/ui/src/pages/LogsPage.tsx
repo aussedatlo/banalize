@@ -66,6 +66,7 @@ export default function LogsPage() {
           <Input
             type="search"
             className="pl-8"
+            data-testid="logs-search"
             placeholder="Search message or target…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -91,6 +92,7 @@ export default function LogsPage() {
         </Select>
         <Button
           variant="outline"
+          data-testid="logs-pause-toggle"
           aria-pressed={autoScroll}
           onClick={() => setAutoScroll((v) => !v)}
         >
@@ -101,7 +103,11 @@ export default function LogsPage() {
           )}
           {autoScroll ? "Pause scroll" : "Follow"}
         </Button>
-        <Button variant="outline" onClick={() => setLogs([])}>
+        <Button
+          variant="outline"
+          data-testid="logs-clear"
+          onClick={() => setLogs([])}
+        >
           <Eraser className="mr-1 h-3 w-3" />
           Clear
         </Button>
@@ -118,6 +124,7 @@ export default function LogsPage() {
           visible.map((entry, i) => (
             <div
               key={i}
+              data-testid="logs-line"
               className="flex gap-3 rounded px-1 py-px leading-5 hover:bg-muted/50"
             >
               <span className="w-20 shrink-0 tabular-nums text-muted-foreground">

@@ -1,0 +1,12 @@
+{
+  "extends": "@banalize/typescript-config/node.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"],
+    "noEmit": true
+  },
+  "include": ["fixtures.ts", "playwright.config.ts", "utils", "cases"],
+  "exclude": ["node_modules"]
+}
