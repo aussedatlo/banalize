@@ -18,6 +18,10 @@ export class MatchesDriver extends BaseDriver {
     await expect(this.row(ip)).toBeVisible({ timeout: 20_000 });
   }
 
+  async expectNoRow(ip: string): Promise<void> {
+    await expect(this.byTestId(`matches-row-${ip}`)).toHaveCount(0);
+  }
+
   /** Expand a match row to reveal its raw log line. */
   async expandRow(ip: string): Promise<void> {
     await this.row(ip).click();

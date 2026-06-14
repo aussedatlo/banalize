@@ -32,6 +32,10 @@ export class BansDriver extends BaseDriver {
     await expect(this.row(ip)).toBeVisible({ timeout: 20_000 });
   }
 
+  async expectNoRow(ip: string): Promise<void> {
+    await expect(this.row(ip)).toHaveCount(0);
+  }
+
   async unban(ip: string): Promise<void> {
     await this.byTestId(`bans-unban-${ip}`).click();
   }
