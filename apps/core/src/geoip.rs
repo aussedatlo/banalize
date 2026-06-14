@@ -45,20 +45,19 @@ impl GeoIp {
         let Some(reader) = guard.as_ref() else {
             return IpInfo::default();
         };
-        let Ok(country) = reader.lookup::<geoip2::Country>(ip) else {
+        let Ok(result) = reader.lookup(ip) else {
             return IpInfo::default();
         };
-        let Some(country) = country.country else {
+        let Ok(Some(record)) = result.decode::<geoip2::Country>() else {
             return IpInfo::default();
         };
+        // maxminddb 0.27's geoip2 model exposes `country` as a non-optional
+        // struct; absent data simply means its fields (iso_code, names) are None.
+        let country = record.country;
         let iso = country.iso_code.map(str::to_string);
         IpInfo {
             flag: iso.as_deref().map(flag_emoji),
-            country_name: country
-                .names
-                .as_ref()
-                .and_then(|n| n.get("en"))
-                .map(|n| n.to_string()),
+            country_name: country.names.english.map(str::to_string),
             country_code: iso,
         }
     }

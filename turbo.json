@@ -4,10 +4,11 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        "dist/**",
-        "apps/core/target/release/banalize-core"
-      ]
+      "outputs": ["dist/**"]
+    },
+    "@banalize/core#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["../../target/release/banalize-core"]
     },
     "lint": {
       "dependsOn": ["^lint"]

@@ -3,6 +3,21 @@ module.exports = {
   plugins: ["stylelint-prettier"],
   rules: {
     "prettier/prettier": true,
+    // Tailwind's directives are not standard CSS at-rules.
+    "at-rule-no-unknown": [
+      true,
+      {
+        ignoreAtRules: [
+          "tailwind",
+          "apply",
+          "layer",
+          "config",
+          "screen",
+          "variants",
+          "responsive",
+        ],
+      },
+    ],
     "selector-class-pattern": [
       "^[a-z][a-zA-Z0-9]+$",
       {
