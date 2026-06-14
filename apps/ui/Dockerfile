@@ -1,4 +1,4 @@
-FROM node:22-slim
+FROM node:22-slim AS build
 
 WORKDIR /usr/src/app
 
@@ -12,13 +12,17 @@ COPY packages ./packages
 COPY apps/ui/package.json ./apps/ui/package.json
 RUN pnpm install --frozen-lockfile --filter "@banalize/ui..."
 
-# Build the SPA
+# Build the SPA to apps/ui/dist
 COPY apps/ui ./apps/ui
 RUN pnpm --filter @banalize/ui build
 
-# Serve the built app with vite preview; it proxies /api to the core
-# (see preview config in vite.config.ts, BANALIZE_UI_API_URL to override)
-WORKDIR /usr/src/app/apps/ui
-EXPOSE 5050
+# Serve the static build with Caddy; no Node in the runtime image.
+# Caddy serves /srv with a SPA fallback and proxies /api to the core
+# (see Caddyfile; BANALIZE_UI_PORT sets the listen port,
+# BANALIZE_UI_API_URL the core target).
+FROM caddy:2-alpine
 
-CMD ["pnpm", "preview"]
+COPY apps/ui/Caddyfile /etc/caddy/Caddyfile
+COPY --from=build /usr/src/app/apps/ui/dist /srv
+
+EXPOSE 6041
