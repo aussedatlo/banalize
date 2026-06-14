@@ -31,7 +31,6 @@ pub async fn restore_state(
 
     for (config_id, config) in configs_read.iter() {
         let now = now_millis();
-        let ban_cutoff = now.saturating_sub(config.ban_time);
         let match_cutoff = now.saturating_sub(config.find_time);
 
         // Gather everything we need under a single lock, then release it before
@@ -48,21 +47,38 @@ pub async fn restore_state(
                     .into_iter()
                     .map(|e| (e.ip, e.timestamp)),
             );
-            let latest_ban = latest_per_ip(
-                db.get_ban_events(Some(config_id))
-                    .unwrap_or_default()
-                    .into_iter()
-                    .map(|e| (e.ip, e.timestamp)),
-            );
+            let ban_events = db.get_ban_events(Some(config_id)).unwrap_or_default();
+
+            // Total bans ever seen per IP — this is the recidive history that
+            // drives escalation, and it must survive a restart.
+            let mut ban_counts: HashMap<String, u32> = HashMap::new();
+            for e in &ban_events {
+                *ban_counts.entry(e.ip.clone()).or_insert(0) += 1;
+            }
+
+            let latest_ban =
+                latest_per_ip(ban_events.iter().map(|e| (e.ip.clone(), e.timestamp)));
+
+            for (ip_str, &count) in &ban_counts {
+                if let Ok(ip) = ip_str.parse::<IpAddr>() {
+                    store.set_recidive(config_id, ip, count);
+                }
+            }
 
             for (ip_str, ban_ts) in latest_ban {
+                // The latest ban is the `count`-th, so its effective duration
+                // used the exponent `count - 1`. With the multiplicator off this
+                // collapses to the flat `ban_time` (matching `ban_cutoff`).
+                let prior = ban_counts.get(&ip_str).copied().unwrap_or(1).saturating_sub(1);
+                let effective = config.effective_ban_time(prior);
+                let expired = ban_ts.saturating_add(effective) <= now;
                 let undone = latest_unban.get(&ip_str).is_some_and(|&u| u >= ban_ts);
-                if ban_ts < ban_cutoff || undone {
+                if expired || undone {
                     continue; // expired or already lifted
                 }
                 match ip_str.parse::<IpAddr>() {
                     Ok(ip) => {
-                        store.add_ban(config_id, ip, ban_ts);
+                        store.add_ban_with_duration(config_id, ip, ban_ts, effective);
                         to_deny.push(ip);
                         restored_bans += 1;
                     }

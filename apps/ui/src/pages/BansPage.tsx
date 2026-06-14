@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { type BanStatus, banStatus } from "@/lib/ban-status";
+import { type BanStatus, banStatus, effectiveBanTime } from "@/lib/ban-status";
 import { useDataSource } from "@/lib/datasource";
 import { type Period, periodStart } from "@/lib/period";
 import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
@@ -138,10 +138,11 @@ export default function BansPage() {
               </TableRow>
             ) : (
               visible.map((ban) => {
-                const status = banStatus(ban, unbans, configMap, now);
+                const status = banStatus(ban, bans, unbans, configMap, now);
                 const active = status === "active";
-                const scheduledEnd = configMap.get(ban.config_id)
-                  ? ban.timestamp + configMap.get(ban.config_id)!.ban_time
+                const banConfig = configMap.get(ban.config_id);
+                const scheduledEnd = banConfig
+                  ? ban.timestamp + effectiveBanTime(ban, bans, banConfig)
                   : undefined;
                 return (
                   <TableRow

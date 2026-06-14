@@ -7,6 +7,12 @@ export interface Config {
   find_time: number;
   max_matches: number;
   ignore_ips: string[];
+  /**
+   * Optional escalation factor (> 1). When set, each successive ban of the same
+   * IP lasts `ban_time * recidive_multiplicator^prior_bans` — exponential
+   * growth for repeat offenders. Omitted/undefined keeps a flat `ban_time`.
+   */
+  recidive_multiplicator?: number;
 }
 
 export interface BanEvent {

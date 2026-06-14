@@ -131,6 +131,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 find_time: config_record.find_time,
                 max_matches: config_record.max_matches,
                 ignore_ips,
+                recidive_multiplicator: config_record.recidive_multiplicator,
             };
             config_map.insert(config_record.id, config);
         }
