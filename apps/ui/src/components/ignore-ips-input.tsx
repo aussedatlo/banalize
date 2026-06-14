@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Plus, X } from "lucide-react";
-import { isValidIpOrCidr } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { isValidIpOrCidr } from "@/lib/utils";
+import { Plus, X } from "lucide-react";
+import { useState } from "react";
 
 interface IgnoreIpsInputProps {
   id: string;
@@ -16,7 +16,11 @@ interface IgnoreIpsInputProps {
  * button to commit it; pasting a list splits it into entries. Invalid entries
  * are rejected with an inline message. Each entry has its own delete button.
  */
-export default function IgnoreIpsInput({ id, value, onChange }: IgnoreIpsInputProps) {
+export default function IgnoreIpsInput({
+  id,
+  value,
+  onChange,
+}: IgnoreIpsInputProps) {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
 

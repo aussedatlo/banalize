@@ -12,20 +12,14 @@ A long-running daemon providing APIs and managing multiple concurrent watchers.
 ## **Key Principles**
 
 - **Parallelism:**  
-    Each configuration runs in its own watcher task. No config should degrade the performance of others. All watchers operate fully independently.
-    
+   Each configuration runs in its own watcher task. No config should degrade the performance of others. All watchers operate fully independently.
 - **Performance isolation:**  
-    Regex scanning runs per-line in a shared thread pool. DB operations are queued to avoid blocking IO on the critical path.
-    
+   Regex scanning runs per-line in a shared thread pool. DB operations are queued to avoid blocking IO on the critical path.
 - **Minimal persistent data in sled database:**  
-    Only essential match + ban records are kept. A background cleaner removes expired entries to maintain fast lookups.
-    
+   Only essential match + ban records are kept. A background cleaner removes expired entries to maintain fast lookups.
 - **Modularity & Extensibility:**
-    
-    - Pluggable watcher types (file tail, docker logs, journald, etc.)
-        
-    - Pluggable firewall backends (iptables, nftables, cloud firewall API, etc.)
-    
+  - Pluggable watcher types (file tail, docker logs, journald, etc.)
+  - Pluggable firewall backends (iptables, nftables, cloud firewall API, etc.)
 - **timestamp**: all timestamp are in milliseconds
 
 ## Critical path description
@@ -34,20 +28,16 @@ file watcher detect a line -> regex extract an IP -> add a match in sled db -> e
 
 match event: add match in sqlite
 ban event: add ban in sqlite
-        
 
 ---
 
 ## **Tech Stack**
 
-- **Database:** sled - persistent storage for current bans/matches. is used in the critical path.  the file that operate sled operations should not contains any business logic, only sled operations. a cleanup task will clean old bans/matches from this database periodically
+- **Database:** sled - persistent storage for current bans/matches. is used in the critical path. the file that operate sled operations should not contains any business logic, only sled operations. a cleanup task will clean old bans/matches from this database periodically
 
 - Database: sqlite: persistent storage for configs/events, this database is used by the REST API and is populated in a async manner using events from the critical path file watcher.
-    
 - **File tailing:** linemux
-    
 - **Firewall backend:** iptables (first implementation)
-    
 
 ---
 
@@ -62,7 +52,6 @@ match:<config_id>:<ip>:<timestamp>
 ```
 
 - Enables efficient iteration by `(config_id, ip)` prefix
-    
 - Timestamp ordering supports quick expiry scanning
 
 ### Ban Tree
@@ -72,10 +61,9 @@ ban:<config_id>:<ip>:<timestamp>
 ```
 
 - One key per ban event
-    
 - Simplifies manual unbans and checking current ban state
 
-### Firewall 
+### Firewall
 
 Chain layout: `INPUT → banalize (parent) → bnz-<config> (one child chain per config)`.
 Every config owns its own child chain so bans never interfere across configs:
@@ -104,18 +92,14 @@ once.
 cleanup (shutdown):
 Flushes the parent (unreferencing the children), flushes and deletes every
 child chain, removes the jump from the link chain, then deletes the parent.
-    
 
 ### **Cleaning / Expiration**
 
 A background cleaner will:
 
 - Remove match entries older than `find_time` (from their config)
-    
 - Remove expired bans older than `ban_time`
-    
 - Run periodically (interval configurable)
-    
 
 Goal: keep sled DB small, predictable, and fast for range scans.
 
@@ -157,10 +141,10 @@ example config:
 
 should cleanup properly with SIGTERM or SIGINT
 
-
 ```
 
 ## Error handling
 
 - invalid config: Return an error and does not create the config/does not start the config watcher
 - firewall error: do nothing
+```

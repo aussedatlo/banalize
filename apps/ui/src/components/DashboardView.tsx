@@ -1,14 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { Activity, ShieldOff, Shield } from "lucide-react";
+import ActivityChart from "@/components/ActivityChart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDataSource } from "@/lib/datasource";
 import { cn } from "@/lib/utils";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import ActivityChart from "@/components/ActivityChart";
+import { useQuery } from "@tanstack/react-query";
+import { Activity, Shield, ShieldOff } from "lucide-react";
 
 function StatCard({
   title,
@@ -44,7 +39,9 @@ function StatCard({
           >
             {value}
           </p>
-          <p className="truncate text-xs text-muted-foreground">{description}</p>
+          <p className="truncate text-xs text-muted-foreground">
+            {description}
+          </p>
         </div>
       </CardContent>
     </Card>

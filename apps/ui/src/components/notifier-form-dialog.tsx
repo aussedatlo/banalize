@@ -1,12 +1,3 @@
-import { useEffect, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  ApiError,
-  type NotifierConfig,
-  type NotifierEventType,
-  useDataSource,
-} from "@/lib/datasource";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,6 +17,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import {
+  ApiError,
+  type NotifierConfig,
+  type NotifierEventType,
+  useDataSource,
+} from "@/lib/datasource";
+import { cn } from "@/lib/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 type NotifierKind = "email" | "signal";
 
@@ -34,14 +34,26 @@ const ALL_EVENTS: NotifierEventType[] = ["ban", "unban", "match"];
 interface FormState {
   kind: NotifierKind;
   events: NotifierEventType[];
-  email: { server: string; port: number; username: string; password: string; recipient_email: string };
+  email: {
+    server: string;
+    port: number;
+    username: string;
+    password: string;
+    recipient_email: string;
+  };
   signal: { server: string; number: string; recipients: string };
 }
 
 const defaultForm = (): FormState => ({
   kind: "email",
   events: ["ban"],
-  email: { server: "", port: 587, username: "", password: "", recipient_email: "" },
+  email: {
+    server: "",
+    port: 587,
+    username: "",
+    password: "",
+    recipient_email: "",
+  },
   signal: { server: "", number: "", recipients: "" },
 });
 
@@ -53,7 +65,10 @@ function fromConfig(config: NotifierConfig): FormState {
       ? { ...config.email_config }
       : defaultForm().email,
     signal: config.signal_config
-      ? { ...config.signal_config, recipients: config.signal_config.recipients.join(", ") }
+      ? {
+          ...config.signal_config,
+          recipients: config.signal_config.recipients.join(", "),
+        }
       : defaultForm().signal,
   };
 }
@@ -65,7 +80,9 @@ function errorMessage(error: unknown): string {
 }
 
 function Hint({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs leading-relaxed text-muted-foreground">{children}</p>;
+  return (
+    <p className="text-xs leading-relaxed text-muted-foreground">{children}</p>
+  );
 }
 
 interface NotifierFormDialogProps {
@@ -150,7 +167,9 @@ export default function NotifierFormDialog({
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>{initial ? "Edit notifier" : "Create notifier"}</DialogTitle>
+          <DialogTitle>
+            {initial ? "Edit notifier" : "Create notifier"}
+          </DialogTitle>
           <DialogDescription>
             Get notified by email or Signal message when events occur.
           </DialogDescription>

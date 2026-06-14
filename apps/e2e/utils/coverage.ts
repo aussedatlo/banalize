@@ -1,7 +1,9 @@
 import { CoverageReport } from "monocart-coverage-reports";
 
 /** Coverage collection is opt-in via COVERAGE=1 (see the test:coverage script). */
-export const COVERAGE_ENABLED = ["1", "true"].includes(process.env.COVERAGE ?? "");
+export const COVERAGE_ENABLED = ["1", "true"].includes(
+  process.env.COVERAGE ?? "",
+);
 
 /**
  * Shared monocart options. Every process (test workers + global hooks) builds a
@@ -25,4 +27,5 @@ export const coverageOptions = {
     sourcePath.includes("src/") && !sourcePath.includes("node_modules"),
 };
 
-export const createReport = (): CoverageReport => new CoverageReport(coverageOptions);
+export const createReport = (): CoverageReport =>
+  new CoverageReport(coverageOptions);

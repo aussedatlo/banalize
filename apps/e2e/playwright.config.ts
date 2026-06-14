@@ -12,8 +12,12 @@ export default defineConfig({
   testDir: "./cases",
   testMatch: "**/*.spec.ts",
   // Coverage hooks clear/merge the raw V8 data around the run (COVERAGE=1 only).
-  globalSetup: COVERAGE_ENABLED ? "./utils/coverage-global-setup.ts" : undefined,
-  globalTeardown: COVERAGE_ENABLED ? "./utils/coverage-global-teardown.ts" : undefined,
+  globalSetup: COVERAGE_ENABLED
+    ? "./utils/coverage-global-setup.ts"
+    : undefined,
+  globalTeardown: COVERAGE_ENABLED
+    ? "./utils/coverage-global-teardown.ts"
+    : undefined,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -38,8 +42,9 @@ export default defineConfig({
     // check on the UI implies the whole stack is up.
     url: UI_URL,
     reuseExistingServer: !process.env.CI,
-    // The first run builds both Docker images, which can take a while.
-    timeout: 300_000,
+    // The first run builds both Docker images, which can take a while
+    // (notably the Rust core build on a cold CI runner).
+    timeout: 600_000,
     // Give start-servers.sh's trap time to `docker compose down` the stack.
     gracefulShutdown: { signal: "SIGTERM", timeout: 30_000 },
     stdout: "pipe",

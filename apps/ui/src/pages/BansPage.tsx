@@ -1,13 +1,3 @@
-import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ShieldOff } from "lucide-react";
-import { useDataSource } from "@/lib/datasource";
-import { type BanStatus, banStatus } from "@/lib/ban-status";
-import { type Period, periodStart } from "@/lib/period";
-import { useNow } from "@/lib/use-now";
-import { formatDuration, formatTimestamp } from "@/lib/utils";
-import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
-import { useIpInfos } from "@/lib/use-ip-infos";
 import EventTableToolbar from "@/components/event-table-toolbar";
 import IpFlag from "@/components/ip-flag";
 import { Badge } from "@/components/ui/badge";
@@ -20,8 +10,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { type BanStatus, banStatus } from "@/lib/ban-status";
+import { useDataSource } from "@/lib/datasource";
+import { type Period, periodStart } from "@/lib/period";
+import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
+import { useIpInfos } from "@/lib/use-ip-infos";
+import { useNow } from "@/lib/use-now";
+import { formatDuration, formatTimestamp } from "@/lib/utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ShieldOff } from "lucide-react";
+import { useState } from "react";
 
-const statusBadge: Record<BanStatus, { variant: "destructive" | "secondary" | "outline"; label: string }> = {
+const statusBadge: Record<
+  BanStatus,
+  { variant: "destructive" | "secondary" | "outline"; label: string }
+> = {
   active: { variant: "destructive", label: "active" },
   expired: { variant: "outline", label: "expired" },
   unbanned: { variant: "secondary", label: "unbanned" },
@@ -114,7 +117,10 @@ export default function BansPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  className="text-center text-muted-foreground"
+                >
                   Loading…
                 </TableCell>
               </TableRow>
@@ -171,7 +177,8 @@ export default function BansPage() {
                         </Badge>
                         {active && scheduledEnd !== undefined ? (
                           <span className="text-xs tabular-nums text-muted-foreground">
-                            {formatDuration(Math.max(0, scheduledEnd - now))} left
+                            {formatDuration(Math.max(0, scheduledEnd - now))}{" "}
+                            left
                           </span>
                         ) : null}
                       </div>
@@ -199,7 +206,10 @@ export default function BansPage() {
       </div>
 
       {count < filtered.length ? (
-        <div ref={sentinelRef} className="py-2 text-center text-xs text-muted-foreground">
+        <div
+          ref={sentinelRef}
+          className="py-2 text-center text-xs text-muted-foreground"
+        >
           Loading more…
         </div>
       ) : filtered.length > PAGE_SIZE ? (

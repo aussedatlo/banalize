@@ -1,6 +1,3 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Eraser, Pause, Play } from "lucide-react";
-import { type TailLine, useDataSource } from "@/lib/datasource";
 import HighlightedLine, { IP_PATTERN } from "@/components/highlighted-line";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { type TailLine, useDataSource } from "@/lib/datasource";
+import { Eraser, Pause, Play } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const MAX_LINES = 500;
 
@@ -40,7 +40,10 @@ export default function LiveLogTail({
 
   useEffect(() => {
     if (autoScroll) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      bottomRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }
   }, [lines, autoScroll]);
 

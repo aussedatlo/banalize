@@ -1,14 +1,3 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { ArrowDown, ArrowUp } from "lucide-react";
-import { type IpStats, useDataSource } from "@/lib/datasource";
-import { isIpBanned } from "@/lib/ban-status";
-import { type Period, periodStart } from "@/lib/period";
-import { useNow } from "@/lib/use-now";
-import { formatTimestamp } from "@/lib/utils";
-import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
-import { useIpInfos } from "@/lib/use-ip-infos";
 import EventTableToolbar from "@/components/event-table-toolbar";
 import IpFlag from "@/components/ip-flag";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +9,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { isIpBanned } from "@/lib/ban-status";
+import { type IpStats, useDataSource } from "@/lib/datasource";
+import { type Period, periodStart } from "@/lib/period";
+import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
+import { useIpInfos } from "@/lib/use-ip-infos";
+import { useNow } from "@/lib/use-now";
+import { formatTimestamp } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowDown, ArrowUp } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 50;
 
@@ -145,7 +145,10 @@ export default function OffendersPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="text-center text-muted-foreground"
+                >
                   Loading…
                 </TableCell>
               </TableRow>
@@ -212,7 +215,10 @@ export default function OffendersPage() {
       </div>
 
       {count < filtered.length ? (
-        <div ref={sentinelRef} className="py-2 text-center text-xs text-muted-foreground">
+        <div
+          ref={sentinelRef}
+          className="py-2 text-center text-xs text-muted-foreground"
+        >
           Loading more…
         </div>
       ) : filtered.length > PAGE_SIZE ? (

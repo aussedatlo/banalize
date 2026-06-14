@@ -1,7 +1,12 @@
 import { test } from "../../fixtures";
 import { containerLogPath } from "../../utils/config";
 import { FAILED_LOGIN_REGEX } from "../../utils/log-injector";
-import { MINUTE, sleep, uniqueSuffix, WATCHER_WARMUP_MS } from "../../utils/utils";
+import {
+  MINUTE,
+  sleep,
+  uniqueSuffix,
+  WATCHER_WARMUP_MS,
+} from "../../utils/utils";
 
 /**
  * An ignored IP is exempt from banning (the allow-list that keeps you from

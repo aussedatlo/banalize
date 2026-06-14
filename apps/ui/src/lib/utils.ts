@@ -52,7 +52,8 @@ export function isValidIpOrCidr(entry: string): boolean {
   // IPv6: hex groups with at most one "::" compression. v4-mapped notation is
   // not accepted, keeping the check simple — the backend validates again.
   if (!addr.includes(":") || /:::/.test(addr)) return false;
-  if (addr !== "::" && (/^:(?!:)/.test(addr) || /(?<!:):$/.test(addr))) return false;
+  if (addr !== "::" && (/^:(?!:)/.test(addr) || /(?<!:):$/.test(addr)))
+    return false;
   const compressions = addr.split("::").length - 1;
   if (compressions > 1) return false;
   const groups = addr.split(/::?/).filter(Boolean);

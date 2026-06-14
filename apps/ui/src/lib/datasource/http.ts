@@ -15,7 +15,10 @@ import type {
 
 /** HTTP failure carrying the status code so callers can map it to a message. */
 export class ApiError extends Error {
-  constructor(public readonly status: number, statusText: string) {
+  constructor(
+    public readonly status: number,
+    statusText: string,
+  ) {
     super(`HTTP ${status}: ${statusText}`);
     this.name = "ApiError";
   }

@@ -1,23 +1,20 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Pencil } from "lucide-react";
-import { useDataSource } from "@/lib/datasource";
-import { formatDuration } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import DashboardView from "@/components/DashboardView";
 import ConfigFormDialog from "@/components/config-form-dialog";
 import LiveLogTail from "@/components/live-log-tail";
+import { Button } from "@/components/ui/button";
+import { useDataSource } from "@/lib/datasource";
+import { formatDuration } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Pencil } from "lucide-react";
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 export default function ConfigDetailPage() {
   const { id = "" } = useParams();
   const ds = useDataSource();
   const [editing, setEditing] = useState(false);
 
-  const {
-    data: config,
-    isLoading,
-  } = useQuery({
+  const { data: config, isLoading } = useQuery({
     queryKey: ["config", id],
     queryFn: () => ds.getConfig(id),
   });
@@ -42,7 +39,10 @@ export default function ConfigDetailPage() {
         <>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold" data-testid="config-detail-name">
+              <h2
+                className="text-2xl font-bold"
+                data-testid="config-detail-name"
+              >
                 {config.name}
               </h2>
               <p className="font-mono text-sm text-muted-foreground">

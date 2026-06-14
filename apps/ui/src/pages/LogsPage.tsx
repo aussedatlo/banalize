@@ -1,7 +1,3 @@
-import { useEffect, useRef, useState } from "react";
-import { Eraser, Pause, Play, Search } from "lucide-react";
-import { type LogEntry, type LogLevel, useDataSource } from "@/lib/datasource";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,6 +7,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { type LogEntry, type LogLevel, useDataSource } from "@/lib/datasource";
+import { cn } from "@/lib/utils";
+import { Eraser, Pause, Play, Search } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const LEVELS: LogLevel[] = ["ERROR", "WARN", "INFO", "DEBUG", "TRACE"];
 
@@ -31,7 +31,9 @@ export default function LogsPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ds.getLogs().then(setLogs).catch(() => {});
+    ds.getLogs()
+      .then(setLogs)
+      .catch(() => {});
   }, [ds]);
 
   useEffect(() => {
@@ -83,7 +85,9 @@ export default function LogsPage() {
             <SelectItem value="ALL">All levels</SelectItem>
             {LEVELS.map((lvl) => (
               <SelectItem key={lvl} value={lvl}>
-                <span className={cn("font-mono font-semibold", levelClass[lvl])}>
+                <span
+                  className={cn("font-mono font-semibold", levelClass[lvl])}
+                >
                   {lvl}
                 </span>
               </SelectItem>

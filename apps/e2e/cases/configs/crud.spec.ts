@@ -33,6 +33,8 @@ test.describe("config CRUD", () => {
     // Delete it from the list and confirm it is gone everywhere.
     await configs.goto();
     await configs.deleteConfig(id);
-    await expect.poll(async () => (await api.listConfigs()).map((c) => c.id)).not.toContain(id);
+    await expect
+      .poll(async () => (await api.listConfigs()).map((c) => c.id))
+      .not.toContain(id);
   });
 });

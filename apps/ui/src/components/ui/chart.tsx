@@ -1,11 +1,8 @@
+import { cn } from "@/lib/utils";
 import * as React from "react";
 import { ResponsiveContainer } from "recharts";
-import { cn } from "@/lib/utils";
 
-export type ChartConfig = Record<
-  string,
-  { label: string; color?: string }
->;
+export type ChartConfig = Record<string, { label: string; color?: string }>;
 
 /**
  * Lightweight recharts wrapper: exposes each series colour as a

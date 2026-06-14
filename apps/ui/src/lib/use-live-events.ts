@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useDataSource, type LiveEventKind } from "@/lib/datasource";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 /** Root query keys to refresh per event kind (prefix-matched by React Query). */
 const AFFECTED_KEYS: Record<LiveEventKind, string[]> = {

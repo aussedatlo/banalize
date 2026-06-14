@@ -1,7 +1,15 @@
-import { NavLink } from "react-router-dom";
-import { Activity, Bell, LayoutDashboard, ScrollText, Settings, Shield, UserX } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import {
+  Activity,
+  Bell,
+  LayoutDashboard,
+  ScrollText,
+  Settings,
+  Shield,
+  UserX,
+} from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },

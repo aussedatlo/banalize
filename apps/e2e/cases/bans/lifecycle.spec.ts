@@ -1,7 +1,12 @@
 import { expect, test } from "../../fixtures";
 import { containerLogPath } from "../../utils/config";
 import { FAILED_LOGIN_REGEX } from "../../utils/log-injector";
-import { MINUTE, sleep, uniqueSuffix, WATCHER_WARMUP_MS } from "../../utils/utils";
+import {
+  MINUTE,
+  sleep,
+  uniqueSuffix,
+  WATCHER_WARMUP_MS,
+} from "../../utils/utils";
 
 /**
  * The full UI+core end-to-end: a config watches a real log file, injected
@@ -65,6 +70,8 @@ test.describe("ban lifecycle", () => {
     await bans.expectStatus(ip, "unbanned");
 
     // And the unban is persisted in the core.
-    await expect.poll(async () => (await api.listBans()).length).toBeGreaterThanOrEqual(1);
+    await expect
+      .poll(async () => (await api.listBans()).length)
+      .toBeGreaterThanOrEqual(1);
   });
 });

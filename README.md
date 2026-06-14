@@ -79,16 +79,16 @@ curl -X POST http://localhost:6040/api/configs \
   }'
 ```
 
-| Field | Description |
-|---|---|
-| `id` | Unique identifier |
-| `name` | Human-readable label |
-| `param` | Absolute path to the log file to watch |
-| `regex` | Pattern with `<IP>` as placeholder for the IPv4 address |
-| `ban_time` | How long a ban lasts, in milliseconds |
-| `find_time` | Time window for counting matches, in milliseconds |
+| Field         | Description                                              |
+| ------------- | -------------------------------------------------------- |
+| `id`          | Unique identifier                                        |
+| `name`        | Human-readable label                                     |
+| `param`       | Absolute path to the log file to watch                   |
+| `regex`       | Pattern with `<IP>` as placeholder for the IPv4 address  |
+| `ban_time`    | How long a ban lasts, in milliseconds                    |
+| `find_time`   | Time window for counting matches, in milliseconds        |
 | `max_matches` | Number of matches within `find_time` that triggers a ban |
-| `ignore_ips` | List of IPs or CIDR ranges to never ban |
+| `ignore_ips`  | List of IPs or CIDR ranges to never ban                  |
 
 ---
 
@@ -96,39 +96,39 @@ curl -X POST http://localhost:6040/api/configs \
 
 All endpoints return JSON. Full spec at `GET /api/openapi.json`, interactive UI at `GET /swagger`.
 
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/api/configs` | List all configs |
-| `POST` | `/api/configs` | Create a config |
-| `GET` | `/api/configs/{id}` | Get a config |
-| `PUT` | `/api/configs/{id}` | Update a config (restarts its watcher) |
-| `DELETE` | `/api/configs/{id}` | Delete a config |
-| `GET` | `/api/matches` | All match events |
-| `GET` | `/api/matches/{config_id}` | Match events for one config |
-| `GET` | `/api/bans` | All ban events |
-| `GET` | `/api/bans/{config_id}` | Ban events for one config |
-| `POST` | `/api/bans/{id}/disable` | Manually unban an IP |
-| `GET` | `/api/unbans` | All unban events |
-| `GET` | `/api/unbans/{config_id}` | Unban events for one config |
+| Method   | Path                       | Description                            |
+| -------- | -------------------------- | -------------------------------------- |
+| `GET`    | `/api/configs`             | List all configs                       |
+| `POST`   | `/api/configs`             | Create a config                        |
+| `GET`    | `/api/configs/{id}`        | Get a config                           |
+| `PUT`    | `/api/configs/{id}`        | Update a config (restarts its watcher) |
+| `DELETE` | `/api/configs/{id}`        | Delete a config                        |
+| `GET`    | `/api/matches`             | All match events                       |
+| `GET`    | `/api/matches/{config_id}` | Match events for one config            |
+| `GET`    | `/api/bans`                | All ban events                         |
+| `GET`    | `/api/bans/{config_id}`    | Ban events for one config              |
+| `POST`   | `/api/bans/{id}/disable`   | Manually unban an IP                   |
+| `GET`    | `/api/unbans`              | All unban events                       |
+| `GET`    | `/api/unbans/{config_id}`  | Unban events for one config            |
 
 ---
 
 ## Environment variables (`apps/core`)
 
-| Variable | Default | Description |
-|---|---|---|
-| `BANALIZE_CORE_API_ADDR` | `0.0.0.0:6040` | HTTP listen address |
-| `BANALIZE_CORE_DATABASE_PATH` | `/tmp/banalize-core` | Directory for sled and SQLite databases |
-| `BANALIZE_CORE_FIREWALL_CHAIN` | `INPUT` | iptables chain to link the `banalize` chain into |
-| `BANALIZE_CORE_LOG_LEVEL` | `INFO` | Log verbosity (`ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE`) |
-| `BANALIZE_CORE_CLEANER_INTERVAL` | `30` | How often the expiry cleaner runs, in seconds |
+| Variable                         | Default              | Description                                               |
+| -------------------------------- | -------------------- | --------------------------------------------------------- |
+| `BANALIZE_CORE_API_ADDR`         | `0.0.0.0:6040`       | HTTP listen address                                       |
+| `BANALIZE_CORE_DATABASE_PATH`    | `/tmp/banalize-core` | Directory for sled and SQLite databases                   |
+| `BANALIZE_CORE_FIREWALL_CHAIN`   | `INPUT`              | iptables chain to link the `banalize` chain into          |
+| `BANALIZE_CORE_LOG_LEVEL`        | `INFO`               | Log verbosity (`ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE`) |
+| `BANALIZE_CORE_CLEANER_INTERVAL` | `30`                 | How often the expiry cleaner runs, in seconds             |
 
 ## Environment variables (`apps/ui`)
 
-| Variable | Default | Description |
-|---|---|---|
-| `BANALIZE_UI_PORT` | `6041` | Port the dashboard (`vite preview`) listens on |
-| `BANALIZE_UI_API_URL` | `http://localhost:6040` | Core API the dashboard proxies `/api/*` to |
+| Variable              | Default                 | Description                                    |
+| --------------------- | ----------------------- | ---------------------------------------------- |
+| `BANALIZE_UI_PORT`    | `6041`                  | Port the dashboard (`vite preview`) listens on |
+| `BANALIZE_UI_API_URL` | `http://localhost:6040` | Core API the dashboard proxies `/api/*` to     |
 
 > With `docker compose`, set `BANALIZE_CORE_PORT` / `BANALIZE_UI_PORT` (e.g. in a `.env` file) to change the ports — the compose file feeds the core port into the UI's proxy target automatically.
 

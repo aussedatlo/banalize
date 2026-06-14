@@ -29,7 +29,9 @@ export class NotificationsDriver extends BaseDriver {
 
   /** The card whose visible text contains `text` (e.g. a recipient address). */
   card(text: string): Locator {
-    return this.page.locator('[data-testid^="notifier-card-"]').filter({ hasText: text });
+    return this.page
+      .locator('[data-testid^="notifier-card-"]')
+      .filter({ hasText: text });
   }
 
   async openCreateDialog(): Promise<void> {
@@ -49,7 +51,11 @@ export class NotificationsDriver extends BaseDriver {
 
   private async selectChannel(kind: "email" | "signal"): Promise<void> {
     await this.page.getByLabel("Channel").click();
-    await this.page.getByRole("option", { name: kind === "email" ? "Email (SMTP)" : "Signal" }).click();
+    await this.page
+      .getByRole("option", {
+        name: kind === "email" ? "Email (SMTP)" : "Signal",
+      })
+      .click();
   }
 
   async createEmailNotifier(input: EmailNotifierInput): Promise<void> {
@@ -57,9 +63,12 @@ export class NotificationsDriver extends BaseDriver {
     await this.setEvents(input.events ?? ["ban"]);
     await this.selectChannel("email");
     await this.page.locator("#email-server").fill(input.server);
-    if (input.port !== undefined) await this.page.locator("#email-port").fill(String(input.port));
-    if (input.username) await this.page.locator("#email-username").fill(input.username);
-    if (input.password) await this.page.locator("#email-password").fill(input.password);
+    if (input.port !== undefined)
+      await this.page.locator("#email-port").fill(String(input.port));
+    if (input.username)
+      await this.page.locator("#email-username").fill(input.username);
+    if (input.password)
+      await this.page.locator("#email-password").fill(input.password);
     await this.page.locator("#email-recipient").fill(input.recipient);
     await this.byTestId("notifier-form-submit").click();
     await expect(this.byTestId("notifier-form")).toBeHidden();
@@ -85,7 +94,10 @@ export class NotificationsDriver extends BaseDriver {
   }
 
   async testNotifier(text: string): Promise<void> {
-    await this.card(text).locator('[data-testid^="notifier-test-"]').first().click();
+    await this.card(text)
+      .locator('[data-testid^="notifier-test-"]')
+      .first()
+      .click();
   }
 
   /** The test-result message inside a card (success or failure). */

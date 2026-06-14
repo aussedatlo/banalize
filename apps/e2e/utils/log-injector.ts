@@ -24,7 +24,10 @@ export class LogInjector {
 
   /** Append a single raw line. */
   async appendLine(file: string, line: string): Promise<void> {
-    await appendFile(this.filePath(file), line.endsWith("\n") ? line : `${line}\n`);
+    await appendFile(
+      this.filePath(file),
+      line.endsWith("\n") ? line : `${line}\n`,
+    );
   }
 
   async appendLines(file: string, lines: string[]): Promise<void> {
@@ -38,7 +41,8 @@ export class LogInjector {
   async failedLogin(file: string, ip: string, count: number): Promise<void> {
     const lines = Array.from(
       { length: count },
-      (_, i) => `${new Date().toISOString()} sshd[${1000 + i}]: Failed password for root from ${ip} port 4242 ssh2`,
+      (_, i) =>
+        `${new Date().toISOString()} sshd[${1000 + i}]: Failed password for root from ${ip} port 4242 ssh2`,
     );
     await this.appendLines(file, lines);
   }

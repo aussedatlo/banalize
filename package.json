@@ -15,6 +15,7 @@
     "e2e:coverage": "pnpm --filter=@banalize/e2e test:coverage",
     "e2e:coverage:core": "pnpm --filter=@banalize/e2e test:coverage:core",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md}\"",
     "lint": "turbo lint",
     "packages": "pnpm --filter={./packages/*}"
   },

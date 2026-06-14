@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
 import { type IpInfo, useDataSource } from "@/lib/datasource";
+import { useQuery } from "@tanstack/react-query";
 
 /**
  * Country info for a set of IPs, batched into one request. Geo data for an IP

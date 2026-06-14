@@ -2,7 +2,6 @@ import { test as base } from "@playwright/test";
 
 import { ApiClient } from "./utils/api-client";
 import { COVERAGE_ENABLED, createReport } from "./utils/coverage";
-import { LogInjector } from "./utils/log-injector";
 import { BansDriver } from "./utils/drivers/BansDriver";
 import { ConfigDetailDriver } from "./utils/drivers/ConfigDetailDriver";
 import { ConfigsDriver } from "./utils/drivers/ConfigsDriver";
@@ -12,6 +11,7 @@ import { MatchesDriver } from "./utils/drivers/MatchesDriver";
 import { NotificationsDriver } from "./utils/drivers/NotificationsDriver";
 import { OffendersDriver } from "./utils/drivers/OffendersDriver";
 import { SidebarDriver } from "./utils/drivers/SidebarDriver";
+import { LogInjector } from "./utils/log-injector";
 
 type Fixtures = {
   api: ApiClient;

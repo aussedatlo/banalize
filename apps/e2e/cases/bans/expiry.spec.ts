@@ -1,7 +1,13 @@
 import { test } from "../../fixtures";
 import { containerLogPath } from "../../utils/config";
 import { FAILED_LOGIN_REGEX } from "../../utils/log-injector";
-import { MINUTE, SECOND, sleep, uniqueSuffix, WATCHER_WARMUP_MS } from "../../utils/utils";
+import {
+  MINUTE,
+  SECOND,
+  sleep,
+  uniqueSuffix,
+  WATCHER_WARMUP_MS,
+} from "../../utils/utils";
 
 /**
  * Bans are temporary: once `ban_time` elapses the cleaner lifts them. This is the

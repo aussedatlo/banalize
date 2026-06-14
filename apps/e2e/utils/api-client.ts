@@ -44,7 +44,9 @@ export class ApiClient {
   private async json<T>(path: string, init?: RequestInit): Promise<T> {
     const res = await fetch(`${this.baseUrl}${path}`, init);
     if (!res.ok) {
-      throw new Error(`${init?.method ?? "GET"} ${path} -> ${res.status} ${res.statusText}`);
+      throw new Error(
+        `${init?.method ?? "GET"} ${path} -> ${res.status} ${res.statusText}`,
+      );
     }
     return res.json() as Promise<T>;
   }
@@ -62,7 +64,9 @@ export class ApiClient {
   }
 
   async deleteConfig(id: string): Promise<void> {
-    const res = await fetch(`${this.baseUrl}/api/configs/${id}`, { method: "DELETE" });
+    const res = await fetch(`${this.baseUrl}/api/configs/${id}`, {
+      method: "DELETE",
+    });
     if (!res.ok && res.status !== 404) {
       throw new Error(`DELETE /api/configs/${id} -> ${res.status}`);
     }
@@ -81,9 +85,12 @@ export class ApiClient {
   }
 
   async deleteNotifier(id: string): Promise<void> {
-    const res = await fetch(`${this.baseUrl}/api/notifiers/${encodeURIComponent(id)}`, {
-      method: "DELETE",
-    });
+    const res = await fetch(
+      `${this.baseUrl}/api/notifiers/${encodeURIComponent(id)}`,
+      {
+        method: "DELETE",
+      },
+    );
     if (!res.ok && res.status !== 404) {
       throw new Error(`DELETE /api/notifiers/${id} -> ${res.status}`);
     }

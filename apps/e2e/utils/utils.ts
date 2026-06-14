@@ -1,5 +1,6 @@
 /** A unique-ish id suffix so parallel-safe specs don't collide on names/ids. */
-export const uniqueSuffix = (): string => Math.random().toString(36).slice(2, 8);
+export const uniqueSuffix = (): string =>
+  Math.random().toString(36).slice(2, 8);
 
 /** Common ban-rule timings for the lifecycle spec (milliseconds). */
 export const SECOND = 1000;

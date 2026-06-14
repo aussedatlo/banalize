@@ -46,6 +46,7 @@ The application exposes a REST API for managing configurations:
 ### Example Requests
 
 **Create a config:**
+
 ```bash
 curl -X POST http://localhost:6040/api/configs \
   -H "Content-Type: application/json" \
@@ -62,6 +63,7 @@ curl -X POST http://localhost:6040/api/configs \
 ```
 
 **Update a config:**
+
 ```bash
 curl -X PUT http://localhost:6040/api/configs/ssh-failed-login \
   -H "Content-Type: application/json" \
@@ -72,6 +74,7 @@ curl -X PUT http://localhost:6040/api/configs/ssh-failed-login \
 ```
 
 **Delete a config:**
+
 ```bash
 curl -X DELETE http://localhost:6040/api/configs/ssh-failed-login
 ```
@@ -98,4 +101,3 @@ Uses three databases:
 - **Firewall**: Manages iptables rules for IP banning
 - **Cleaner**: Background task that removes expired entries
 - **Event Emitter**: Asynchronously emits events (non-blocking)
-

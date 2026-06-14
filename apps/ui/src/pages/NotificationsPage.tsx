@@ -1,21 +1,16 @@
-import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Mail, MessageSquare, Pencil, Plus, Send, Trash2 } from "lucide-react";
+import NotifierFormDialog from "@/components/notifier-form-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   type NotifierConfig,
   type NotifierTestResult,
   useDataSource,
 } from "@/lib/datasource";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import NotifierFormDialog from "@/components/notifier-form-dialog";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Mail, MessageSquare, Pencil, Plus, Send, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 function NotifierCard({
   notifier,

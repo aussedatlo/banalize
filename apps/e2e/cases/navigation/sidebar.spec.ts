@@ -20,7 +20,9 @@ test.describe("sidebar navigation", () => {
       await expect(page).toHaveURL(new RegExp(`/${route}$`));
       await sidebar.expectActive(route);
       if (heading) {
-        await expect(page.getByRole("heading", { name: heading, level: 2 })).toBeVisible();
+        await expect(
+          page.getByRole("heading", { name: heading, level: 2 }),
+        ).toBeVisible();
       }
     }
   });

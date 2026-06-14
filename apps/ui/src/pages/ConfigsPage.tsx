@@ -1,17 +1,12 @@
-import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
-import { ChevronRight, FileText, Plus, Trash2 } from "lucide-react";
+import ConfigFormDialog from "@/components/config-form-dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDataSource } from "@/lib/datasource";
 import { formatDuration } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import ConfigFormDialog from "@/components/config-form-dialog";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChevronRight, FileText, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function ConfigsPage() {
   const ds = useDataSource();
@@ -33,9 +28,14 @@ export default function ConfigsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Configs</h2>
-          <p className="text-muted-foreground">Manage log-watching configurations</p>
+          <p className="text-muted-foreground">
+            Manage log-watching configurations
+          </p>
         </div>
-        <Button data-testid="config-create-button" onClick={() => setOpen(true)}>
+        <Button
+          data-testid="config-create-button"
+          onClick={() => setOpen(true)}
+        >
           <Plus className="mr-2 h-4 w-4" />
           New config
         </Button>
@@ -64,7 +64,9 @@ export default function ConfigsPage() {
                 <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
                   <div className="space-y-1">
                     <CardTitle className="text-base">{c.name}</CardTitle>
-                    <p className="font-mono text-xs text-muted-foreground">{c.id}</p>
+                    <p className="font-mono text-xs text-muted-foreground">
+                      {c.id}
+                    </p>
                   </div>
                   <Button
                     variant="ghost"
@@ -84,7 +86,9 @@ export default function ConfigsPage() {
                 <CardContent className="space-y-3 text-sm">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <FileText className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate font-mono text-xs">{c.param}</span>
+                    <span className="truncate font-mono text-xs">
+                      {c.param}
+                    </span>
                   </div>
                   <p className="truncate font-mono text-xs text-muted-foreground">
                     {c.regex}

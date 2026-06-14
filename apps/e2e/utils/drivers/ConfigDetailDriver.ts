@@ -21,7 +21,9 @@ export class ConfigDetailDriver extends BaseDriver {
 
   /** Wait for at least one line to appear in the live log tail. */
   async expectLiveLogLine(text: string): Promise<void> {
-    await expect(this.byTestId("live-log-line").filter({ hasText: text }).first()).toBeVisible({
+    await expect(
+      this.byTestId("live-log-line").filter({ hasText: text }).first(),
+    ).toBeVisible({
       timeout: 15_000,
     });
   }
