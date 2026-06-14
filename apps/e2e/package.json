@@ -8,6 +8,7 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:coverage": "COVERAGE=1 playwright test",
+    "test:coverage:core": "./scripts/core-coverage.sh",
     "test:report": "playwright show-report",
     "install:browsers": "playwright install --with-deps chromium",
     "typecheck": "tsc --noEmit"

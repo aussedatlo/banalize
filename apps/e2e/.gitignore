@@ -1,5 +1,6 @@
 .tmp/
 coverage/
+coverage-core/
 playwright-report/
 test-results/
 blob-report/

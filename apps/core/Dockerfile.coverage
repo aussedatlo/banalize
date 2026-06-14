@@ -1,0 +1,34 @@
+# Instrumented build of the core used to collect coverage during the Playwright
+# e2e run. Unlike the production Dockerfile (slim, release), this is a single
+# stage that keeps the Rust toolchain, the llvm tools and the source tree, so the
+# lcov/html report can be generated inside this same image — the binary's
+# embedded source paths (/usr/src/app/apps/core/src/...) then resolve without any
+# path remapping.
+FROM rust:1.91.0
+
+WORKDIR /usr/src/app
+
+# iptables for the firewall integration; llvm-tools for profdata/cov.
+RUN apt-get update && apt-get install -y iptables && rm -rf /var/lib/apt/lists/*
+RUN rustup component add llvm-tools-preview
+
+# Workspace manifests first so the dependency compile layer caches.
+COPY Cargo.toml Cargo.lock ./
+COPY apps/core ./apps/core
+
+# Source-based coverage instrumentation. Debug build: faster to compile and maps
+# lines more precisely than an optimized one.
+ENV RUSTFLAGS="-C instrument-coverage"
+RUN cargo build --package banalize-core
+
+# Where the instrumented binary writes raw profiles at exit (overridden at
+# runtime to the mounted /cov directory). Each process/module gets a unique file.
+ENV LLVM_PROFILE_FILE=/cov/banalize-core-%p-%m.profraw
+
+# Reuse the production entrypoint (it `exec`s the binary, so SIGTERM reaches it
+# directly and the graceful shutdown flushes coverage).
+RUN cp target/debug/banalize-core /usr/local/bin/banalize-core
+COPY apps/core/bin/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+CMD ["/usr/local/bin/entrypoint.sh"]

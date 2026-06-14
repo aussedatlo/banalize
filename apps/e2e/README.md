@@ -67,3 +67,26 @@ How it is wired (`utils/coverage.ts`):
 Reports (`html`, `lcovonly`, `console-summary`) land in `apps/e2e/coverage/`.
 
 [monocart-coverage-reports]: https://github.com/cenfun/monocart-coverage-reports
+
+### Core (Rust) coverage
+
+```bash
+pnpm e2e:coverage:core   # runs the suite against an instrumented core, then reports
+open apps/e2e/coverage-core/html/index.html
+```
+
+This measures how much of the **Rust core** the e2e suite exercises, via LLVM
+source-based coverage:
+
+- `apps/core/Dockerfile.coverage` builds the core with `-C instrument-coverage`
+  and keeps the toolchain + source in the image.
+- `docker-compose.e2e.coverage.yml` (layered by `start-servers.sh` when
+  `CORE_COVERAGE=1`) swaps in that image, mounts `.tmp/core-coverage`, and sets
+  `LLVM_PROFILE_FILE`. The core flushes `.profraw` on graceful shutdown (it
+  handles SIGTERM), which happens when the stack is torn down after the run.
+- `scripts/core-coverage.sh` then merges the profiles with
+  `llvm-profdata`/`llvm-cov` inside that same image (so the binary's embedded
+  source paths resolve) and writes `apps/e2e/coverage-core/{core.lcov,html/}`.
+
+> Note: the first `pnpm e2e:coverage:core` does a full instrumented (debug)
+> build of the core, which is slow; subsequent runs reuse the cached image.
