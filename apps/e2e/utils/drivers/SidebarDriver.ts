@@ -23,8 +23,8 @@ export class SidebarDriver {
     await this.page.waitForURL(`**/${route}`);
   }
 
-  /** Assert the given route's link is the active (current) one. */
+  /** Assert the given route's link is the active (current) one (brand gradient). */
   async expectActive(route: Route): Promise<void> {
-    await expect(this.link(route)).toHaveClass(/bg-primary/);
+    await expect(this.link(route)).toHaveClass(/from-brand-blue/);
   }
 }

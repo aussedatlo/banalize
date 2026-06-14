@@ -40,7 +40,7 @@ export default function ConfigDetailPage() {
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <h2
-                className="text-2xl font-bold"
+                className="pageTitle text-2xl font-bold"
                 data-testid="config-detail-name"
               >
                 {config.name}

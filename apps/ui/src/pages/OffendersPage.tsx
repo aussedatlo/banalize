@@ -114,7 +114,7 @@ export default function OffendersPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-bold">Offenders</h2>
+        <h2 className="pageTitle text-2xl font-bold">Offenders</h2>
         <p className="text-muted-foreground">
           Unique IPs ranked by recorded activity — click one to see its matches
         </p>

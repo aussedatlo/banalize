@@ -87,7 +87,7 @@ export default function BansPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-bold">Bans</h2>
+        <h2 className="pageTitle text-2xl font-bold">Bans</h2>
         <p className="text-muted-foreground">
           All ban events — active bans can be lifted with Unban
         </p>

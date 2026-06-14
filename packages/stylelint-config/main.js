@@ -3,6 +3,8 @@ module.exports = {
   plugins: ["stylelint-prettier"],
   rules: {
     "prettier/prettier": true,
+    // Tailwind v4 requires the bare-string import (`@import "tailwindcss"`).
+    "import-notation": "string",
     // Tailwind's directives are not standard CSS at-rules.
     "at-rule-no-unknown": [
       true,
