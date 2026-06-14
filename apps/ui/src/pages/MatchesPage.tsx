@@ -74,7 +74,7 @@ export default function MatchesPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-bold">Matches</h2>
+        <h2 className="pageTitle text-2xl font-bold">Matches</h2>
         <p className="text-muted-foreground">
           Log lines that matched a config regex
         </p>

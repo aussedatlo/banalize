@@ -58,7 +58,7 @@ export default function LogsPage() {
   return (
     <div className="flex h-full flex-col space-y-4">
       <div>
-        <h2 className="text-2xl font-bold">Logs</h2>
+        <h2 className="pageTitle text-2xl font-bold">Logs</h2>
         <p className="text-muted-foreground">Live core application logs</p>
       </div>
 

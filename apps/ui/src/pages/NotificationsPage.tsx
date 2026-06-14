@@ -129,7 +129,7 @@ export default function NotificationsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Notifications</h2>
+          <h2 className="pageTitle text-2xl font-bold">Notifications</h2>
           <p className="text-muted-foreground">
             Send alerts when IPs match or get banned
           </p>

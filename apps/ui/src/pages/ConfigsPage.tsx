@@ -27,7 +27,7 @@ export default function ConfigsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Configs</h2>
+          <h2 className="pageTitle text-2xl font-bold">Configs</h2>
           <p className="text-muted-foreground">
             Manage log-watching configurations
           </p>
