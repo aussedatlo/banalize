@@ -47,6 +47,9 @@ services:
     build:
       context: .
       dockerfile: apps/ui/Dockerfile
+      args:
+        # Inline source maps so the e2e suite can collect source-mapped coverage.
+        BANALIZE_UI_SOURCEMAP: "true"
     environment:
       BANALIZE_UI_PORT: "6043"
       BANALIZE_UI_API_URL: http://core:6042

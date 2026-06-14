@@ -1,6 +1,7 @@
 import { test as base } from "@playwright/test";
 
 import { ApiClient } from "./utils/api-client";
+import { COVERAGE_ENABLED, createReport } from "./utils/coverage";
 import { LogInjector } from "./utils/log-injector";
 import { BansDriver } from "./utils/drivers/BansDriver";
 import { ConfigDetailDriver } from "./utils/drivers/ConfigDetailDriver";
@@ -26,6 +27,8 @@ type Fixtures = {
   logs: LogsDriver;
   /** Auto fixture: wipes all core state after every test so specs are isolated. */
   cleanup: void;
+  /** Auto fixture: collects V8 JS coverage when COVERAGE=1. */
+  collectCoverage: void;
 };
 
 /**
@@ -71,6 +74,20 @@ export const test = base.extend<Fixtures>({
     async ({ api }, use) => {
       await use();
       await api.reset();
+    },
+    { auto: true },
+  ],
+  collectCoverage: [
+    async ({ page, browserName }, use) => {
+      const on = COVERAGE_ENABLED && browserName === "chromium";
+      // resetOnNavigation:false keeps coverage accumulating across the page
+      // reloads each spec performs.
+      if (on) await page.coverage.startJSCoverage({ resetOnNavigation: false });
+      await use();
+      if (on) {
+        const entries = await page.coverage.stopJSCoverage();
+        await createReport().add(entries);
+      }
     },
     { auto: true },
   ],

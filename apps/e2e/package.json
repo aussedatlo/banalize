@@ -7,6 +7,7 @@
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
+    "test:coverage": "COVERAGE=1 playwright test",
     "test:report": "playwright show-report",
     "install:browsers": "playwright install --with-deps chromium",
     "typecheck": "tsc --noEmit"
@@ -14,6 +15,7 @@
   "devDependencies": {
     "@playwright/test": "^1.49.1",
     "@types/node": "^22.10.0",
+    "monocart-coverage-reports": "^2.12.0",
     "typescript": "^5.5.4"
   }
 }

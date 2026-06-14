@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 import { UI_URL } from "./utils/config";
+import { COVERAGE_ENABLED } from "./utils/coverage";
 
 /**
  * Drives the real UI (served by Caddy) which proxies /api to the real core —
@@ -10,6 +11,9 @@ import { UI_URL } from "./utils/config";
 export default defineConfig({
   testDir: "./cases",
   testMatch: "**/*.spec.ts",
+  // Coverage hooks clear/merge the raw V8 data around the run (COVERAGE=1 only).
+  globalSetup: COVERAGE_ENABLED ? "./utils/coverage-global-setup.ts" : undefined,
+  globalTeardown: COVERAGE_ENABLED ? "./utils/coverage-global-teardown.ts" : undefined,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

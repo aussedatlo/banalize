@@ -42,3 +42,28 @@ pnpm e2e test:report     # open the last HTML report
 Requires Docker (with `docker compose`). Set `BANALIZE_E2E_CORE_URL` /
 `BANALIZE_E2E_UI_URL` / `BANALIZE_E2E_LOG_DIR` to point at an externally managed
 stack instead of the bundled compose file.
+
+## Coverage
+
+```bash
+pnpm e2e:coverage        # COVERAGE=1 playwright test
+open apps/e2e/coverage/index.html
+```
+
+UI **frontend** coverage is collected via Chromium's V8 JS coverage and mapped
+back to `apps/ui/src` with [monocart-coverage-reports]. For the mapping to work
+the e2e UI image is built with **inline source maps** (the
+`BANALIZE_UI_SOURCEMAP=true` build arg in `docker-compose.e2e.yml`, gated in
+`apps/ui/vite.config.ts`; production builds stay map-free).
+
+How it is wired (`utils/coverage.ts`):
+
+- `playwright.config.ts` `globalSetup` clears stale raw coverage; `globalTeardown`
+  merges it and writes the report (only when `COVERAGE=1`).
+- The auto `collectCoverage` fixture (`fixtures.ts`) starts/stops
+  `page.coverage` per test and `add()`s the raw V8 data; workers and the global
+  hooks share one on-disk cache via the same monocart `name`/`outputDir`.
+
+Reports (`html`, `lcovonly`, `console-summary`) land in `apps/e2e/coverage/`.
+
+[monocart-coverage-reports]: https://github.com/cenfun/monocart-coverage-reports

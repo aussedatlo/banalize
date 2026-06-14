@@ -12,7 +12,10 @@ COPY packages ./packages
 COPY apps/ui/package.json ./apps/ui/package.json
 RUN pnpm install --frozen-lockfile --filter "@banalize/ui..."
 
-# Build the SPA to apps/ui/dist
+# Build the SPA to apps/ui/dist. BANALIZE_UI_SOURCEMAP=true emits inline source
+# maps so the e2e suite can map V8 coverage back to source (off by default).
+ARG BANALIZE_UI_SOURCEMAP=false
+ENV BANALIZE_UI_SOURCEMAP=$BANALIZE_UI_SOURCEMAP
 COPY apps/ui ./apps/ui
 RUN pnpm --filter @banalize/ui build
 

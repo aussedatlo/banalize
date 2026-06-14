@@ -12,6 +12,7 @@
     "dev": "turbo dev",
     "e2e": "pnpm --filter=@banalize/e2e",
     "e2e:ui": "pnpm --filter=@banalize/e2e test:ui",
+    "e2e:coverage": "pnpm --filter=@banalize/e2e test:coverage",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo lint",
     "packages": "pnpm --filter={./packages/*}"

@@ -9,6 +9,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Inline source maps let the e2e suite map V8 coverage back to source.
+    // Off by default (production), enabled for the e2e image via build arg.
+    sourcemap: process.env.BANALIZE_UI_SOURCEMAP === "true" ? "inline" : false,
+  },
   server: {
     proxy: {
       "/api": process.env.BANALIZE_UI_API_URL ?? "http://localhost:6040",
