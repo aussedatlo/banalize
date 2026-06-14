@@ -1,7 +1,15 @@
-import { NavLink } from "react-router-dom";
-import { Activity, Bell, LayoutDashboard, ScrollText, Settings, Shield, UserX } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import {
+  Activity,
+  Bell,
+  LayoutDashboard,
+  ScrollText,
+  Settings,
+  Shield,
+  UserX,
+} from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -26,6 +34,7 @@ export default function Sidebar() {
           <NavLink
             key={to}
             to={to}
+            data-testid={`nav-link-${to.slice(1)}`}
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",

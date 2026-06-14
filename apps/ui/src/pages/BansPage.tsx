@@ -1,13 +1,3 @@
-import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ShieldOff } from "lucide-react";
-import { useDataSource } from "@/lib/datasource";
-import { type BanStatus, banStatus } from "@/lib/ban-status";
-import { type Period, periodStart } from "@/lib/period";
-import { useNow } from "@/lib/use-now";
-import { formatDuration, formatTimestamp } from "@/lib/utils";
-import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
-import { useIpInfos } from "@/lib/use-ip-infos";
 import EventTableToolbar from "@/components/event-table-toolbar";
 import IpFlag from "@/components/ip-flag";
 import { Badge } from "@/components/ui/badge";
@@ -20,8 +10,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { type BanStatus, banStatus } from "@/lib/ban-status";
+import { useDataSource } from "@/lib/datasource";
+import { type Period, periodStart } from "@/lib/period";
+import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
+import { useIpInfos } from "@/lib/use-ip-infos";
+import { useNow } from "@/lib/use-now";
+import { formatDuration, formatTimestamp } from "@/lib/utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ShieldOff } from "lucide-react";
+import { useState } from "react";
 
-const statusBadge: Record<BanStatus, { variant: "destructive" | "secondary" | "outline"; label: string }> = {
+const statusBadge: Record<
+  BanStatus,
+  { variant: "destructive" | "secondary" | "outline"; label: string }
+> = {
   active: { variant: "destructive", label: "active" },
   expired: { variant: "outline", label: "expired" },
   unbanned: { variant: "secondary", label: "unbanned" },
@@ -114,13 +117,20 @@ export default function BansPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  className="text-center text-muted-foreground"
+                >
                   Loading…
                 </TableCell>
               </TableRow>
             ) : visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  data-testid="bans-empty"
+                  className="text-center text-muted-foreground"
+                >
                   {bans.length === 0
                     ? "No bans recorded"
                     : "No bans for the current filters"}
@@ -134,7 +144,11 @@ export default function BansPage() {
                   ? ban.timestamp + configMap.get(ban.config_id)!.ban_time
                   : undefined;
                 return (
-                  <TableRow key={ban.id} className={active ? undefined : "text-muted-foreground"}>
+                  <TableRow
+                    key={ban.id}
+                    data-testid={`bans-row-${ban.ip}`}
+                    className={active ? undefined : "text-muted-foreground"}
+                  >
                     <TableCell>
                       <div className="flex items-center gap-1.5">
                         <IpFlag info={ipInfos[ban.ip]} />
@@ -154,12 +168,17 @@ export default function BansPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Badge variant={statusBadge[status].variant} className="font-normal">
+                        <Badge
+                          variant={statusBadge[status].variant}
+                          className="font-normal"
+                          data-testid={`bans-status-${ban.ip}`}
+                        >
                           {statusBadge[status].label}
                         </Badge>
                         {active && scheduledEnd !== undefined ? (
                           <span className="text-xs tabular-nums text-muted-foreground">
-                            {formatDuration(Math.max(0, scheduledEnd - now))} left
+                            {formatDuration(Math.max(0, scheduledEnd - now))}{" "}
+                            left
                           </span>
                         ) : null}
                       </div>
@@ -169,6 +188,7 @@ export default function BansPage() {
                         <Button
                           variant="outline"
                           size="sm"
+                          data-testid={`bans-unban-${ban.ip}`}
                           disabled={unbanning === ban.id}
                           onClick={() => unban(ban.id)}
                         >
@@ -186,7 +206,10 @@ export default function BansPage() {
       </div>
 
       {count < filtered.length ? (
-        <div ref={sentinelRef} className="py-2 text-center text-xs text-muted-foreground">
+        <div
+          ref={sentinelRef}
+          className="py-2 text-center text-xs text-muted-foreground"
+        >
           Loading more…
         </div>
       ) : filtered.length > PAGE_SIZE ? (

@@ -1,6 +1,3 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Eraser, Pause, Play } from "lucide-react";
-import { type TailLine, useDataSource } from "@/lib/datasource";
 import HighlightedLine, { IP_PATTERN } from "@/components/highlighted-line";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { type TailLine, useDataSource } from "@/lib/datasource";
+import { Eraser, Pause, Play } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const MAX_LINES = 500;
 
@@ -40,7 +40,10 @@ export default function LiveLogTail({
 
   useEffect(() => {
     if (autoScroll) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      bottomRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }
   }, [lines, autoScroll]);
 
@@ -94,6 +97,7 @@ export default function LiveLogTail({
             lines.map((l, i) => (
               <div
                 key={i}
+                data-testid="live-log-line"
                 className="flex gap-3 rounded px-1 py-px hover:bg-muted/50"
               >
                 <span className="w-20 shrink-0 leading-relaxed tabular-nums text-muted-foreground">

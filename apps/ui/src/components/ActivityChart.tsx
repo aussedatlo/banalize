@@ -1,3 +1,9 @@
+import {
+  ChartContainer,
+  chartTooltipStyle,
+  type ChartConfig,
+} from "@/components/ui/chart";
+import type { BanEvent, MatchEvent } from "@/lib/datasource";
 import { useMemo } from "react";
 import {
   Area,
@@ -8,12 +14,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { BanEvent, MatchEvent } from "@/lib/datasource";
-import {
-  ChartContainer,
-  chartTooltipStyle,
-  type ChartConfig,
-} from "@/components/ui/chart";
 
 const HOUR = 60 * 60 * 1000;
 const WINDOW_HOURS = 24;
@@ -29,10 +29,7 @@ interface Bucket {
   bans: number;
 }
 
-function bucketByHour(
-  matches: MatchEvent[],
-  bans: BanEvent[],
-): Bucket[] {
+function bucketByHour(matches: MatchEvent[], bans: BanEvent[]): Bucket[] {
   const now = Date.now();
   const start = Math.floor((now - WINDOW_HOURS * HOUR) / HOUR) * HOUR;
   const buckets: Bucket[] = [];
@@ -87,12 +84,24 @@ export default function ActivityChart({
       <AreaChart data={data} margin={{ left: -16, right: 8, top: 8 }}>
         <defs>
           <linearGradient id="fill-matches" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--color-matches)" stopOpacity={0.4} />
-            <stop offset="95%" stopColor="var(--color-matches)" stopOpacity={0.05} />
+            <stop
+              offset="5%"
+              stopColor="var(--color-matches)"
+              stopOpacity={0.4}
+            />
+            <stop
+              offset="95%"
+              stopColor="var(--color-matches)"
+              stopOpacity={0.05}
+            />
           </linearGradient>
           <linearGradient id="fill-bans" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="var(--color-bans)" stopOpacity={0.4} />
-            <stop offset="95%" stopColor="var(--color-bans)" stopOpacity={0.05} />
+            <stop
+              offset="95%"
+              stopColor="var(--color-bans)"
+              stopOpacity={0.05}
+            />
           </linearGradient>
         </defs>
         <CartesianGrid vertical={false} strokeOpacity={0.15} />

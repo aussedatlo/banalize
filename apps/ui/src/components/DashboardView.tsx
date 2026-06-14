@@ -1,14 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { Activity, ShieldOff, Shield } from "lucide-react";
+import ActivityChart from "@/components/ActivityChart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDataSource } from "@/lib/datasource";
 import { cn } from "@/lib/utils";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import ActivityChart from "@/components/ActivityChart";
+import { useQuery } from "@tanstack/react-query";
+import { Activity, Shield, ShieldOff } from "lucide-react";
 
 function StatCard({
   title,
@@ -16,15 +11,17 @@ function StatCard({
   icon: Icon,
   description,
   tint,
+  testId,
 }: {
   title: string;
   value: number | string;
   icon: React.ElementType;
   description: string;
   tint: string;
+  testId: string;
 }) {
   return (
-    <Card>
+    <Card data-testid={testId}>
       <CardContent className="flex items-center gap-4 p-5">
         <div
           className={cn(
@@ -36,8 +33,15 @@ function StatCard({
         </div>
         <div className="min-w-0">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-3xl font-bold leading-tight tabular-nums">{value}</p>
-          <p className="truncate text-xs text-muted-foreground">{description}</p>
+          <p
+            data-testid={`${testId}-value`}
+            className="text-3xl font-bold leading-tight tabular-nums"
+          >
+            {value}
+          </p>
+          <p className="truncate text-xs text-muted-foreground">
+            {description}
+          </p>
         </div>
       </CardContent>
     </Card>
@@ -77,6 +81,7 @@ export default function DashboardView({ configId }: { configId?: string }) {
           icon={Shield}
           description="Ban events recorded"
           tint="bg-red-500/10 text-red-600 dark:text-red-400"
+          testId="stat-bans"
         />
         <StatCard
           title="Matches (24h)"
@@ -84,6 +89,7 @@ export default function DashboardView({ configId }: { configId?: string }) {
           icon={Activity}
           description="Log matches in last 24 hours"
           tint="bg-blue-500/10 text-blue-600 dark:text-blue-400"
+          testId="stat-matches"
         />
         <StatCard
           title="Unbans"
@@ -91,6 +97,7 @@ export default function DashboardView({ configId }: { configId?: string }) {
           icon={ShieldOff}
           description="Lifted or expired bans"
           tint="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+          testId="stat-unbans"
         />
       </div>
 

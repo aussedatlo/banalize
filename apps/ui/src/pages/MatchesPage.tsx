@@ -1,11 +1,3 @@
-import { Fragment, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
-import { useDataSource } from "@/lib/datasource";
-import { type Period, periodStart } from "@/lib/period";
-import { formatTimestamp } from "@/lib/utils";
-import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
-import { useIpInfos } from "@/lib/use-ip-infos";
 import EventTableToolbar from "@/components/event-table-toolbar";
 import HighlightedLine from "@/components/highlighted-line";
 import IpFlag from "@/components/ip-flag";
@@ -17,6 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useDataSource } from "@/lib/datasource";
+import { type Period, periodStart } from "@/lib/period";
+import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
+import { useIpInfos } from "@/lib/use-ip-infos";
+import { formatTimestamp } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { Fragment, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const PAGE_SIZE = 50;
 
@@ -103,13 +103,20 @@ export default function MatchesPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={3}
+                  className="text-center text-muted-foreground"
+                >
                   Loading…
                 </TableCell>
               </TableRow>
             ) : visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={3}
+                  data-testid="matches-empty"
+                  className="text-center text-muted-foreground"
+                >
                   {matches.length === 0
                     ? "No matches recorded"
                     : "No matches for the current filters"}
@@ -120,6 +127,7 @@ export default function MatchesPage() {
                 <Fragment key={m.id}>
                   <TableRow
                     className="cursor-pointer"
+                    data-testid={`matches-row-${m.ip}`}
                     onClick={() => toggleExpanded(m.id)}
                   >
                     <TableCell className="whitespace-nowrap font-mono text-sm">
@@ -143,8 +151,8 @@ export default function MatchesPage() {
                           />
                         ) : (
                           <p className="text-xs text-muted-foreground">
-                            No line recorded for this match (event predates
-                            line capture).
+                            No line recorded for this match (event predates line
+                            capture).
                           </p>
                         )}
                       </TableCell>
@@ -158,7 +166,10 @@ export default function MatchesPage() {
       </div>
 
       {count < filtered.length ? (
-        <div ref={sentinelRef} className="py-2 text-center text-xs text-muted-foreground">
+        <div
+          ref={sentinelRef}
+          className="py-2 text-center text-xs text-muted-foreground"
+        >
           Loading more…
         </div>
       ) : filtered.length > PAGE_SIZE ? (

@@ -16,6 +16,9 @@ const PERIOD_MS: Record<Exclude<Period, "all">, number> = {
 };
 
 /** Start of the period as a ms epoch, or undefined for "all". */
-export function periodStart(period: Period, now = Date.now()): number | undefined {
+export function periodStart(
+  period: Period,
+  now = Date.now(),
+): number | undefined {
   return period === "all" ? undefined : now - PERIOD_MS[period];
 }

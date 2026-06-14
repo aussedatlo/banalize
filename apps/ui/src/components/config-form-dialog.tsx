@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiError, type Config, useDataSource } from "@/lib/datasource";
-import { slugify } from "@/lib/utils";
+import DurationInput from "@/components/duration-input";
+import IgnoreIpsInput from "@/components/ignore-ips-input";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,8 +12,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import DurationInput from "@/components/duration-input";
-import IgnoreIpsInput from "@/components/ignore-ips-input";
+import { ApiError, type Config, useDataSource } from "@/lib/datasource";
+import { slugify } from "@/lib/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 const defaultForm = (): Omit<Config, "id"> => ({
   name: "",
@@ -38,7 +38,9 @@ function errorMessage(error: unknown): string {
 }
 
 function Hint({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs leading-relaxed text-muted-foreground">{children}</p>;
+  return (
+    <p className="text-xs leading-relaxed text-muted-foreground">{children}</p>
+  );
 }
 
 interface ConfigFormDialogProps {
@@ -104,6 +106,7 @@ export default function ConfigFormDialog({
         </DialogHeader>
         <form
           className="grid gap-5"
+          data-testid="config-form"
           onSubmit={(e) => {
             e.preventDefault();
             save({ ...form, id });
@@ -152,7 +155,9 @@ export default function ConfigFormDialog({
             />
             <Hint>
               Regex matched against every new line. Use{" "}
-              <code className="rounded bg-muted px-1 font-mono">&lt;IP&gt;</code>{" "}
+              <code className="rounded bg-muted px-1 font-mono">
+                &lt;IP&gt;
+              </code>{" "}
               where the offender&apos;s address appears.
             </Hint>
           </div>
@@ -198,7 +203,9 @@ export default function ConfigFormDialog({
                 />
               </div>
             </div>
-            <Hint>How long the firewall blocks the IP before it is lifted.</Hint>
+            <Hint>
+              How long the firewall blocks the IP before it is lifted.
+            </Hint>
           </div>
 
           <Separator />
@@ -227,7 +234,11 @@ export default function ConfigFormDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending || !id}>
+            <Button
+              type="submit"
+              data-testid="config-form-submit"
+              disabled={isPending || !id}
+            >
               {isPending
                 ? "Saving…"
                 : initial

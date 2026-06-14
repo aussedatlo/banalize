@@ -1,38 +1,23 @@
-name: Tests CI
+name: Coverage CI
 
+# Post-merge Rust coverage tracking on main. PRs are gated by pull-request.yml;
+# this produces the coverage artifact, which that gate does not.
 on:
   push:
     branches:
       - main
-  pull_request:
 
 jobs:
-  typecheck:
-    name: Typecheck
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - uses: pnpm/action-setup@v4
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Typecheck all packages
-        run: pnpm -r typecheck
-
   rust-coverage:
     name: Rust coverage
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.91.0
         with:
           components: llvm-tools-preview
 

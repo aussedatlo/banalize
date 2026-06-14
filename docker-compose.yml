@@ -15,7 +15,7 @@ services:
       BANALIZE_CORE_FIREWALL_CHAIN: FORWARD
       BANALIZE_CORE_LOG_LEVEL: INFO
       BANALIZE_CORE_DATABASE_PATH: /var/lib/banalize
-      BANALIZE_CORE_API_ADDR: 0.0.0.0:5040
+      BANALIZE_CORE_API_ADDR: 0.0.0.0:${BANALIZE_CORE_PORT:-6040}
       BANALIZE_CORE_GEOIP_AUTO_DOWNLOAD: "true"
       BANALIZE_CORE_CLEANER_INTERVAL: "30"
     volumes:
@@ -29,6 +29,9 @@ services:
     build:
       context: .
       dockerfile: apps/ui/Dockerfile
+    environment:
+      BANALIZE_UI_PORT: ${BANALIZE_UI_PORT:-6041}
+      BANALIZE_UI_API_URL: http://localhost:${BANALIZE_CORE_PORT:-6040}
     depends_on:
       - core
 

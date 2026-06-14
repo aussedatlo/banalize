@@ -1,14 +1,3 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { ArrowDown, ArrowUp } from "lucide-react";
-import { type IpStats, useDataSource } from "@/lib/datasource";
-import { isIpBanned } from "@/lib/ban-status";
-import { type Period, periodStart } from "@/lib/period";
-import { useNow } from "@/lib/use-now";
-import { formatTimestamp } from "@/lib/utils";
-import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
-import { useIpInfos } from "@/lib/use-ip-infos";
 import EventTableToolbar from "@/components/event-table-toolbar";
 import IpFlag from "@/components/ip-flag";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +9,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { isIpBanned } from "@/lib/ban-status";
+import { type IpStats, useDataSource } from "@/lib/datasource";
+import { type Period, periodStart } from "@/lib/period";
+import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
+import { useIpInfos } from "@/lib/use-ip-infos";
+import { useNow } from "@/lib/use-now";
+import { formatTimestamp } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowDown, ArrowUp } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 50;
 
@@ -88,6 +88,7 @@ export default function OffendersPage() {
     <TableHead>
       <button
         type="button"
+        data-testid={`offenders-sort-${key}`}
         className="inline-flex items-center gap-1 hover:text-foreground"
         onClick={() => {
           if (sortKey === key) {
@@ -144,13 +145,20 @@ export default function OffendersPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="text-center text-muted-foreground"
+                >
                   Loading…
                 </TableCell>
               </TableRow>
             ) : visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  data-testid="offenders-empty"
+                  className="text-center text-muted-foreground"
+                >
                   {stats.length === 0
                     ? "No activity recorded"
                     : "No IPs for the current filters"}
@@ -162,6 +170,7 @@ export default function OffendersPage() {
                 return (
                   <TableRow
                     key={s.ip}
+                    data-testid={`offenders-row-${s.ip}`}
                     className="cursor-pointer"
                     onClick={() =>
                       navigate(`/matches?q=${encodeURIComponent(s.ip)}`)
@@ -170,8 +179,18 @@ export default function OffendersPage() {
                     <TableCell className="whitespace-nowrap font-mono text-sm">
                       <IpFlag info={ipInfos[s.ip]} /> {s.ip}
                     </TableCell>
-                    <TableCell className="tabular-nums">{s.match_count}</TableCell>
-                    <TableCell className="tabular-nums">{s.ban_count}</TableCell>
+                    <TableCell
+                      className="tabular-nums"
+                      data-testid={`offenders-matches-${s.ip}`}
+                    >
+                      {s.match_count}
+                    </TableCell>
+                    <TableCell
+                      className="tabular-nums"
+                      data-testid={`offenders-bans-${s.ip}`}
+                    >
+                      {s.ban_count}
+                    </TableCell>
                     <TableCell className="max-w-48 truncate text-xs text-muted-foreground">
                       {s.config_ids.join(", ")}
                     </TableCell>
@@ -196,7 +215,10 @@ export default function OffendersPage() {
       </div>
 
       {count < filtered.length ? (
-        <div ref={sentinelRef} className="py-2 text-center text-xs text-muted-foreground">
+        <div
+          ref={sentinelRef}
+          className="py-2 text-center text-xs text-muted-foreground"
+        >
           Loading more…
         </div>
       ) : filtered.length > PAGE_SIZE ? (

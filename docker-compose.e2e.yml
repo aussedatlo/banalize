@@ -1,0 +1,60 @@
+# Isolated stack for Playwright e2e tests.
+#
+# Unlike the production docker-compose.yml (which uses `network_mode: host` so
+# the core can manage the host firewall), this variant runs on a bridge network
+# and publishes the API and UI on dedicated test ports so it never collides with
+# a real 6040/6041 deployment:
+#   - core API  -> http://localhost:6042
+#   - UI (Caddy)-> http://localhost:6043  (proxies /api to core)
+#
+# State is throwaway: the SQLite DB lives on a tmpfs and the watched log
+# directory is bind-mounted from ./apps/e2e/.tmp/logs so the host-side test
+# runner can inject lines that the core's file watcher picks up.
+
+services:
+  core:
+    image: banalize-core:e2e
+    container_name: banalize-core-e2e
+    build:
+      context: .
+      dockerfile: apps/core/Dockerfile
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      BANALIZE_CORE_FIREWALL_CHAIN: FORWARD
+      BANALIZE_CORE_LOG_LEVEL: INFO
+      BANALIZE_CORE_DATABASE_PATH: /var/lib/banalize
+      BANALIZE_CORE_API_ADDR: 0.0.0.0:6042
+      BANALIZE_CORE_GEOIP_AUTO_DOWNLOAD: "false"
+      BANALIZE_CORE_CLEANER_INTERVAL: "5"
+    ports:
+      - "6042:6042"
+    volumes:
+      - ./apps/e2e/.tmp/logs:/var/log/banalize-e2e
+    tmpfs:
+      - /var/lib/banalize
+    healthcheck:
+      # debian-slim ships no curl/wget; bash's /dev/tcp probes the listener.
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/6042"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  ui:
+    image: banalize-ui:e2e
+    container_name: banalize-ui-e2e
+    build:
+      context: .
+      dockerfile: apps/ui/Dockerfile
+      args:
+        # Inline source maps so the e2e suite can collect source-mapped coverage.
+        BANALIZE_UI_SOURCEMAP: "true"
+    environment:
+      BANALIZE_UI_PORT: "6043"
+      BANALIZE_UI_API_URL: http://core:6042
+    ports:
+      - "6043:6043"
+    depends_on:
+      core:
+        condition: service_healthy

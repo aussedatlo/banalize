@@ -1,4 +1,3 @@
-import { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -7,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useRef, useState } from "react";
 
 const UNITS = [
   { value: "ms", label: "ms", ms: 1 },
@@ -40,7 +40,11 @@ interface DurationInputProps {
 }
 
 /** A duration field as an amount plus a unit, emitting milliseconds. */
-export default function DurationInput({ id, value, onChange }: DurationInputProps) {
+export default function DurationInput({
+  id,
+  value,
+  onChange,
+}: DurationInputProps) {
   const [{ amount, unit }, setState] = useState(() => bestFit(value));
 
   // Re-derive amount/unit when the value changes from outside (e.g. the form

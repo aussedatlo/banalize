@@ -1,6 +1,3 @@
-import { Search } from "lucide-react";
-import type { Config } from "@/lib/datasource";
-import { type Period, PERIODS } from "@/lib/period";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -9,6 +6,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Config } from "@/lib/datasource";
+import { type Period, PERIODS } from "@/lib/period";
+import { Search } from "lucide-react";
 
 interface EventTableToolbarProps {
   search: string;
@@ -39,6 +39,7 @@ export default function EventTableToolbar({
         <Input
           type="search"
           className="pl-8"
+          data-testid="table-search"
           placeholder={searchPlaceholder}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}

@@ -15,7 +15,10 @@ import type {
 
 /** HTTP failure carrying the status code so callers can map it to a message. */
 export class ApiError extends Error {
-  constructor(public readonly status: number, statusText: string) {
+  constructor(
+    public readonly status: number,
+    statusText: string,
+  ) {
     super(`HTTP ${status}: ${statusText}`);
     this.name = "ApiError";
   }
@@ -27,7 +30,7 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-/** Talks to the banalize-core REST API (proxied to :5040 in dev). */
+/** Talks to the banalize-core REST API (proxied to :6040 in dev). */
 export class HttpDataSource implements DataSource {
   getConfigs() {
     return fetchJson<Config[]>("/api/configs");
