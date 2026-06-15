@@ -46,7 +46,7 @@ export default function EventTableToolbar({
         />
       </div>
       <Select value={configId} onValueChange={onConfigIdChange}>
-        <SelectTrigger className="w-48" aria-label="Filter by config">
+        <SelectTrigger className="w-full sm:w-48" aria-label="Filter by config">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -59,7 +59,7 @@ export default function EventTableToolbar({
         </SelectContent>
       </Select>
       <Select value={period} onValueChange={(v) => onPeriodChange(v as Period)}>
-        <SelectTrigger className="w-36" aria-label="Filter by period">
+        <SelectTrigger className="w-full sm:w-36" aria-label="Filter by period">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

@@ -19,6 +19,11 @@ pub struct ConfigResponse {
     pub max_matches: u32,
     /// IPs or CIDR ranges that are never banned
     pub ignore_ips: Vec<String>,
+    /// Optional escalation factor (> 1). When set, each successive ban of the
+    /// same IP lasts `ban_time * recidive_multiplicator^prior_bans`. Omit or
+    /// `null` to keep a flat `ban_time`.
+    #[serde(default)]
+    pub recidive_multiplicator: Option<f64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]

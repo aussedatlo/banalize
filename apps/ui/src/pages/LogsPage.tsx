@@ -129,7 +129,7 @@ export default function LogsPage() {
             <div
               key={i}
               data-testid="logs-line"
-              className="flex gap-3 rounded px-1 py-px leading-5 hover:bg-muted/50"
+              className="flex flex-wrap gap-x-3 gap-y-0.5 rounded px-1 py-px leading-5 hover:bg-muted/50"
             >
               <span className="w-20 shrink-0 tabular-nums text-muted-foreground">
                 {new Date(entry.timestamp).toLocaleTimeString()}
@@ -145,7 +145,9 @@ export default function LogsPage() {
               <span className="w-44 shrink-0 truncate text-muted-foreground">
                 {entry.target}
               </span>
-              <span className="break-all">{entry.message}</span>
+              <span className="min-w-0 grow basis-full break-all sm:basis-0">
+                {entry.message}
+              </span>
             </div>
           ))
         )}

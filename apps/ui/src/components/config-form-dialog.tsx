@@ -202,9 +202,32 @@ export default function ConfigFormDialog({
                   onChange={(ms) => set("ban_time", ms)}
                 />
               </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="recidive_multiplicator">
+                  Recidive multiplier
+                </Label>
+                <Input
+                  id="recidive_multiplicator"
+                  type="number"
+                  min={1}
+                  step={0.1}
+                  placeholder="off"
+                  value={form.recidive_multiplicator ?? ""}
+                  onChange={(e) =>
+                    set(
+                      "recidive_multiplicator",
+                      Number.isNaN(e.target.valueAsNumber)
+                        ? undefined
+                        : e.target.valueAsNumber,
+                    )
+                  }
+                />
+              </div>
             </div>
             <Hint>
-              How long the firewall blocks the IP before it is lifted.
+              How long the firewall blocks the IP before it is lifted. Set a
+              multiplier above 1 to grow the ban exponentially each time the
+              same IP re-offends (e.g. 2 doubles the duration on every repeat).
             </Hint>
           </div>
 

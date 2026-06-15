@@ -1,60 +1,36 @@
-import logoIcon from "@/assets/logo-icon.png";
-import { Separator } from "@/components/ui/separator";
+import SidebarNav from "@/components/layout/SidebarNav";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  Activity,
-  Bell,
-  LayoutDashboard,
-  ScrollText,
-  Settings,
-  Shield,
-  UserX,
-} from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
-const navItems = [
-  { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/configs", icon: Settings, label: "Configs" },
-  { to: "/bans", icon: Shield, label: "Bans" },
-  { to: "/matches", icon: Activity, label: "Matches" },
-  { to: "/offenders", icon: UserX, label: "Offenders" },
-  { to: "/notifications", icon: Bell, label: "Notifications" },
-  { to: "/logs", icon: ScrollText, label: "Logs" },
-];
+interface SidebarProps {
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+}
 
-export default function Sidebar() {
+/** Desktop navigation rail. Hidden on mobile (see MobileNav). */
+export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
   return (
-    <div className="flex w-56 flex-col border-r bg-card">
-      <div className="p-5">
-        <div className="flex items-center gap-1.5">
-          <img src={logoIcon} alt="" className="h-8 w-auto" />
-          <span className="pageTitle text-xl font-bold">Banalize</span>
-        </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Automated intrusion prevention
-        </p>
-      </div>
-      <Separator />
-      <nav className="flex flex-col gap-1 p-2">
-        {navItems.map(({ to, icon: Icon, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            data-testid={`nav-link-${to.slice(1)}`}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-gradient-to-r from-brand-blue to-brand-purple text-white shadow-sm"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-              )
-            }
-          >
-            <Icon className="h-4 w-4" />
-            {label}
-          </NavLink>
-        ))}
-      </nav>
+    <div
+      className={cn(
+        "relative hidden flex-col border-r bg-card transition-[width] duration-200 md:flex",
+        collapsed ? "w-16" : "w-56",
+      )}
+    >
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onToggleCollapse}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        className="absolute -right-3 top-5 z-10 h-6 w-6 rounded-full border bg-background shadow-sm"
+      >
+        {collapsed ? (
+          <PanelLeftOpen className="h-3.5 w-3.5" />
+        ) : (
+          <PanelLeftClose className="h-3.5 w-3.5" />
+        )}
+      </Button>
+      <SidebarNav collapsed={collapsed} />
     </div>
   );
 }

@@ -86,7 +86,7 @@ export default function ConfigsPage() {
                 <CardContent className="space-y-3 text-sm">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <FileText className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate font-mono text-xs">
+                    <span className="min-w-0 truncate font-mono text-xs">
                       {c.param}
                     </span>
                   </div>

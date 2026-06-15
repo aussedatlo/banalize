@@ -17,6 +17,7 @@ pub struct ConfigRecord {
     pub find_time: u64,
     pub max_matches: u32,
     pub ignore_ips: String, // JSON array
+    pub recidive_multiplicator: Option<f64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -95,6 +96,13 @@ impl SqliteDatabase {
             )",
             [],
         )?;
+        // Databases created before the recidive multiplicator existed: add the
+        // column in place. The error on re-run ("duplicate column name") is
+        // expected and ignored (same pattern as match_events.line below).
+        let _ = self.conn.execute(
+            "ALTER TABLE configs ADD COLUMN recidive_multiplicator REAL",
+            [],
+        );
 
         // Create match_events table
         self.conn.execute(
@@ -154,8 +162,8 @@ impl SqliteDatabase {
     // Config operations
     pub fn insert_config(&self, config: &ConfigRecord) -> SqliteResult<()> {
         self.conn.execute(
-            "INSERT OR REPLACE INTO configs (id, name, param, regex, ban_time, find_time, max_matches, ignore_ips)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+            "INSERT OR REPLACE INTO configs (id, name, param, regex, ban_time, find_time, max_matches, ignore_ips, recidive_multiplicator)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
             rusqlite::params![
                 config.id,
                 config.name,
@@ -164,7 +172,8 @@ impl SqliteDatabase {
                 config.ban_time,
                 config.find_time,
                 config.max_matches,
-                config.ignore_ips
+                config.ignore_ips,
+                config.recidive_multiplicator
             ],
         )?;
         Ok(())
@@ -172,10 +181,10 @@ impl SqliteDatabase {
 
     pub fn get_config(&self, id: &str) -> SqliteResult<Option<ConfigRecord>> {
         let mut stmt = self.conn.prepare(
-            "SELECT id, name, param, regex, ban_time, find_time, max_matches, ignore_ips
+            "SELECT id, name, param, regex, ban_time, find_time, max_matches, ignore_ips, recidive_multiplicator
              FROM configs WHERE id = ?1"
         )?;
-        
+
         let mut rows = stmt.query_map(rusqlite::params![id], |row| {
             Ok(ConfigRecord {
                 id: row.get(0)?,
@@ -186,6 +195,7 @@ impl SqliteDatabase {
                 find_time: row.get(5)?,
                 max_matches: row.get(6)?,
                 ignore_ips: row.get(7)?,
+                recidive_multiplicator: row.get(8)?,
             })
         })?;
 
@@ -198,10 +208,10 @@ impl SqliteDatabase {
 
     pub fn get_all_configs(&self) -> SqliteResult<Vec<ConfigRecord>> {
         let mut stmt = self.conn.prepare(
-            "SELECT id, name, param, regex, ban_time, find_time, max_matches, ignore_ips
+            "SELECT id, name, param, regex, ban_time, find_time, max_matches, ignore_ips, recidive_multiplicator
              FROM configs"
         )?;
-        
+
         let rows = stmt.query_map([], |row| {
             Ok(ConfigRecord {
                 id: row.get(0)?,
@@ -212,6 +222,7 @@ impl SqliteDatabase {
                 find_time: row.get(5)?,
                 max_matches: row.get(6)?,
                 ignore_ips: row.get(7)?,
+                recidive_multiplicator: row.get(8)?,
             })
         })?;
 

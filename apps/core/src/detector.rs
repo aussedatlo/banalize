@@ -129,8 +129,17 @@ impl Detector {
     async fn ban_ip(&self, ip: &IpAddr, timestamp: u64) -> Result<(), String> {
         info!("Banning IP {} for config {}", ip, self.config.id);
 
-        // Record the ban in memory (critical path).
-        self.store.add_ban(&self.config.id, *ip, timestamp);
+        // Record the ban in memory (critical path). With the recidive
+        // multiplicator on, the duration grows with each prior ban of this IP;
+        // otherwise it is the flat config ban_time (legacy path).
+        if self.config.recidive_multiplicator.is_some() {
+            let prior = self.store.next_recidive(&self.config.id, *ip);
+            let ban_time = self.config.effective_ban_time(prior);
+            self.store
+                .add_ban_with_duration(&self.config.id, *ip, timestamp, ban_time);
+        } else {
+            self.store.add_ban(&self.config.id, *ip, timestamp);
+        }
 
         // Hand the firewall mutation to the actor (lossless mpsc). Errors there
         // are logged and ignored, so a full channel is the only failure mode.

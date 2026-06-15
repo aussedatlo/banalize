@@ -76,6 +76,7 @@ pub(crate) async fn get_configs(
                 find_time: c.find_time,
                 max_matches: c.max_matches,
                 ignore_ips,
+                recidive_multiplicator: c.recidive_multiplicator,
             }
         })
         .collect();
@@ -117,6 +118,7 @@ pub(crate) async fn get_config(
         find_time: config.find_time,
         max_matches: config.max_matches,
         ignore_ips,
+        recidive_multiplicator: config.recidive_multiplicator,
     }))
 }
 
@@ -145,6 +147,7 @@ pub(crate) async fn create_config(
         find_time: payload.find_time,
         max_matches: payload.max_matches,
         ignore_ips: payload.ignore_ips.clone(),
+        recidive_multiplicator: payload.recidive_multiplicator,
     };
 
     if config.validate().is_err() {
@@ -170,6 +173,7 @@ pub(crate) async fn create_config(
         find_time: config.find_time,
         max_matches: config.max_matches,
         ignore_ips: ignore_ips_json,
+        recidive_multiplicator: config.recidive_multiplicator,
     };
 
     db.insert_config(&record)
@@ -231,6 +235,7 @@ pub(crate) async fn update_config(
         find_time: payload.find_time,
         max_matches: payload.max_matches,
         ignore_ips: payload.ignore_ips.clone(),
+        recidive_multiplicator: payload.recidive_multiplicator,
     };
 
     if config.validate().is_err() {
@@ -250,6 +255,7 @@ pub(crate) async fn update_config(
             find_time: config.find_time,
             max_matches: config.max_matches,
             ignore_ips: ignore_ips_json,
+            recidive_multiplicator: config.recidive_multiplicator,
         };
         db.insert_config(&record)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
