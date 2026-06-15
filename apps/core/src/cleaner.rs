@@ -67,15 +67,12 @@ impl Cleaner {
 
         // Expire bans: take everything past ban_time and push the unban out to
         // the firewall (lossless) and the audit log.
-        for (config_id, config) in configs.iter() {
-            // Recidive bans each carry their own duration, so expiry is per-ban
-            // (`timestamp + effective_ban_time`); flat configs share one cutoff.
-            let expired = if config.recidive_multiplicator.is_some() {
-                self.store.take_expired_bans_now(config_id, now)
-            } else {
-                let cutoff = now.saturating_sub(config.ban_time);
-                self.store.take_expired_bans(config_id, cutoff)
-            };
+        for (config_id, _config) in configs.iter() {
+            // Every ban carries its own effective duration (the flat config just
+            // resolves to `ban_time`), so expiry is uniformly per-ban on
+            // `timestamp + effective_ban_time`. Using one path means toggling the
+            // recidive multiplicator never changes how an existing ban expires.
+            let expired = self.store.take_expired_bans_now(config_id, now);
             if expired.is_empty() {
                 continue;
             }
