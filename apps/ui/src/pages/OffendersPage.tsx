@@ -116,7 +116,7 @@ export default function OffendersPage() {
       <div>
         <h2 className="pageTitle text-2xl font-bold">Offenders</h2>
         <p className="text-muted-foreground">
-          Unique IPs ranked by recorded activity — click one to see its matches
+          Unique IPs ranked by recorded activity — click one to see its timeline
         </p>
       </div>
 
@@ -173,7 +173,7 @@ export default function OffendersPage() {
                     data-testid={`offenders-row-${s.ip}`}
                     className="cursor-pointer"
                     onClick={() =>
-                      navigate(`/matches?q=${encodeURIComponent(s.ip)}`)
+                      navigate(`/events?q=${encodeURIComponent(s.ip)}`)
                     }
                   >
                     <TableCell className="whitespace-nowrap font-mono text-sm">

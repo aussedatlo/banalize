@@ -3,8 +3,7 @@ import { expect, type Page } from "@playwright/test";
 export type Route =
   | "dashboard"
   | "configs"
-  | "bans"
-  | "matches"
+  | "events"
   | "offenders"
   | "notifications"
   | "logs";

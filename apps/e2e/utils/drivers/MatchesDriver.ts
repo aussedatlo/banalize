@@ -2,9 +2,9 @@ import { expect } from "@playwright/test";
 
 import { BaseDriver } from "./BaseDriver";
 
-/** Drives the Matches table. */
+/** Drives match rows on the merged Events table. */
 export class MatchesDriver extends BaseDriver {
-  protected readonly path = "/matches";
+  protected readonly path = "/events";
 
   row(ip: string) {
     return this.byTestId(`matches-row-${ip}`).first();
@@ -28,6 +28,6 @@ export class MatchesDriver extends BaseDriver {
   }
 
   async expectEmpty(): Promise<void> {
-    await expect(this.byTestId("matches-empty")).toBeVisible();
+    await expect(this.byTestId("events-empty")).toBeVisible();
   }
 }

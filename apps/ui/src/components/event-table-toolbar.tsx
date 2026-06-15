@@ -9,6 +9,7 @@ import {
 import type { Config } from "@/lib/datasource";
 import { type Period, PERIODS } from "@/lib/period";
 import { Search } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface EventTableToolbarProps {
   search: string;
@@ -19,6 +20,10 @@ interface EventTableToolbarProps {
   period: Period;
   onPeriodChange: (value: Period) => void;
   searchPlaceholder?: string;
+  /** Hide the config Select (e.g. when the table is already scoped to one config). */
+  hideConfig?: boolean;
+  /** Extra filter controls rendered at the end of the row. */
+  children?: ReactNode;
 }
 
 /** Search + config + time-period filter row shared by the event tables. */
@@ -31,6 +36,8 @@ export default function EventTableToolbar({
   period,
   onPeriodChange,
   searchPlaceholder = "Search by IP…",
+  hideConfig = false,
+  children,
 }: EventTableToolbarProps) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -45,19 +52,24 @@ export default function EventTableToolbar({
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
-      <Select value={configId} onValueChange={onConfigIdChange}>
-        <SelectTrigger className="w-full sm:w-48" aria-label="Filter by config">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All configs</SelectItem>
-          {configs.map((c) => (
-            <SelectItem key={c.id} value={c.id}>
-              {c.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {!hideConfig && (
+        <Select value={configId} onValueChange={onConfigIdChange}>
+          <SelectTrigger
+            className="w-full sm:w-48"
+            aria-label="Filter by config"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All configs</SelectItem>
+            {configs.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
       <Select value={period} onValueChange={(v) => onPeriodChange(v as Period)}>
         <SelectTrigger className="w-full sm:w-36" aria-label="Filter by period">
           <SelectValue />
@@ -70,6 +82,7 @@ export default function EventTableToolbar({
           ))}
         </SelectContent>
       </Select>
+      {children}
     </div>
   );
 }

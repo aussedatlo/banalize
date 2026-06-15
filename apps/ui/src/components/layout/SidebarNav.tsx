@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   ScrollText,
   Settings,
-  Shield,
   UserX,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
@@ -15,8 +14,7 @@ import { NavLink } from "react-router-dom";
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/configs", icon: Settings, label: "Configs" },
-  { to: "/bans", icon: Shield, label: "Bans" },
-  { to: "/matches", icon: Activity, label: "Matches" },
+  { to: "/events", icon: Activity, label: "Events" },
   { to: "/offenders", icon: UserX, label: "Offenders" },
   { to: "/notifications", icon: Bell, label: "Notifications" },
   { to: "/logs", icon: ScrollText, label: "Logs" },
