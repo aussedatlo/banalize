@@ -1,30 +1,36 @@
-const path = require("node:path");
+const js = require("@eslint/js");
+const tseslint = require("@typescript-eslint/eslint-plugin");
+const tsparser = require("@typescript-eslint/parser");
+const prettierRecommended = require("eslint-plugin-prettier/recommended");
 
-const project = path.resolve(process.cwd(), "tsconfig.json");
-
-module.exports = {
-  parser: "@typescript-eslint/parser",
-  parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
-    project: [project],
-  },
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
-  ],
-  plugins: ["@typescript-eslint", "prettier"],
-  ignorePatterns: [".turbo", "node_modules", "dist", ".eslintrc.cjs"],
-  rules: {
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        argsIgnorePattern: "^_",
-        varsIgnorePattern: "^_",
-        caughtErrorsIgnorePattern: "^_",
+/**
+ * Shared flat config (ESLint 9+). Consumers spread this array into their own
+ * `eslint.config.js` and layer on framework-specific rules.
+ */
+module.exports = [
+  { ignores: ["**/.turbo/**", "**/node_modules/**", "**/dist/**"] },
+  js.configs.recommended,
+  ...tseslint.configs["flat/recommended"],
+  prettierRecommended,
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
       },
-    ],
+    },
+    rules: {
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+    },
   },
-};
+];

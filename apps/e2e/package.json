@@ -17,6 +17,6 @@
     "@playwright/test": "^1.49.1",
     "@types/node": "^22.10.0",
     "monocart-coverage-reports": "^2.12.0",
-    "typescript": "^5.5.4"
+    "typescript": "^6.0.3"
   }
 }
