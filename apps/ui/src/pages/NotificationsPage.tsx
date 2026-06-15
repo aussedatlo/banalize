@@ -127,7 +127,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="pageTitle text-2xl font-bold">Notifications</h2>
           <p className="text-muted-foreground">
@@ -135,6 +135,7 @@ export default function NotificationsPage() {
           </p>
         </div>
         <Button
+          className="w-full sm:w-auto"
           data-testid="notifier-create-button"
           onClick={() => {
             setEditing(undefined);

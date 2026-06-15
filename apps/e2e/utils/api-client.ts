@@ -10,9 +10,18 @@ export interface Config {
   find_time: number;
   max_matches: number;
   ignore_ips: string[];
+  /** Optional escalation factor (> 1) for repeat offenders. */
+  recidive_multiplicator?: number;
 }
 
 export interface BanEvent {
+  id: string;
+  config_id: string;
+  ip: string;
+  timestamp: number;
+}
+
+export interface UnbanEvent {
   id: string;
   config_id: string;
   ip: string;
@@ -74,6 +83,15 @@ export class ApiClient {
 
   listBans(): Promise<BanEvent[]> {
     return this.json<BanEvent[]>("/api/bans");
+  }
+
+  listUnbans(): Promise<UnbanEvent[]> {
+    return this.json<UnbanEvent[]>("/api/unbans");
+  }
+
+  /** Lift a ban by its event id (manual unban); keeps recidive history. */
+  disableBan(id: string): Promise<UnbanEvent> {
+    return this.json<UnbanEvent>(`/api/bans/${id}/disable`, { method: "POST" });
   }
 
   listMatches(): Promise<MatchEvent[]> {

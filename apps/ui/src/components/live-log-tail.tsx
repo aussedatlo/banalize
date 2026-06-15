@@ -59,7 +59,7 @@ export default function LiveLogTail({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-start justify-between space-y-0">
+      <CardHeader className="flex flex-col gap-3 space-y-0 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1.5">
           <CardTitle>Live log</CardTitle>
           <CardDescription>
@@ -71,6 +71,7 @@ export default function LiveLogTail({
           <Button
             variant="outline"
             size="sm"
+            className="flex-1 sm:flex-none"
             aria-pressed={autoScroll}
             onClick={() => setAutoScroll((v) => !v)}
           >
@@ -81,7 +82,12 @@ export default function LiveLogTail({
             )}
             {autoScroll ? "Pause scroll" : "Follow"}
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setLines([])}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 sm:flex-none"
+            onClick={() => setLines([])}
+          >
             <Eraser className="mr-1 h-3 w-3" />
             Clear
           </Button>
@@ -98,18 +104,20 @@ export default function LiveLogTail({
               <div
                 key={i}
                 data-testid="live-log-line"
-                className="flex gap-3 rounded px-1 py-px hover:bg-muted/50"
+                className="flex flex-wrap gap-x-3 rounded px-1 py-px hover:bg-muted/50"
               >
                 <span className="w-20 shrink-0 leading-relaxed tabular-nums text-muted-foreground">
                   {new Date(l.timestamp).toLocaleTimeString()}
                 </span>
-                {jsRegex?.test(l.line) ? (
-                  <HighlightedLine line={l.line} regex={regex} />
-                ) : (
-                  <span className="break-all leading-relaxed text-muted-foreground">
-                    {l.line}
-                  </span>
-                )}
+                <div className="min-w-0 grow basis-full sm:basis-0">
+                  {jsRegex?.test(l.line) ? (
+                    <HighlightedLine line={l.line} regex={regex} />
+                  ) : (
+                    <span className="break-all leading-relaxed text-muted-foreground">
+                      {l.line}
+                    </span>
+                  )}
+                </div>
               </div>
             ))
           )}
