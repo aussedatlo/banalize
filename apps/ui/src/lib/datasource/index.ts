@@ -10,6 +10,7 @@ export { DataSourceProvider } from "./provider";
 export type {
   BanEvent,
   Config,
+  CountryStats,
   DataSource,
   IpInfo,
   IpStats,

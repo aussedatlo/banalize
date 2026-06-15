@@ -1,4 +1,8 @@
 import ActivityChart from "@/components/ActivityChart";
+import AttackMap from "@/components/AttackMap";
+import TopCountries from "@/components/TopCountries";
+import TopOffenders from "@/components/TopOffenders";
+import LiveLogTail from "@/components/live-log-tail";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDataSource } from "@/lib/datasource";
 import { useQuery } from "@tanstack/react-query";
@@ -60,6 +64,17 @@ export default function DashboardView({ configId }: { configId?: string }) {
     queryKey: ["unbans", scope],
     queryFn: () => ds.getUnbans(configId),
   });
+  const { data: countryStats = [] } = useQuery({
+    queryKey: ["country-stats", scope],
+    queryFn: () => ds.getCountryStats(configId),
+  });
+  // Only when scoped to a config: shares the cache with ConfigDetailPage's
+  // ["config", id] query, so this adds no extra request.
+  const { data: scopedConfig } = useQuery({
+    queryKey: ["config", configId],
+    queryFn: () => ds.getConfig(configId as string),
+    enabled: configId !== undefined,
+  });
 
   const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
   const recentMatches = matches.filter((m) => m.timestamp > dayAgo).length;
@@ -98,6 +113,33 @@ export default function DashboardView({ configId }: { configId?: string }) {
           <ActivityChart matches={matches} bans={bans} />
         </CardContent>
       </Card>
+
+      {/* Map on the left; top-countries and top-offenders stacked on the right.
+          Side by side on desktop, stacked on mobile. */}
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
+        <Card className="flex flex-col">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Attacks by country</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AttackMap data={countryStats} />
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-col gap-6">
+          <TopCountries data={countryStats} className="flex-1" />
+          <TopOffenders configId={configId} className="flex-1" />
+        </div>
+      </div>
+
+      {/* Config-scoped only: the live tail of the watched file, full width. */}
+      {scopedConfig ? (
+        <LiveLogTail
+          configId={scopedConfig.id}
+          regex={scopedConfig.regex}
+          param={scopedConfig.param}
+        />
+      ) : null}
     </div>
   );
 }
