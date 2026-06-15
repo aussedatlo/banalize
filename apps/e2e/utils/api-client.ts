@@ -72,6 +72,15 @@ export class ApiClient {
     });
   }
 
+  /** Update an existing config in place (PUT); restarts its watcher. */
+  updateConfig(config: Config): Promise<Config> {
+    return this.json<Config>(`/api/configs/${config.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(config),
+    });
+  }
+
   async deleteConfig(id: string): Promise<void> {
     const res = await fetch(`${this.baseUrl}/api/configs/${id}`, {
       method: "DELETE",

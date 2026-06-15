@@ -10,3 +10,15 @@ node_modules
 **/dist
 **/.next
 **/.env
+
+# Rust build artifacts (~3.3GB) — the image rebuilds these in-container
+**/target
+
+# Not needed by any image build
+.github
+bugs
+coverage
+**/coverage
+**/.turbo
+**/*.tsbuildinfo
+apps/e2e

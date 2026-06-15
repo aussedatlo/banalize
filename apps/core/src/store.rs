@@ -20,9 +20,9 @@ pub struct MemoryStore {
 /// One active ban: when it started and how long it is meant to last.
 ///
 /// `ban_time` carries the *effective* duration for this specific ban, which the
-/// recidive multiplicator can grow beyond the config's base `ban_time`. The
-/// legacy flat path stores `0` here and never reads it (it expires off a
-/// caller-supplied cutoff instead), so per-ban duration is opt-in.
+/// recidive multiplicator can grow beyond the config's base `ban_time`. Every
+/// ban records a real duration (a flat config resolves to its plain `ban_time`),
+/// so the cleaner can always expire off `timestamp + ban_time`.
 #[derive(Clone, Copy)]
 struct BanEntry {
     timestamp: u64,
@@ -104,18 +104,9 @@ impl MemoryStore {
             .is_some_and(|ips| ips.contains_key(ip))
     }
 
-    pub fn add_ban(&self, config_id: &str, ip: IpAddr, timestamp: u64) {
-        let mut inner = self.inner.lock().unwrap();
-        inner
-            .bans
-            .entry(config_id.to_string())
-            .or_default()
-            .insert(ip, BanEntry { timestamp, ban_time: 0 });
-    }
-
-    /// Record a ban that carries its own effective duration (recidive path), so
-    /// the cleaner can expire it on `timestamp + ban_time` rather than off the
-    /// config's flat `ban_time`.
+    /// Record a ban that carries its own effective duration, so the cleaner can
+    /// expire it on `timestamp + ban_time`. A flat config passes its plain
+    /// `ban_time`; a recidive config passes the escalated duration.
     pub fn add_ban_with_duration(&self, config_id: &str, ip: IpAddr, timestamp: u64, ban_time: u64) {
         let mut inner = self.inner.lock().unwrap();
         inner
@@ -161,29 +152,9 @@ impl MemoryStore {
             .is_some_and(|ips| ips.remove(ip).is_some())
     }
 
-    /// Remove and return every ban for a config whose timestamp is older than
-    /// `cutoff` (now - ban_time). Used by the cleaner to drive expiry.
-    pub fn take_expired_bans(&self, config_id: &str, cutoff: u64) -> Vec<IpAddr> {
-        let mut inner = self.inner.lock().unwrap();
-        let Some(ips) = inner.bans.get_mut(config_id) else {
-            return Vec::new();
-        };
-        let expired: Vec<IpAddr> = ips
-            .iter()
-            .filter(|(_, entry)| entry.timestamp < cutoff)
-            .map(|(ip, _)| *ip)
-            .collect();
-        for ip in &expired {
-            ips.remove(ip);
-        }
-        expired
-    }
-
     /// Remove and return every ban for a config whose own effective duration has
-    /// elapsed by `now` (recidive path: each ban expires at
-    /// `timestamp + ban_time`). Used by the cleaner for configs with the
-    /// multiplicator enabled, where a single shared cutoff cannot express the
-    /// per-ban durations.
+    /// elapsed by `now` (each ban expires at `timestamp + ban_time`). Used by the
+    /// cleaner to drive expiry for every config, recidive or flat.
     pub fn take_expired_bans_now(&self, config_id: &str, now: u64) -> Vec<IpAddr> {
         let mut inner = self.inner.lock().unwrap();
         let Some(ips) = inner.bans.get_mut(config_id) else {
@@ -286,21 +257,10 @@ mod tests {
     fn ban_lifecycle() {
         let store = MemoryStore::new();
         assert!(!store.is_banned("c", &ip("10.0.0.1")));
-        store.add_ban("c", ip("10.0.0.1"), 5000);
+        store.add_ban_with_duration("c", ip("10.0.0.1"), 5000, 1000);
         assert!(store.is_banned("c", &ip("10.0.0.1")));
         assert!(store.remove_ban("c", &ip("10.0.0.1")));
         assert!(!store.is_banned("c", &ip("10.0.0.1")));
-    }
-
-    #[test]
-    fn take_expired_bans_only_removes_old() {
-        let store = MemoryStore::new();
-        store.add_ban("c", ip("10.0.0.1"), 1000);
-        store.add_ban("c", ip("10.0.0.2"), 9000);
-        let expired = store.take_expired_bans("c", 5000);
-        assert_eq!(expired, vec![ip("10.0.0.1")]);
-        assert!(!store.is_banned("c", &ip("10.0.0.1")));
-        assert!(store.is_banned("c", &ip("10.0.0.2")));
     }
 
     #[test]
