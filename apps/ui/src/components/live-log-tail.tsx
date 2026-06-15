@@ -1,4 +1,5 @@
-import HighlightedLine, { IP_PATTERN } from "@/components/highlighted-line";
+import HighlightedLine from "@/components/highlighted-line";
+import { IP_PATTERN } from "@/components/ip-pattern";
 import { Button } from "@/components/ui/button";
 import {
   Card,

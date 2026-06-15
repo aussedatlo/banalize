@@ -134,3 +134,17 @@ pub struct IpStatsResponse {
     pub config_ids: Vec<String>,
     pub last_seen: u64,
 }
+
+/// Per-country attack aggregates: every offending IP folded into its GeoIP
+/// country. Countries the GeoIP database can't resolve are omitted.
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct CountryStatsResponse {
+    /// ISO 3166-1 alpha-2 code.
+    pub country_code: String,
+    pub country_name: Option<String>,
+    pub flag: Option<String>,
+    pub match_count: u64,
+    pub ban_count: u64,
+    /// Distinct offending IPs geolocated to this country.
+    pub ip_count: u64,
+}

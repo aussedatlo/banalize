@@ -1,8 +1,5 @@
-import {
-  ChartContainer,
-  chartTooltipStyle,
-  type ChartConfig,
-} from "@/components/ui/chart";
+import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
+import { chartTooltipStyle } from "@/components/ui/chart-tooltip-style";
 import type { BanEvent, MatchEvent } from "@/lib/datasource";
 import { useMemo } from "react";
 import {

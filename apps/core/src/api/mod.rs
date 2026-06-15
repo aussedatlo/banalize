@@ -15,7 +15,10 @@ use crate::events::{EventEmitter, FirewallCommand};
 use crate::store::MemoryStore;
 use crate::watcher_manager::WatcherManager;
 use axum::{response::Html, response::Json, routing::get, routing::post, Router};
-use models::{BanResponse, ConfigResponse, IpStatsResponse, MatchResponse, UnbanResponse};
+use models::{
+    BanResponse, ConfigResponse, CountryStatsResponse, IpStatsResponse, MatchResponse,
+    UnbanResponse,
+};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use utoipa::OpenApi;
@@ -67,6 +70,7 @@ pub struct AppState {
         notifiers::test_notifier,
         ip_infos::get_ip_infos,
         ips::get_ip_stats,
+        ips::get_country_stats,
     ),
     components(schemas(
         ConfigResponse,
@@ -74,6 +78,7 @@ pub struct AppState {
         BanResponse,
         UnbanResponse,
         IpStatsResponse,
+        CountryStatsResponse,
         models::TailLineResponse,
         models::EventResponse,
         models::TestResultResponse,
@@ -159,6 +164,7 @@ pub fn create_router(state: AppState) -> Router {
         )
         .route("/api/ip-infos", get(ip_infos::get_ip_infos))
         .route("/api/ips/stats", get(ips::get_ip_stats))
+        .route("/api/ips/by-country", get(ips::get_country_stats))
         .route("/api/logs", get(logs::get_logs))
         .route("/api/logs/stream", get(logs::stream_logs))
         .route("/api/events/stream", get(events::stream_events))

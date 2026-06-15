@@ -1,6 +1,5 @@
 import DashboardView from "@/components/DashboardView";
 import ConfigFormDialog from "@/components/config-form-dialog";
-import LiveLogTail from "@/components/live-log-tail";
 import { Button } from "@/components/ui/button";
 import { useDataSource } from "@/lib/datasource";
 import { formatDuration } from "@/lib/utils";
@@ -73,12 +72,6 @@ export default function ConfigDetailPage() {
           />
 
           <DashboardView configId={config.id} />
-
-          <LiveLogTail
-            configId={config.id}
-            regex={config.regex}
-            param={config.param}
-          />
         </>
       )}
     </div>

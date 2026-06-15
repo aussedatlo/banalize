@@ -60,6 +60,18 @@ export interface IpInfo {
   flag?: string | null;
 }
 
+/** Attack aggregates folded by GeoIP country (powers the dashboard map). */
+export interface CountryStats {
+  /** ISO 3166-1 alpha-2 code. */
+  country_code: string;
+  country_name?: string | null;
+  flag?: string | null;
+  match_count: number;
+  ban_count: number;
+  /** Distinct offending IPs geolocated to this country. */
+  ip_count: number;
+}
+
 export type NotifierEventType = "ban" | "unban" | "match";
 
 export interface NotifierEmailConfig {
@@ -132,6 +144,8 @@ export interface DataSource {
   getIpInfos(ips: string[]): Promise<Record<string, IpInfo>>;
   /** Per-IP event aggregates, heaviest offenders first; `since` (ms epoch) restricts the counted events. */
   getIpStats(configId?: string, since?: number): Promise<IpStats[]>;
+  /** Attack aggregates folded by GeoIP country; `since` (ms epoch) restricts the counted events. */
+  getCountryStats(configId?: string, since?: number): Promise<CountryStats[]>;
   /** New lines of the config's watched file, starting from now. Returns an unsubscribe function. */
   streamConfigLines(
     configId: string,

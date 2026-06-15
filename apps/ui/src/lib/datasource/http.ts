@@ -1,6 +1,7 @@
 import type {
   BanEvent,
   Config,
+  CountryStats,
   DataSource,
   IpInfo,
   IpStats,
@@ -103,6 +104,16 @@ export class HttpDataSource implements DataSource {
     if (since !== undefined) params.set("since", String(since));
     const qs = params.toString();
     return fetchJson<IpStats[]>(qs ? `/api/ips/stats?${qs}` : "/api/ips/stats");
+  }
+
+  getCountryStats(configId?: string, since?: number) {
+    const params = new URLSearchParams();
+    if (configId) params.set("config_id", configId);
+    if (since !== undefined) params.set("since", String(since));
+    const qs = params.toString();
+    return fetchJson<CountryStats[]>(
+      qs ? `/api/ips/by-country?${qs}` : "/api/ips/by-country",
+    );
   }
 
   getLogs() {
