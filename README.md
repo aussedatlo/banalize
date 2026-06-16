@@ -1,6 +1,21 @@
-# Banalize
+<div align="center">
 
-Banalize is a lightweight, fail2ban-style intrusion prevention system written in Rust. It tails log files, extracts IP addresses via configurable regex patterns, and blocks offenders using `iptables` after a configurable number of matches within a time window.
+<img src="apps/ui/src/assets/logo-full.png" alt="Banalize" width="220" />
+
+**A lightweight intrusion prevention system written in Rust.**
+
+[![CI](https://github.com/aussedatlo/banalize/actions/workflows/pull-request.yml/badge.svg)](https://github.com/aussedatlo/banalize/actions/workflows/pull-request.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
+[![Rust](https://img.shields.io/badge/Rust-stable-CE422B?logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+
+</div>
+
+---
+
+Banalize tails log files, extracts IP addresses via configurable regex patterns, and blocks offenders using `iptables` after a configurable number of matches within a time window.
 
 ## Architecture
 
