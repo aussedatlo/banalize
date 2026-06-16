@@ -53,7 +53,7 @@ export default function TopOffenders({
                 data-testid={`top-offenders-${s.ip}`}
                 className="flex cursor-pointer items-center gap-3 rounded px-1 py-0.5 hover:bg-muted/50"
                 onClick={() =>
-                  navigate(`/matches?q=${encodeURIComponent(s.ip)}`)
+                  navigate(`/events?q=${encodeURIComponent(s.ip)}`)
                 }
               >
                 <IpFlag info={ipInfos[s.ip]} />
