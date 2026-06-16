@@ -6,6 +6,7 @@ mod ip_infos;
 mod ips;
 mod logs;
 mod matches;
+mod meta;
 mod notifiers;
 mod unbans;
 
@@ -71,6 +72,8 @@ pub struct AppState {
         ip_infos::get_ip_infos,
         ips::get_ip_stats,
         ips::get_country_stats,
+        meta::get_version,
+        meta::get_health,
     ),
     components(schemas(
         ConfigResponse,
@@ -88,6 +91,8 @@ pub struct AppState {
         crate::notifier::NotifyEventType,
         crate::log_capture::LogEntry,
         crate::geoip::IpInfo,
+        meta::VersionResponse,
+        meta::HealthResponse,
     )),
     tags(
         (name = "configs", description = "Configuration management"),
@@ -99,6 +104,7 @@ pub struct AppState {
         (name = "notifiers", description = "Notification channels"),
         (name = "ip-infos", description = "GeoIP country lookup"),
         (name = "ips",     description = "Per-IP aggregates"),
+        (name = "meta",    description = "Service version and health"),
     )
 )]
 pub struct ApiDoc;
@@ -165,6 +171,8 @@ pub fn create_router(state: AppState) -> Router {
         .route("/api/ip-infos", get(ip_infos::get_ip_infos))
         .route("/api/ips/stats", get(ips::get_ip_stats))
         .route("/api/ips/by-country", get(ips::get_country_stats))
+        .route("/api/version", get(meta::get_version))
+        .route("/api/health", get(meta::get_health))
         .route("/api/logs", get(logs::get_logs))
         .route("/api/logs/stream", get(logs::stream_logs))
         .route("/api/events/stream", get(events::stream_events))

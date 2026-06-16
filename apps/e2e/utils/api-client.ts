@@ -60,6 +60,14 @@ export class ApiClient {
     return res.json() as Promise<T>;
   }
 
+  getVersion(): Promise<{ version: string }> {
+    return this.json<{ version: string }>("/api/version");
+  }
+
+  getHealth(): Promise<{ status: string }> {
+    return this.json<{ status: string }>("/api/health");
+  }
+
   listConfigs(): Promise<Config[]> {
     return this.json<Config[]>("/api/configs");
   }
