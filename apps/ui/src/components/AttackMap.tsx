@@ -15,15 +15,19 @@ type CountryFeature = {
   geometry: GeoPermissibleObjects;
 };
 
-const features = (worldGeo as { features: CountryFeature[] }).features;
+// Drop Antarctica (ISO "AQ"): it's never a source of activity and its huge
+// southern footprint just wastes vertical space / skews the projection fit.
+const features = (worldGeo as { features: CountryFeature[] }).features.filter(
+  (f) => f.properties.iso !== "AQ",
+);
 
 // Precompute the projection + path strings once: the geometry never changes,
 // only the per-country fill does.
 const paths = (() => {
-  const projection = geoNaturalEarth1().fitSize(
-    [WIDTH, HEIGHT],
-    worldGeo as GeoPermissibleObjects,
-  );
+  const projection = geoNaturalEarth1().fitSize([WIDTH, HEIGHT], {
+    type: "FeatureCollection",
+    features,
+  } as GeoPermissibleObjects);
   const path = geoPath(projection);
   return features.map((f) => ({
     iso: f.properties.iso,

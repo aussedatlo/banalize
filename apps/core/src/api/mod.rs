@@ -43,7 +43,7 @@ pub struct AppState {
     info(
         title = "Banalize API",
         version = "0.1.0",
-        description = "Fail2ban-style log monitoring and IP ban management"
+        description = "Log monitoring and IP ban management"
     ),
     paths(
         configs::get_configs,

@@ -5,8 +5,14 @@ import TopOffenders from "@/components/TopOffenders";
 import LiveLogTail from "@/components/live-log-tail";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDataSource } from "@/lib/datasource";
+import { useCountUp } from "@/lib/use-count-up";
 import { useQuery } from "@tanstack/react-query";
 import { Activity, Shield, ShieldOff } from "lucide-react";
+
+/** Renders a number that counts up from 0 on mount and whenever it changes. */
+function AnimatedNumber({ value }: { value: number }) {
+  return <>{useCountUp(value).toLocaleString()}</>;
+}
 
 function StatCard({
   title,
@@ -33,7 +39,11 @@ function StatCard({
             data-testid={`${testId}-value`}
             className="text-3xl font-bold leading-tight tabular-nums"
           >
-            {value}
+            {typeof value === "number" ? (
+              <AnimatedNumber value={value} />
+            ) : (
+              value
+            )}
           </p>
           <p className="truncate text-xs text-muted-foreground">
             {description}
