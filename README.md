@@ -33,7 +33,7 @@ log file → regex match → IP extracted → threshold reached → iptables DRO
 ```
 
 - **Watchers** tail one log file per config using inotify
-- **Matches** are stored in an embedded sled database for fast threshold counting
+- **Matches** are counted in an in-memory store (per config + IP) for fast threshold checks, rebuilt from the SQLite audit log on restart
 - **Bans** are applied synchronously via iptables and persisted across restarts
 - **Events** (match, ban, unban) are recorded asynchronously in SQLite for auditing
 - **Cleaner** runs periodically to expire bans and matches outside their time windows
@@ -133,7 +133,7 @@ All endpoints return JSON. Full spec at `GET /api/openapi.json`, interactive UI 
 | Variable                         | Default              | Description                                               |
 | -------------------------------- | -------------------- | --------------------------------------------------------- |
 | `BANALIZE_CORE_API_ADDR`         | `0.0.0.0:6040`       | HTTP listen address                                       |
-| `BANALIZE_CORE_DATABASE_PATH`    | `/tmp/banalize-core` | Directory for sled and SQLite databases                   |
+| `BANALIZE_CORE_DATABASE_PATH`    | `/tmp/banalize-core` | Directory for the SQLite databases and GeoIP data         |
 | `BANALIZE_CORE_FIREWALL_CHAIN`   | `INPUT`              | iptables chain to link the `banalize` chain into          |
 | `BANALIZE_CORE_LOG_LEVEL`        | `INFO`               | Log verbosity (`ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE`) |
 | `BANALIZE_CORE_CLEANER_INTERVAL` | `30`                 | How often the expiry cleaner runs, in seconds             |
