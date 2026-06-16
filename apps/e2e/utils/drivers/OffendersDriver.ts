@@ -40,10 +40,10 @@ export class OffendersDriver extends BaseDriver {
     }
   }
 
-  /** Click an offender row, which navigates to its matches. */
-  async openMatchesFor(ip: string): Promise<void> {
+  /** Click an offender row, which navigates to its event timeline. */
+  async openEventsFor(ip: string): Promise<void> {
     await this.row(ip).click();
-    await this.page.waitForURL("**/matches**");
+    await this.page.waitForURL("**/events**");
   }
 
   async expectEmpty(): Promise<void> {

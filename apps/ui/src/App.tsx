@@ -4,12 +4,11 @@ import Sidebar from "@/components/layout/Sidebar";
 import { Button } from "@/components/ui/button";
 import { DataSourceProvider, dataSource } from "@/lib/datasource";
 import { useLiveEvents } from "@/lib/use-live-events";
-import BansPage from "@/pages/BansPage";
 import ConfigDetailPage from "@/pages/ConfigDetailPage";
 import ConfigsPage from "@/pages/ConfigsPage";
 import DashboardPage from "@/pages/DashboardPage";
+import EventsPage from "@/pages/EventsPage";
 import LogsPage from "@/pages/LogsPage";
-import MatchesPage from "@/pages/MatchesPage";
 import NotificationsPage from "@/pages/NotificationsPage";
 import OffendersPage from "@/pages/OffendersPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -66,8 +65,15 @@ export default function App() {
                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/configs" element={<ConfigsPage />} />
                   <Route path="/configs/:id" element={<ConfigDetailPage />} />
-                  <Route path="/bans" element={<BansPage />} />
-                  <Route path="/matches" element={<MatchesPage />} />
+                  <Route path="/events" element={<EventsPage />} />
+                  <Route
+                    path="/bans"
+                    element={<Navigate to="/events" replace />}
+                  />
+                  <Route
+                    path="/matches"
+                    element={<Navigate to="/events" replace />}
+                  />
                   <Route path="/offenders" element={<OffendersPage />} />
                   <Route
                     path="/notifications"

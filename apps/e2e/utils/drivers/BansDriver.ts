@@ -4,9 +4,9 @@ import { BaseDriver } from "./BaseDriver";
 
 export type BanStatus = "active" | "expired" | "unbanned";
 
-/** Drives the Bans table. */
+/** Drives ban rows on the merged Events table. */
 export class BansDriver extends BaseDriver {
-  protected readonly path = "/bans";
+  protected readonly path = "/events";
 
   row(ip: string) {
     return this.byTestId(`bans-row-${ip}`);
@@ -41,6 +41,6 @@ export class BansDriver extends BaseDriver {
   }
 
   async expectEmpty(): Promise<void> {
-    await expect(this.byTestId("bans-empty")).toBeVisible();
+    await expect(this.byTestId("events-empty")).toBeVisible();
   }
 }

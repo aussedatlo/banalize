@@ -1,10 +1,12 @@
 import DashboardView from "@/components/DashboardView";
 import ConfigFormDialog from "@/components/config-form-dialog";
+import EventsTable from "@/components/events-table";
+import LiveLogDialog from "@/components/live-log-dialog";
 import { Button } from "@/components/ui/button";
 import { useDataSource } from "@/lib/datasource";
 import { formatDuration } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft, Pencil, ScrollText } from "lucide-react";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -12,6 +14,7 @@ export default function ConfigDetailPage() {
   const { id = "" } = useParams();
   const ds = useDataSource();
   const [editing, setEditing] = useState(false);
+  const [liveLogOpen, setLiveLogOpen] = useState(false);
 
   const { data: config, isLoading } = useQuery({
     queryKey: ["config", id],
@@ -56,22 +59,41 @@ export default function ConfigDetailPage() {
                 </span>
               </div>
             </div>
-            <Button
-              variant="outline"
-              data-testid="config-detail-edit"
-              onClick={() => setEditing(true)}
-            >
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
-            </Button>
+            <div className="flex shrink-0 gap-2">
+              <Button
+                variant="outline"
+                data-testid="config-detail-live-log"
+                onClick={() => setLiveLogOpen(true)}
+              >
+                <ScrollText className="mr-2 h-4 w-4" />
+                Live log
+              </Button>
+              <Button
+                variant="outline"
+                data-testid="config-detail-edit"
+                onClick={() => setEditing(true)}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+            </div>
           </div>
           <ConfigFormDialog
             open={editing}
             onOpenChange={setEditing}
             initial={config}
           />
+          <LiveLogDialog
+            configId={config.id}
+            regex={config.regex}
+            param={config.param}
+            open={liveLogOpen}
+            onOpenChange={setLiveLogOpen}
+          />
 
           <DashboardView configId={config.id} />
+
+          <EventsTable configId={config.id} />
         </>
       )}
     </div>

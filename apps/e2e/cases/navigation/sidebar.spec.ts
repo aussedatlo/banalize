@@ -4,8 +4,7 @@ import { type Route } from "../../utils/drivers/SidebarDriver";
 const ROUTES: { route: Route; heading: string }[] = [
   { route: "dashboard", heading: "" },
   { route: "configs", heading: "Configs" },
-  { route: "bans", heading: "Bans" },
-  { route: "matches", heading: "Matches" },
+  { route: "events", heading: "Events" },
   { route: "offenders", heading: "Offenders" },
   { route: "notifications", heading: "Notifications" },
   { route: "logs", heading: "Logs" },
