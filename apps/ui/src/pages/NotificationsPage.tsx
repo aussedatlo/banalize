@@ -40,7 +40,10 @@ function NotifierCard({
     : notifier.signal_config?.server;
 
   return (
-    <Card className="h-full" data-testid={`notifier-card-${notifier.id}`}>
+    <Card
+      className="h-full min-w-0"
+      data-testid={`notifier-card-${notifier.id}`}
+    >
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
         <div className="flex min-w-0 items-start gap-3">
           <div className="rounded-md bg-muted p-2">

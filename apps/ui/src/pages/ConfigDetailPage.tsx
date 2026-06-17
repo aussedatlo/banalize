@@ -39,19 +39,21 @@ export default function ConfigDetailPage() {
         </div>
       ) : (
         <>
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-1">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 space-y-1">
               <h2
                 className="pageTitle text-2xl font-bold"
                 data-testid="config-detail-name"
               >
                 {config.name}
               </h2>
-              <p className="font-mono text-sm text-muted-foreground">
+              <p className="break-all font-mono text-sm text-muted-foreground">
                 {config.param}
               </p>
               <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-xs text-muted-foreground">
-                <span className="font-mono">{config.regex}</span>
+                <span className="min-w-0 break-all font-mono">
+                  {config.regex}
+                </span>
                 <span>
                   bans after {config.max_matches} hits in{" "}
                   {formatDuration(config.find_time)} · for{" "}

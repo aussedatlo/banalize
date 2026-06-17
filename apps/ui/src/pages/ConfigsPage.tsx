@@ -58,7 +58,7 @@ export default function ConfigsPage() {
               key={c.id}
               to={`/configs/${c.id}`}
               data-testid={`config-card-${c.id}`}
-              className="group rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="group min-w-0 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Card className="h-full transition-colors hover:bg-accent">
                 <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
