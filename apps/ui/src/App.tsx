@@ -1,6 +1,7 @@
 import logoIcon from "@/assets/logo-icon.png";
 import MobileNav from "@/components/layout/MobileNav";
 import Sidebar from "@/components/layout/Sidebar";
+import StatusBar from "@/components/layout/StatusBar";
 import { Button } from "@/components/ui/button";
 import { DataSourceProvider, dataSource } from "@/lib/datasource";
 import { useLiveEvents } from "@/lib/use-live-events";
@@ -82,6 +83,7 @@ export default function App() {
                   <Route path="/logs" element={<LogsPage />} />
                 </Routes>
               </main>
+              <StatusBar />
             </div>
           </div>
         </BrowserRouter>

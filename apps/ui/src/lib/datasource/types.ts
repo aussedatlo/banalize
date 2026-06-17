@@ -153,6 +153,10 @@ export interface DataSource {
   ): () => void;
   /** Subscribe to live match/ban/unban events. Returns an unsubscribe function. */
   streamEvents(onEvent: (event: LiveEvent) => void): () => void;
+  /** The running core version (semver). Stable for the process lifetime. */
+  getVersion(): Promise<{ version: string }>;
+  /** Liveness probe; resolves only while the core is reachable. */
+  getHealth(): Promise<{ status: string }>;
   getNotifiers(): Promise<NotifierConfig[]>;
   createNotifier(notifier: NotifierConfig): Promise<NotifierConfig>;
   updateNotifier(notifier: NotifierConfig): Promise<NotifierConfig>;

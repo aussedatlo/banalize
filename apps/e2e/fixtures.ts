@@ -11,12 +11,14 @@ import { MatchesDriver } from "./utils/drivers/MatchesDriver";
 import { NotificationsDriver } from "./utils/drivers/NotificationsDriver";
 import { OffendersDriver } from "./utils/drivers/OffendersDriver";
 import { SidebarDriver } from "./utils/drivers/SidebarDriver";
+import { StatusBarDriver } from "./utils/drivers/StatusBarDriver";
 import { LogInjector } from "./utils/log-injector";
 
 type Fixtures = {
   api: ApiClient;
   logInjector: LogInjector;
   sidebar: SidebarDriver;
+  statusBar: StatusBarDriver;
   dashboard: DashboardDriver;
   configs: ConfigsDriver;
   configDetail: ConfigDetailDriver;
@@ -45,6 +47,9 @@ export const test = base.extend<Fixtures>({
   },
   sidebar: async ({ page }, use) => {
     await use(new SidebarDriver(page));
+  },
+  statusBar: async ({ page }, use) => {
+    await use(new StatusBarDriver(page));
   },
   dashboard: async ({ page }, use) => {
     await use(new DashboardDriver(page));

@@ -146,6 +146,14 @@ export class HttpDataSource implements DataSource {
     return () => es.close();
   }
 
+  getVersion() {
+    return fetchJson<{ version: string }>("/api/version");
+  }
+
+  getHealth() {
+    return fetchJson<{ status: string }>("/api/health");
+  }
+
   getNotifiers() {
     return fetchJson<NotifierConfig[]>("/api/notifiers");
   }
