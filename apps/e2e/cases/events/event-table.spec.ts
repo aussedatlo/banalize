@@ -1,4 +1,4 @@
-import { test } from "../../fixtures";
+import { expect, test } from "../../fixtures";
 import { containerLogPath } from "../../utils/config";
 import { FAILED_LOGIN_REGEX } from "../../utils/log-injector";
 import {
@@ -80,6 +80,74 @@ test.describe("merged events table", () => {
       await matches.expectRowVisible(ip);
       await bans.expectNoRow(ip);
       await bans.expectNoUnbanRow(ip);
+    });
+  });
+
+  test("a ban never interleaves with the matches that triggered it", async ({
+    api,
+    logInjector,
+    bans,
+    matches,
+  }) => {
+    test.setTimeout(60 * SECOND);
+
+    const suffix = uniqueSuffix();
+    const file = `events-order-${suffix}.log`;
+    const configId = `events-order-${suffix}`;
+    const ip = randomIp();
+    const maxMatches = 4;
+
+    await test.step("Given a config that bans after a series of matches", async () => {
+      await logInjector.create(file);
+      await api.createConfig({
+        id: configId,
+        name: `Events order ${suffix}`,
+        param: containerLogPath(file),
+        regex: FAILED_LOGIN_REGEX,
+        ban_time: 5 * MINUTE,
+        find_time: 5 * MINUTE,
+        max_matches: maxMatches,
+        ignore_ips: [],
+      });
+      await sleep(WATCHER_WARMUP_MS);
+    });
+
+    await test.step("When the IP trips the rule with spaced-out matches", async () => {
+      // Inject one line at a time with a gap so each match lands at a distinct,
+      // increasing timestamp. Distinct match timestamps are what made the old
+      // bug observable: the ban used to reuse the triggering match's timestamp,
+      // so it tied with that match and sorted *between* the matches. The ban now
+      // stamps its own (strictly later) time, so it must sort above all of them.
+      for (let i = 0; i < maxMatches; i++) {
+        await logInjector.failedLogin(file, ip, 1);
+        await sleep(250);
+      }
+
+      await bans.goto();
+      await bans.search(ip);
+      await bans.expectStatus(ip, "active");
+      await matches.expectRowVisible(ip);
+    });
+
+    await test.step("Then the ban is the newest row, sitting above every match", async () => {
+      const kinds = await bans.rowKindsInOrder(ip);
+
+      expect(
+        kinds.filter((k) => k === "match"),
+        "all spaced-out matches should be listed",
+      ).toHaveLength(maxMatches);
+
+      // Reverse-chronological timeline: the ban is the latest event for this IP,
+      // so it sits above every match that caused it. No match may appear before
+      // (above) the ban — that would mean the ban interleaved with its matches.
+      const banIndex = kinds.indexOf("ban");
+      expect(banIndex, "the ban row should be present").toBeGreaterThanOrEqual(
+        0,
+      );
+      expect(
+        kinds.slice(0, banIndex).includes("match"),
+        `no match should appear before the ban (order: ${kinds.join(", ")})`,
+      ).toBe(false);
     });
   });
 });

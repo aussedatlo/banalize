@@ -92,4 +92,22 @@ export class BansDriver extends BaseDriver {
   async expectEmpty(): Promise<void> {
     await expect(this.byTestId("events-empty")).toBeVisible();
   }
+
+  /**
+   * The event kind of every row for `ip`, in the order they appear in the
+   * merged timeline (top first). Lets a spec assert the relative ordering of an
+   * IP's match / ban / unban rows — every kind's row testid ends in `-row-<ip>`.
+   */
+  async rowKindsInOrder(ip: string): Promise<Array<"match" | "ban" | "unban">> {
+    const ids = await this.page
+      .locator(`tbody tr[data-testid$="-row-${ip}"]`)
+      .evaluateAll((rows) =>
+        rows.map((row) => row.getAttribute("data-testid") ?? ""),
+      );
+    return ids.map((id) => {
+      if (id.startsWith("matches-row-")) return "match";
+      if (id.startsWith("unbans-row-")) return "unban";
+      return "ban";
+    });
+  }
 }
