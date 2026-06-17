@@ -14,9 +14,36 @@ export class ConfigDetailDriver extends BaseDriver {
     await expect(this.byTestId("config-detail-name")).toHaveText(name);
   }
 
+  /** Assert the summary shows the recidive multiplier (only rendered when > 1). */
+  async expectRecidiveMultiplier(value: number): Promise<void> {
+    await expect(this.byTestId("config-detail-recidive")).toHaveText(
+      `×${value} on repeat`,
+    );
+  }
+
   async openEdit(): Promise<void> {
     await this.byTestId("config-detail-edit").click();
     await expect(this.byTestId("config-form")).toBeVisible();
+  }
+
+  /** Submit the edit form and wait for it to close. */
+  private async saveEdit(): Promise<void> {
+    await this.byTestId("config-form-submit").click();
+    await expect(this.byTestId("config-form")).toBeHidden();
+  }
+
+  /** Open the edit form, change the display name, and save (id is immutable). */
+  async editName(name: string): Promise<void> {
+    await this.openEdit();
+    await this.page.locator("#name").fill(name);
+    await this.saveEdit();
+  }
+
+  /** Open the edit form, change the match threshold, and save. */
+  async editMaxMatches(value: number): Promise<void> {
+    await this.openEdit();
+    await this.page.locator("#max_matches").fill(String(value));
+    await this.saveEdit();
   }
 
   /** Open the live log modal (the tail streams only while it is open). */

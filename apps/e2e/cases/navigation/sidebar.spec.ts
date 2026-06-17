@@ -12,17 +12,24 @@ const ROUTES: { route: Route; heading: string }[] = [
 
 test.describe("sidebar navigation", () => {
   test("every nav link loads its page", async ({ page, sidebar }) => {
-    await page.goto("/dashboard");
+    await test.step("Given the app starts on the dashboard", async () => {
+      await page.goto("/dashboard");
+    });
 
     for (const { route, heading } of ROUTES) {
-      await sidebar.navigateTo(route);
-      await expect(page).toHaveURL(new RegExp(`/${route}$`));
-      await sidebar.expectActive(route);
-      if (heading) {
-        await expect(
-          page.getByRole("heading", { name: heading, level: 2 }),
-        ).toBeVisible();
-      }
+      await test.step(`When navigating to the ${route} link`, async () => {
+        await sidebar.navigateTo(route);
+      });
+
+      await test.step(`Then the ${route} page loads and its link is active`, async () => {
+        await expect(page).toHaveURL(new RegExp(`/${route}$`));
+        await sidebar.expectActive(route);
+        if (heading) {
+          await expect(
+            page.getByRole("heading", { name: heading, level: 2 }),
+          ).toBeVisible();
+        }
+      });
     }
   });
 });

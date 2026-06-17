@@ -57,6 +57,12 @@ export default function ConfigDetailPage() {
                   {formatDuration(config.find_time)} · for{" "}
                   {formatDuration(config.ban_time)}
                 </span>
+                {config.recidive_multiplicator &&
+                config.recidive_multiplicator > 1 ? (
+                  <span data-testid="config-detail-recidive">
+                    ×{config.recidive_multiplicator} on repeat
+                  </span>
+                ) : null}
               </div>
             </div>
             <div className="flex shrink-0 gap-2">

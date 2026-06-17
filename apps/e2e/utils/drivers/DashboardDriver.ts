@@ -26,6 +26,26 @@ export class DashboardDriver extends BaseDriver {
       .toBeGreaterThanOrEqual(min);
   }
 
+  /** Poll the 24h matches stat until it reaches `expected`. */
+  async expectMatchCount(expected: number): Promise<void> {
+    await expect
+      .poll(
+        async () => Number((await this.matchesValue().textContent()) ?? "0"),
+        { timeout: 20_000 },
+      )
+      .toBe(expected);
+  }
+
+  /** Poll the unbans stat until it reaches `expected`. */
+  async expectUnbanCount(expected: number): Promise<void> {
+    await expect
+      .poll(
+        async () => Number((await this.unbansValue().textContent()) ?? "0"),
+        { timeout: 20_000 },
+      )
+      .toBe(expected);
+  }
+
   async expectVisible(): Promise<void> {
     await expect(this.bansValue()).toBeVisible();
   }

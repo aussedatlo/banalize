@@ -117,7 +117,7 @@ impl Detector {
         let cutoff = timestamp.saturating_sub(self.config.find_time);
         let count = self.store.count_matches(&self.config.id, &ip, cutoff);
         if count >= self.config.max_matches as usize && !self.store.is_banned(&self.config.id, &ip) {
-            if let Err(e) = self.ban_ip(&ip, timestamp).await {
+            if let Err(e) = self.ban_ip(&ip).await {
                 error!("Failed to ban IP {}: {}", ip, e);
                 // Continue anyway, don't block critical path
             }
@@ -126,8 +126,15 @@ impl Detector {
         Ok(())
     }
 
-    async fn ban_ip(&self, ip: &IpAddr, timestamp: u64) -> Result<(), String> {
+    async fn ban_ip(&self, ip: &IpAddr) -> Result<(), String> {
         info!("Banning IP {} for config {}", ip, self.config.id);
+
+        // The ban is its own event and must stamp the moment it is issued, not
+        // reuse the triggering match's timestamp. Sharing the match timestamp let
+        // the ban tie with — and sort among — the matches in the merged timeline;
+        // a fresh `now_millis()` keeps the ban strictly after every match that
+        // caused it.
+        let timestamp = now_millis();
 
         // Record the ban in memory (critical path) with its own effective
         // duration. With the recidive multiplicator on, the duration grows with

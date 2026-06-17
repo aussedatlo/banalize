@@ -36,15 +36,21 @@ export class LogInjector {
 
   /**
    * Append `count` sshd-style failed-login lines for `ip`, matching the regex
-   * `Failed password .* from <IP>`.
+   * `Failed password .* from <IP>`. Returns the exact lines written so a UI test
+   * can assert the rendered raw line (timestamp prefix included).
    */
-  async failedLogin(file: string, ip: string, count: number): Promise<void> {
+  async failedLogin(
+    file: string,
+    ip: string,
+    count: number,
+  ): Promise<string[]> {
     const lines = Array.from(
       { length: count },
       (_, i) =>
         `${new Date().toISOString()} sshd[${1000 + i}]: Failed password for root from ${ip} port 4242 ssh2`,
     );
     await this.appendLines(file, lines);
+    return lines;
   }
 }
 

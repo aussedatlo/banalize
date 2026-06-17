@@ -20,6 +20,16 @@ export class OffendersDriver extends BaseDriver {
     await this.byTestId(`offenders-sort-${key}`).click();
   }
 
+  /** The IPs of the currently-rendered rows, in DOM (sorted) order. */
+  async rowOrder(): Promise<string[]> {
+    const ids = await this.page
+      .locator('[data-testid^="offenders-row-"]')
+      .evaluateAll((rows) =>
+        rows.map((r) => r.getAttribute("data-testid") ?? ""),
+      );
+    return ids.map((id) => id.replace("offenders-row-", ""));
+  }
+
   async expectRowVisible(ip: string): Promise<void> {
     await expect(this.row(ip)).toBeVisible({ timeout: 20_000 });
   }

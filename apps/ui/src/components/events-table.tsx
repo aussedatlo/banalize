@@ -34,6 +34,16 @@ const PAGE_SIZE = 50;
 type EventKind = "match" | "ban" | "unban";
 type TypeFilter = "all" | EventKind;
 
+/**
+ * Chronological recency of each kind, used only to break timestamp ties. A ban
+ * is issued after the matches that trigger it (and an unban after the ban), but
+ * the millisecond clock can collapse a ban onto the same tick as its triggering
+ * match. Sorting equal timestamps by this rank keeps a ban from interleaving
+ * with its own matches — newest kind first, matching the reverse-chronological
+ * order of the table.
+ */
+const kindRecency: Record<EventKind, number> = { match: 0, ban: 1, unban: 2 };
+
 /** One row in the merged timeline, derived from a match, ban or unban event. */
 interface EventRow {
   kind: EventKind;
@@ -187,7 +197,10 @@ export default function EventsTable({
           r.ip.toLowerCase().includes(query) ||
           (r.line?.toLowerCase().includes(query) ?? false)),
     )
-    .sort((a, b) => b.timestamp - a.timestamp);
+    .sort(
+      (a, b) =>
+        b.timestamp - a.timestamp || kindRecency[b.kind] - kindRecency[a.kind],
+    );
 
   const { count, sentinelRef } = useInfiniteScroll(
     PAGE_SIZE,
