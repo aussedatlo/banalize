@@ -27,6 +27,24 @@ export class MatchesDriver extends BaseDriver {
     await this.row(ip).click();
   }
 
+  /**
+   * Expand the (first) match row and assert the raw line renders with the regex
+   * match highlighted (amber) and the offending IP within it (red). Pass `oneOf`
+   * (the lines returned by `logInjector.failedLogin`) to also assert the shown
+   * text is exactly one of those injected lines — robust to row ordering when an
+   * IP has several identical-timestamp matches.
+   */
+  async expectMatchedLine(ip: string, oneOf?: string[]): Promise<void> {
+    await this.expandRow(ip);
+    const line = this.byTestId("highlighted-line");
+    await expect(line).toBeVisible({ timeout: 20_000 });
+    await expect(this.byTestId("highlighted-line-ip")).toHaveText(ip);
+    await expect(this.byTestId("highlighted-line-match")).toContainText(
+      "Failed password",
+    );
+    if (oneOf) expect(oneOf).toContain(await line.innerText());
+  }
+
   async expectEmpty(): Promise<void> {
     await expect(this.byTestId("events-empty")).toBeVisible();
   }

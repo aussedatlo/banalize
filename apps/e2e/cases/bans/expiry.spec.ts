@@ -3,6 +3,7 @@ import { containerLogPath } from "../../utils/config";
 import { FAILED_LOGIN_REGEX } from "../../utils/log-injector";
 import {
   MINUTE,
+  randomIp,
   SECOND,
   sleep,
   uniqueSuffix,
@@ -24,30 +25,35 @@ test.describe("ban auto-expiry", () => {
     const suffix = uniqueSuffix();
     const file = `expiry-${suffix}.log`;
     const configId = `expiry-${suffix}`;
-    const ip = `198.51.100.${10 + Math.floor(Math.random() * 200)}`;
+    const ip = randomIp();
     const maxMatches = 3;
 
-    await logInjector.create(file);
-    await api.createConfig({
-      id: configId,
-      name: `Expiry ${suffix}`,
-      param: containerLogPath(file),
-      regex: FAILED_LOGIN_REGEX,
-      // Short ban so the cleaner (5s tick) expires it within the test.
-      ban_time: 8 * SECOND,
-      find_time: 5 * MINUTE,
-      max_matches: maxMatches,
-      ignore_ips: [],
+    await test.step("Given a config with a short ban_time", async () => {
+      await logInjector.create(file);
+      await api.createConfig({
+        id: configId,
+        name: `Expiry ${suffix}`,
+        param: containerLogPath(file),
+        regex: FAILED_LOGIN_REGEX,
+        // Short ban so the cleaner (5s tick) expires it within the test.
+        ban_time: 8 * SECOND,
+        find_time: 5 * MINUTE,
+        max_matches: maxMatches,
+        ignore_ips: [],
+      });
     });
 
-    await sleep(WATCHER_WARMUP_MS);
-    await logInjector.failedLogin(file, ip, maxMatches + 2);
+    await test.step("When an IP trips the match threshold", async () => {
+      await sleep(WATCHER_WARMUP_MS);
+      await logInjector.failedLogin(file, ip, maxMatches + 2);
+    });
 
-    await bans.goto();
-    await bans.expectRowVisible(ip);
-    await bans.expectStatus(ip, "active");
-
-    // No unban() call — the cleaner lifts it on its own and the badge flips.
-    await bans.expectStatus(ip, "expired");
+    await test.step("Then the ban shows active, then flips to expired on its own", async () => {
+      await bans.goto();
+      await bans.expectRowVisible(ip);
+      await bans.expectStatus(ip, "active");
+      // No unban() call — the cleaner lifts it on its own and the badge flips.
+      await bans.expectStatus(ip, "expired");
+    });
   });
 });

@@ -11,30 +11,41 @@ test.describe("config CRUD", () => {
     const name = `SSH Brute Force ${uniqueSuffix()}`;
     const id = slugify(name);
 
-    await configs.goto();
-    await configs.expectEmpty();
-
-    await configs.createConfig({
-      name,
-      param: "/var/log/auth.log",
-      regex: "Failed password .* from <IP>",
-      maxMatches: 5,
+    await test.step("Given the configs page is empty", async () => {
+      await configs.goto();
+      await configs.expectEmpty();
     });
-    await configs.expectConfigVisible(id);
 
-    // Persisted in the core, not just rendered optimistically.
-    const fromApi = await api.listConfigs();
-    expect(fromApi.map((c) => c.id)).toContain(id);
+    await test.step("When a config is created via the UI", async () => {
+      await configs.createConfig({
+        name,
+        param: "/var/log/auth.log",
+        regex: "Failed password .* from <IP>",
+        maxMatches: 5,
+      });
+    });
 
-    // The card links through to the detail page.
-    await configs.openConfig(id);
-    await configDetail.expectName(name);
+    await test.step("Then it is listed, persisted in the core, and links to its detail page", async () => {
+      await configs.expectConfigVisible(id);
 
-    // Delete it from the list and confirm it is gone everywhere.
-    await configs.goto();
-    await configs.deleteConfig(id);
-    await expect
-      .poll(async () => (await api.listConfigs()).map((c) => c.id))
-      .not.toContain(id);
+      // Persisted in the core, not just rendered optimistically.
+      const fromApi = await api.listConfigs();
+      expect(fromApi.map((c) => c.id)).toContain(id);
+
+      // The card links through to the detail page.
+      await configs.openConfig(id);
+      await configDetail.expectName(name);
+    });
+
+    await test.step("When it is deleted from the list", async () => {
+      await configs.goto();
+      await configs.deleteConfig(id);
+    });
+
+    await test.step("Then it is gone everywhere", async () => {
+      await expect
+        .poll(async () => (await api.listConfigs()).map((c) => c.id))
+        .not.toContain(id);
+    });
   });
 });
