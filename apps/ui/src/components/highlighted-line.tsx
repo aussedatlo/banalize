@@ -35,15 +35,24 @@ export default function HighlightedLine({
   const resolvedIp = ip ?? matched.match(new RegExp(IP_PATTERN))?.[0];
   const ipAt = resolvedIp ? matched.indexOf(resolvedIp) : -1;
   return (
-    <p className="whitespace-pre-wrap break-all font-mono text-xs leading-relaxed">
+    <p
+      data-testid="highlighted-line"
+      className="whitespace-pre-wrap break-all font-mono text-xs leading-relaxed"
+    >
       <span className="text-muted-foreground">{line.slice(0, start)}</span>
-      <span className="rounded bg-amber-500/15 px-0.5 text-amber-700 dark:text-amber-300">
+      <span
+        data-testid="highlighted-line-match"
+        className="rounded bg-amber-500/15 px-0.5 text-amber-700 dark:text-amber-300"
+      >
         {!resolvedIp || ipAt === -1 ? (
           matched
         ) : (
           <>
             {matched.slice(0, ipAt)}
-            <span className="rounded bg-red-500/15 px-0.5 font-semibold text-red-600 dark:text-red-400">
+            <span
+              data-testid="highlighted-line-ip"
+              className="rounded bg-red-500/15 px-0.5 font-semibold text-red-600 dark:text-red-400"
+            >
               {resolvedIp}
             </span>
             {matched.slice(ipAt + resolvedIp.length)}
