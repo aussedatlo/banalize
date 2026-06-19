@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <title>Banalize</title>
+    <script>
+      // Apply the saved/system theme before paint to avoid a light flash.
+      // Keep in sync with getInitialTheme() in src/lib/use-theme.ts.
+      (function () {
+        try {
+          var saved = localStorage.getItem("banalize-theme");
+          var dark =
+            saved === "dark" ||
+            (saved !== "light" &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          if (dark) document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

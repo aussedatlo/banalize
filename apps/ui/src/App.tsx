@@ -1,4 +1,4 @@
-import logoIcon from "@/assets/logo-icon.png";
+import Logo from "@/components/layout/Logo";
 import MobileNav from "@/components/layout/MobileNav";
 import Sidebar from "@/components/layout/Sidebar";
 import StatusBar from "@/components/layout/StatusBar";
@@ -54,8 +54,10 @@ export default function App() {
                 >
                   <Menu className="h-5 w-5" />
                 </Button>
-                <img src={logoIcon} alt="" className="h-7 w-auto" />
-                <span className="pageTitle text-lg font-bold">Banalize</span>
+                <Logo className="h-8 w-10 shrink-0" />
+                <span className="brandWordmark text-lg font-semibold tracking-tight">
+                  banalize
+                </span>
               </header>
               <main className="flex-1 overflow-auto p-4 md:p-6">
                 <Routes>

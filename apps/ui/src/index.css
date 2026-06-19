@@ -29,27 +29,27 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 230 35% 7%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 230 28% 11%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 230 28% 11%;
     --popover-foreground: 210 40% 98%;
     --primary: 230 85% 62%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 230 22% 16%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 230 40% 22%;
+    --muted: 230 22% 15%;
+    --muted-foreground: 215 18% 62%;
+    --accent: 230 30% 20%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 45%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 230 20% 18%;
+    --input: 230 20% 18%;
     --ring: 230 85% 62%;
-    --brand-blue: 230 85% 62%;
-    --brand-purple: 263 87% 60%;
+    --brand-blue: 230 85% 66%;
+    --brand-purple: 263 87% 66%;
   }
 }
 
@@ -70,5 +70,15 @@
 }
 
 .pageTitle::first-letter {
+  color: hsl(var(--brand-blue));
+}
+
+/* Brand wordmark next to the shield: same display font, with a brand-blue
+   first letter echoing the logo. */
+.brandWordmark {
+  font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+}
+
+.brandWordmark::first-letter {
   color: hsl(var(--brand-blue));
 }

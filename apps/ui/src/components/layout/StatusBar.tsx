@@ -1,3 +1,4 @@
+import ThemeToggle from "@/components/theme-toggle";
 import { useStatus, type HealthState } from "@/lib/use-status";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +38,9 @@ export default function StatusBar() {
       <span data-testid="status-bar-core-version">
         core {coreVersion ?? "—"}
       </span>
+      <div className="ml-auto">
+        <ThemeToggle />
+      </div>
     </footer>
   );
 }

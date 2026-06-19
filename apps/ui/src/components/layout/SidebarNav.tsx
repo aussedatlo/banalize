@@ -1,4 +1,4 @@
-import logoIcon from "@/assets/logo-icon.png";
+import Logo from "@/components/layout/Logo";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
@@ -32,14 +32,16 @@ export default function SidebarNav({ collapsed, onNavigate }: SidebarNavProps) {
   return (
     <>
       <div className={cn("p-5", collapsed && "px-3")}>
-        <div className="flex items-center gap-1.5">
-          <img src={logoIcon} alt="" className="h-8 w-auto" />
+        <div className="flex items-center justify-center gap-2">
+          <Logo className="h-10 w-12 shrink-0" />
           {!collapsed && (
-            <span className="pageTitle text-xl font-bold">Banalize</span>
+            <span className="brandWordmark text-2xl font-semibold tracking-tight">
+              banalize
+            </span>
           )}
         </div>
         {!collapsed && (
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-center text-xs text-muted-foreground">
             Automated intrusion prevention
           </p>
         )}
