@@ -18,7 +18,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { type BanStatus, banStatus, effectiveBanTime } from "@/lib/ban-status";
+import {
+  type BanStatus,
+  banStatus,
+  effectiveBanTime,
+  type MatchStatus,
+  matchStatus,
+} from "@/lib/ban-status";
 import { useDataSource } from "@/lib/datasource";
 import { type Period, periodStart } from "@/lib/period";
 import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
@@ -91,6 +97,19 @@ const statusBadge: Record<
   active: { variant: "destructive", label: "active" },
   expired: { variant: "outline", label: "expired" },
   unbanned: { variant: "secondary", label: "unbanned" },
+};
+
+const matchStatusBadge: Record<
+  MatchStatus,
+  { variant: "secondary" | "outline"; label: string; className?: string }
+> = {
+  counting: {
+    variant: "secondary",
+    label: "counting",
+    className:
+      "border-transparent bg-gradient-to-r from-brand-blue to-brand-purple text-white hover:opacity-90",
+  },
+  expired: { variant: "outline", label: "expired" },
 };
 
 interface EventsTableProps {
@@ -297,6 +316,17 @@ export default function EventsTable({
                     ? ban.timestamp + effectiveBanTime(ban, bans, banConfig)
                     : undefined;
 
+                const matchConfig =
+                  r.kind === "match" ? configMap.get(r.config_id) : undefined;
+                const mStatus =
+                  r.kind === "match"
+                    ? matchStatus(r.timestamp, matchConfig, now)
+                    : undefined;
+                const countingEnd =
+                  mStatus === "counting" && matchConfig
+                    ? r.timestamp + matchConfig.find_time
+                    : undefined;
+
                 return (
                   <Fragment key={rowKey(r)}>
                     <TableRow
@@ -339,6 +369,25 @@ export default function EventsTable({
                                 {formatDuration(
                                   Math.max(0, scheduledEnd - now),
                                 )}{" "}
+                                left
+                              </span>
+                            ) : null}
+                          </div>
+                        ) : mStatus ? (
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              variant={matchStatusBadge[mStatus].variant}
+                              className={cn(
+                                "font-normal",
+                                matchStatusBadge[mStatus].className,
+                              )}
+                              data-testid={`matches-status-${r.ip}`}
+                            >
+                              {matchStatusBadge[mStatus].label}
+                            </Badge>
+                            {countingEnd !== undefined ? (
+                              <span className="text-xs tabular-nums text-muted-foreground">
+                                {formatDuration(Math.max(0, countingEnd - now))}{" "}
                                 left
                               </span>
                             ) : null}

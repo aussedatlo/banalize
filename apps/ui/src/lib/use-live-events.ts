@@ -16,31 +16,39 @@ const THROTTLE_MS = 1_000;
  * affected queries so every page refreshes without polling. Invalidations
  * are throttled (leading + trailing) because an attack burst can emit
  * hundreds of match events per second.
+ *
+ * Both edges fire every window: the leading edge keeps live updates snappy,
+ * and the trailing edge re-fetches once more ~THROTTLE_MS later. The trailing
+ * refetch is essential, not just coalescing — a match's SSE event is emitted
+ * before its durable audit-log write lands, so the leading refetch alone can
+ * read stale (empty) data and, with no further events, never correct itself.
  */
 export function useLiveEvents() {
   const ds = useDataSource();
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const pending = new Set<string>();
+    let keys = new Set<string>();
     let timer: ReturnType<typeof setTimeout> | undefined;
 
-    const flush = () => {
-      timer = undefined;
-      pending.forEach((key) => {
+    const invalidate = () => {
+      keys.forEach((key) => {
         void queryClient.invalidateQueries({ queryKey: [key] });
       });
-      pending.clear();
     };
 
     const unsubscribe = ds.streamEvents((event) => {
-      const keys = AFFECTED_KEYS[event.kind];
-      if (!keys) return;
-      keys.forEach((key) => pending.add(key));
-      if (timer === undefined) {
-        flush();
-        timer = setTimeout(flush, THROTTLE_MS);
-      }
+      const affected = AFFECTED_KEYS[event.kind];
+      if (!affected) return;
+      affected.forEach((key) => keys.add(key));
+      if (timer !== undefined) return;
+
+      invalidate(); // leading edge
+      timer = setTimeout(() => {
+        timer = undefined;
+        invalidate(); // trailing edge
+        keys = new Set();
+      }, THROTTLE_MS);
     });
 
     return () => {

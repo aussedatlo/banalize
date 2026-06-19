@@ -2,6 +2,23 @@ import type { BanEvent, Config, UnbanEvent } from "@/lib/datasource";
 
 export type BanStatus = "active" | "expired" | "unbanned";
 
+export type MatchStatus = "counting" | "expired";
+
+/**
+ * Whether a match still counts toward triggering a ban. The backend bans an IP
+ * once `max_matches` of its matches fall within the trailing `find_time` window
+ * (see detector.rs); once a match ages past that window it no longer counts.
+ * With the config gone there is nothing left to count it for, so it's expired.
+ */
+export function matchStatus(
+  matchTimestamp: number,
+  config: Config | undefined,
+  now: number,
+): MatchStatus {
+  if (!config) return "expired";
+  return matchTimestamp + config.find_time > now ? "counting" : "expired";
+}
+
 /**
  * Effective duration of a single ban, mirroring the backend: with the recidive
  * multiplicator set, the same (config, IP) escalates as
