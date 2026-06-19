@@ -56,7 +56,7 @@ export default function App() {
                 </Button>
                 <Logo className="h-8 w-10 shrink-0" />
                 <span className="brandWordmark text-lg font-semibold tracking-tight">
-                  banalize
+                  Banalize
                 </span>
               </header>
               <main className="flex-1 overflow-auto p-4 md:p-6">
