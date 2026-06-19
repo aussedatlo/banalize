@@ -305,7 +305,7 @@ export default function EventsTable({
                     ? bans.find((b) => b.id === r.id)
                     : undefined;
                 const status = ban
-                  ? banStatus(ban, bans, unbans, configMap, now)
+                  ? banStatus(ban, bans, unbans, configMap)
                   : undefined;
                 const active = status === "active";
                 const banConfig = ban
@@ -364,12 +364,11 @@ export default function EventsTable({
                             >
                               {statusBadge[status].label}
                             </Badge>
-                            {active && scheduledEnd !== undefined ? (
+                            {active &&
+                            scheduledEnd !== undefined &&
+                            scheduledEnd > now ? (
                               <span className="text-xs tabular-nums text-muted-foreground">
-                                {formatDuration(
-                                  Math.max(0, scheduledEnd - now),
-                                )}{" "}
-                                left
+                                {formatDuration(scheduledEnd - now)} left
                               </span>
                             ) : null}
                           </div>

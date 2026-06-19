@@ -44,10 +44,13 @@ export function effectiveBanTime(
 }
 
 /**
- * Status of one ban event, mirroring the backend semantics: a ban ends when a
- * matching unban event lands at or after it (manual disable, config deletion,
- * or the cleaner expiring it) or when its ban_time elapses (shown as expired
- * even before the cleaner's next tick records the unban event).
+ * Status of one ban event, mirroring the backend semantics: a ban is enforced
+ * until the backend records a matching unban event (manual disable, config
+ * deletion, or the cleaner expiring it). Crucially, the UI does *not* declare a
+ * ban expired on its own once the config's ban_time elapses: a ban keeps the
+ * effective duration it was issued with, which the backend froze at creation,
+ * so a later edit to the config's ban_time must not retroactively "expire" a
+ * still-enforced ban here. Only the unban event ends a ban.
  *
  * `bans` is the full ban list, needed to size escalated (recidive) bans.
  */
@@ -56,7 +59,6 @@ export function banStatus(
   bans: BanEvent[],
   unbans: UnbanEvent[],
   configs: Map<string, Config>,
-  now: number,
 ): BanStatus {
   const config = configs.get(ban.config_id);
   const scheduledEnd = config
@@ -79,8 +81,9 @@ export function banStatus(
     return "unbanned";
   }
 
-  if (scheduledEnd !== undefined && scheduledEnd <= now) return "expired";
-  // Config gone and no unban event: nothing enforces this ban anymore.
+  // Config gone but no unban yet: deletion lifts every ban and emits an unban
+  // (see api/configs.rs), so this only covers the brief load race before that
+  // unban arrives — nothing enforces the ban anymore.
   if (!config) return "expired";
   return "active";
 }
@@ -91,9 +94,8 @@ export function isIpBanned(
   bans: BanEvent[],
   unbans: UnbanEvent[],
   configs: Map<string, Config>,
-  now: number,
 ): boolean {
   return bans.some(
-    (b) => b.ip === ip && banStatus(b, bans, unbans, configs, now) === "active",
+    (b) => b.ip === ip && banStatus(b, bans, unbans, configs) === "active",
   );
 }

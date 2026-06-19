@@ -14,7 +14,6 @@ import { type IpStats, useDataSource } from "@/lib/datasource";
 import { type Period, periodStart } from "@/lib/period";
 import { useInfiniteScroll } from "@/lib/use-infinite-scroll";
 import { useIpInfos } from "@/lib/use-ip-infos";
-import { useNow } from "@/lib/use-now";
 import { formatTimestamp } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDown, ArrowUp } from "lucide-react";
@@ -66,7 +65,6 @@ export default function OffendersPage() {
     refetchInterval: 60_000,
   });
 
-  const now = useNow(1000);
   const configMap = new Map(configs.map((c) => [c.id, c]));
 
   const query = search.trim().toLowerCase();
@@ -166,7 +164,7 @@ export default function OffendersPage() {
               </TableRow>
             ) : (
               visible.map((s) => {
-                const banned = isIpBanned(s.ip, bans, unbans, configMap, now);
+                const banned = isIpBanned(s.ip, bans, unbans, configMap);
                 return (
                   <TableRow
                     key={s.ip}
