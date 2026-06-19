@@ -81,6 +81,8 @@ pub struct Notification {
     pub title: String,
     pub message: String,
     pub html: Option<String>,
+    /// Compact, chat-friendly body for Signal (email reuses title + message).
+    pub signal: String,
 }
 
 async fn send_email(cfg: &EmailConfig, n: &Notification) -> Result<(), String> {
@@ -137,7 +139,7 @@ async fn send_signal(cfg: &SignalConfig, n: &Notification) -> Result<(), String>
         .build()
         .map_err(|e| e.to_string())?;
     let body = serde_json::json!({
-        "message": format!("{}\n{}", n.title, n.message),
+        "message": n.signal,
         "number": cfg.number,
         "recipients": cfg.recipients,
     });
@@ -220,6 +222,52 @@ fn build_ban_text(ip: &str, timestamp: u64, ctx: &BanContext) -> String {
         lines.push(format!("Matches: {}", count));
     }
     lines.push(format!("Time: {}", iso8601(timestamp)));
+    lines.join("\n")
+}
+
+/// Chars of context kept on each side of the IP when surfacing a log line on
+/// Signal — keeps a long raw line down to a glanceable snippet.
+const SIGNAL_LOG_CONTEXT: usize = 10;
+
+/// `…before <ip> after…`, trimmed to a window around the IP. Falls back to a
+/// head cut if the IP isn't found in the line. Char-based, so UTF-8 safe.
+fn signal_log_snippet(line: &str, ip: &str) -> String {
+    let chars: Vec<char> = line.chars().collect();
+    let ip_chars: Vec<char> = ip.chars().collect();
+    let pos = chars
+        .windows(ip_chars.len().max(1))
+        .position(|w| w == ip_chars.as_slice());
+
+    let (start, end) = match pos {
+        Some(p) => (
+            p.saturating_sub(SIGNAL_LOG_CONTEXT),
+            (p + ip_chars.len() + SIGNAL_LOG_CONTEXT).min(chars.len()),
+        ),
+        None => (0, (SIGNAL_LOG_CONTEXT * 3).min(chars.len())),
+    };
+
+    let mut out = String::new();
+    if start > 0 {
+        out.push('…');
+    }
+    out.extend(&chars[start..end]);
+    if end < chars.len() {
+        out.push('…');
+    }
+    out
+}
+
+/// Compact Signal body for a ban: two-line header plus an optional windowed log
+/// snippet. No regex/match-count/timestamp — those are email-only noise here.
+fn build_ban_signal(ip: &str, ctx: &BanContext) -> String {
+    let header = match &ctx.country {
+        Some((flag, name)) => format!("{} {} {}", ip, flag, name),
+        None => ip.to_string(),
+    };
+    let mut lines = vec![format!("🚫 Ban · {}", ctx.config_name), header];
+    if let Some(line) = &ctx.line {
+        lines.push(format!("↳ {}", signal_log_snippet(line, ip)));
+    }
     lines.join("\n")
 }
 
@@ -356,6 +404,7 @@ pub async fn run_dispatcher(
                     title: "Banalize: Match found".to_string(),
                     message: format!("[{}] New match for IP {}", name, ip),
                     html: None,
+                    signal: format!("👀 Match · {} · {}", name, ip),
                 }
             }
             Event::Unban { config_id, ip, .. } => {
@@ -364,6 +413,7 @@ pub async fn run_dispatcher(
                     title: "Banalize: IP Unbanned".to_string(),
                     message: format!("[{}] IP {} unbanned", name, ip),
                     html: None,
+                    signal: format!("✅ Unban · {} · {}", name, ip),
                 }
             }
             Event::Ban {
@@ -402,6 +452,7 @@ pub async fn run_dispatcher(
                     title: "Banalize: IP Banned".to_string(),
                     message: build_ban_text(ip, *timestamp, &ctx),
                     html: Some(build_ban_html(ip, *timestamp, &ctx)),
+                    signal: build_ban_signal(ip, &ctx),
                 }
             }
         };
@@ -426,4 +477,84 @@ async fn config_name(configs: &Arc<RwLock<ConfigMap>>, config_id: &str) -> Strin
         .get(config_id)
         .map(|c| c.name.clone())
         .unwrap_or_else(|| config_id.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // These expectations assume SIGNAL_LOG_CONTEXT == 10.
+
+    #[test]
+    fn snippet_windows_both_sides() {
+        let line = "0123456789ABCDE1.2.3.4FGHIJKLMNOPQRST";
+        assert_eq!(
+            signal_log_snippet(line, "1.2.3.4"),
+            "…56789ABCDE1.2.3.4FGHIJKLMNO…"
+        );
+    }
+
+    #[test]
+    fn snippet_no_leading_ellipsis_when_ip_at_start() {
+        let line = "1.2.3.4FGHIJKLMNOPQRST";
+        assert_eq!(signal_log_snippet(line, "1.2.3.4"), "1.2.3.4FGHIJKLMNO…");
+    }
+
+    #[test]
+    fn snippet_no_trailing_ellipsis_when_ip_at_end() {
+        let line = "0123456789ABCDE1.2.3.4";
+        assert_eq!(signal_log_snippet(line, "1.2.3.4"), "…56789ABCDE1.2.3.4");
+    }
+
+    #[test]
+    fn snippet_short_line_kept_whole() {
+        let line = "from 1.2.3.4 ssh";
+        assert_eq!(signal_log_snippet(line, "1.2.3.4"), "from 1.2.3.4 ssh");
+    }
+
+    #[test]
+    fn snippet_falls_back_to_head_when_ip_absent() {
+        let line = "this line has no matching ip and is fairly long indeed";
+        let out = signal_log_snippet(line, "9.9.9.9");
+        // Head cut: first 30 chars + trailing ellipsis, nothing trimmed at front.
+        assert_eq!(out, "this line has no matching ip a…");
+        assert!(!out.starts_with('…'));
+    }
+
+    #[test]
+    fn snippet_is_char_aligned_on_multibyte_lines() {
+        // Must not panic on UTF-8 boundaries and must window by chars, not bytes.
+        let line = "héllo 🚀 from 1.2.3.4 pôrt 22 ✨";
+        assert_eq!(
+            signal_log_snippet(line, "1.2.3.4"),
+            "…lo 🚀 from 1.2.3.4 pôrt 22 ✨"
+        );
+    }
+
+    #[test]
+    fn ban_signal_includes_country_and_snippet() {
+        let ctx = BanContext {
+            config_name: "ssh".to_string(),
+            regex: Some(".*<IP>.*".to_string()),
+            country: Some(("🇫🇷".to_string(), "France".to_string())),
+            line: Some("Failed password for root from 1.2.3.4 port 22 ssh2".to_string()),
+            match_count: Some(5),
+        };
+        assert_eq!(
+            build_ban_signal("1.2.3.4", &ctx),
+            "🚫 Ban · ssh\n1.2.3.4 🇫🇷 France\n↳ …root from 1.2.3.4 port 22 s…"
+        );
+    }
+
+    #[test]
+    fn ban_signal_omits_optional_lines_when_absent() {
+        let ctx = BanContext {
+            config_name: "ssh".to_string(),
+            regex: None,
+            country: None,
+            line: None,
+            match_count: None,
+        };
+        assert_eq!(build_ban_signal("1.2.3.4", &ctx), "🚫 Ban · ssh\n1.2.3.4");
+    }
 }

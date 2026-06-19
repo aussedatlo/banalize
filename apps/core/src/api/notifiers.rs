@@ -201,6 +201,7 @@ pub(crate) async fn test_notifier(
         title: "Banalize test title".to_string(),
         message: "Banalize test message".to_string(),
         html: None,
+        signal: "🛡 Banalize test notification".to_string(),
     };
     let result = notifier::send(&config, &notification).await;
 
