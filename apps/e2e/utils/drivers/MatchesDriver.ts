@@ -2,6 +2,8 @@ import { expect } from "@playwright/test";
 
 import { BaseDriver } from "./BaseDriver";
 
+export type MatchStatus = "counting" | "expired";
+
 /** Drives match rows on the merged Events table. */
 export class MatchesDriver extends BaseDriver {
   protected readonly path = "/events";
@@ -12,6 +14,19 @@ export class MatchesDriver extends BaseDriver {
 
   async search(query: string): Promise<void> {
     await this.byTestId("table-search").fill(query);
+  }
+
+  /**
+   * Wait for `ip`'s (first) match row to show the expected window status:
+   * "counting" while the match is inside the config's find_time window,
+   * "expired" once it ages out. Polls — matches arrive async and the badge
+   * flips client-side as the window elapses.
+   */
+  async expectStatus(ip: string, status: MatchStatus): Promise<void> {
+    await expect(this.byTestId(`matches-status-${ip}`).first()).toHaveText(
+      status,
+      { timeout: 20_000 },
+    );
   }
 
   async expectRowVisible(ip: string): Promise<void> {

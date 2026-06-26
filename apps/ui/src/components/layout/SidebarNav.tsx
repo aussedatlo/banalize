@@ -36,7 +36,7 @@ export default function SidebarNav({ collapsed, onNavigate }: SidebarNavProps) {
           <Logo className="h-10 w-12 shrink-0" />
           {!collapsed && (
             <span className="brandWordmark text-2xl font-semibold tracking-tight">
-              banalize
+              Banalize
             </span>
           )}
         </div>

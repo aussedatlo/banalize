@@ -1,6 +1,10 @@
 version: 2
 updates:
-  # Root package.json (monorepo root)
+  # npm/pnpm workspace (root + apps/* + packages/*)
+  # A single entry at the workspace root is required because the whole
+  # monorepo shares one root pnpm-lock.yaml. Per-directory entries would
+  # update the member package.json but leave the root lockfile untouched,
+  # so CI fails on the out-of-sync lockfile.
   - package-ecosystem: "npm"
     directory: "/"
     target-branch: "main"
@@ -24,46 +28,10 @@ updates:
           - "gitmoji*"
           - "eslint*"
           - "typescript*"
-
-  # UI app
-  - package-ecosystem: "npm"
-    directory: "/apps/ui"
-    target-branch: "main"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-    open-pull-requests-limit: 10
-    commit-message:
-      prefix: "chore"
-      include: "scope"
-    labels:
-      - "dependencies"
-      - "npm"
-      - "ui"
-
-  # Packages
-  - package-ecosystem: "npm"
-    directory: "/packages"
-    target-branch: "main"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-    open-pull-requests-limit: 10
-    commit-message:
-      prefix: "chore"
-      include: "scope"
-    labels:
-      - "dependencies"
-      - "npm"
-      - "packages"
-    groups:
-      dev-dependencies:
-        patterns:
-          - "eslint*"
-          - "typescript*"
           - "stylelint*"
+      radix:
+        patterns:
+          - "@radix-ui/*"
 
   # Rust/Cargo dependencies
   - package-ecosystem: "cargo"
