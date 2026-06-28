@@ -34,7 +34,7 @@ anyhow = "1.0"
 # Web framework
 axum = "0.8.7"
 tower = "0.5"
-tower-http = { version = "0.6", features = ["cors"] }
+tower-http = { version = "0.7", features = ["cors"] }
 
 # IP address handling
 ipnet = "2.9"
