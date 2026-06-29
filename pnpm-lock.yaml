@@ -135,8 +135,8 @@ importers:
         specifier: ^0.5.3
         version: 0.5.3(eslint@10.5.0(jiti@2.7.0))
       postcss:
-        specifier: ^8.5.15
-        version: 8.5.15
+        specifier: ^8.5.16
+        version: 8.5.16
       stylelint:
         specifier: ^17.13.0
         version: 17.13.0(typescript@6.0.3)
@@ -172,7 +172,7 @@ importers:
         version: 2.32.0(@typescript-eslint/parser@8.61.1(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))
       eslint-plugin-prettier:
         specifier: ^5.5.6
-        version: 5.5.6(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.5.0(jiti@2.7.0)))(eslint@10.5.0(jiti@2.7.0))(prettier@3.8.4)
+        version: 5.5.6(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.5.0(jiti@2.7.0)))(eslint@10.5.0(jiti@2.7.0))(prettier@3.9.1)
 
   packages/stylelint-config:
     dependencies:
@@ -181,7 +181,7 @@ importers:
         version: 40.0.0(stylelint@17.13.0(typescript@6.0.3))
       stylelint-prettier:
         specifier: ^5.0.2
-        version: 5.0.3(prettier@3.8.4)(stylelint@17.13.0(typescript@6.0.3))
+        version: 5.0.3(prettier@3.9.1)(stylelint@17.13.0(typescript@6.0.3))
 
   packages/typescript-config: {}
 
@@ -2614,8 +2614,8 @@ packages:
     resolution: {integrity: sha512-avsJQhyd+680gKXyG/sQc0nXaC6rBkPOfyHYcFb9+hdkqQkR9bdnkJ0AMZhke0oesPqIO+mFFJ+IdBc7mst4IA==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
-  nanoid@3.3.12:
-    resolution: {integrity: sha512-ZB9RH/39qpq5Vu6Y+NmUaFhQR6pp+M2Xt76XBnEwDaGcVAqhlvxrl3B2bKS5D3NH3QR76v3aSrKaF/Kiy7lEtQ==}
+  nanoid@3.3.15:
+    resolution: {integrity: sha512-y7Wygv/7mEOvxTuEQDB8StXdMRBWf1kR/tlhAzBRUFkB2jfcLOAxO/SHmOO2zgz1pVgK29/kyupn059/bCHdjA==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
@@ -2795,6 +2795,10 @@ packages:
     resolution: {integrity: sha512-FfR8sjd4em2T6fb3I2MwAJU7HWVMr9zba+enmQeeWFfCbm+UOC/0X4DS8XtpUTMwWMGbjKYP7xjfNekzyGmB3A==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postcss@8.5.16:
+    resolution: {integrity: sha512-vuwillviilfKZsg0VGj5R/YwwcHx4SLsIOI/7K6mQkWx+l5cUHTjj5g0AasTBcyXsbfTgrwsUNmVUb5xVwyPwg==}
+    engines: {node: ^10 || ^12 || >=14}
+
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
@@ -2819,6 +2823,11 @@ packages:
 
   prettier@3.8.4:
     resolution: {integrity: sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==}
+    engines: {node: '>=14'}
+    hasBin: true
+
+  prettier@3.9.1:
+    resolution: {integrity: sha512-ppiDo2CSwexck1eyZUwJHg/N3nf1+6IRCv7W/VJ5vaLnVCmB7+3CdRfMwoCHBBX6xTrREDTksZ4OZl5SSf4zXA==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -5093,10 +5102,10 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-prettier@5.5.6(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.5.0(jiti@2.7.0)))(eslint@10.5.0(jiti@2.7.0))(prettier@3.8.4):
+  eslint-plugin-prettier@5.5.6(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.5.0(jiti@2.7.0)))(eslint@10.5.0(jiti@2.7.0))(prettier@3.9.1):
     dependencies:
       eslint: 10.5.0(jiti@2.7.0)
-      prettier: 3.8.4
+      prettier: 3.9.1
       prettier-linter-helpers: 1.0.1
       synckit: 0.11.13
     optionalDependencies:
@@ -5882,7 +5891,7 @@ snapshots:
 
   mute-stream@1.0.0: {}
 
-  nanoid@3.3.12: {}
+  nanoid@3.3.15: {}
 
   natural-compare@1.4.0: {}
 
@@ -6072,9 +6081,9 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-safe-parser@7.0.1(postcss@8.5.15):
+  postcss-safe-parser@7.0.1(postcss@8.5.16):
     dependencies:
-      postcss: 8.5.15
+      postcss: 8.5.16
 
   postcss-selector-parser@7.1.4:
     dependencies:
@@ -6085,7 +6094,13 @@ snapshots:
 
   postcss@8.5.15:
     dependencies:
-      nanoid: 3.3.12
+      nanoid: 3.3.15
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
+  postcss@8.5.16:
+    dependencies:
+      nanoid: 3.3.15
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -6105,6 +6120,8 @@ snapshots:
       typescript: 6.0.3
 
   prettier@3.8.4: {}
+
+  prettier@3.9.1: {}
 
   proto-list@1.2.4: {}
 
@@ -6529,9 +6546,9 @@ snapshots:
       stylelint: 17.13.0(typescript@6.0.3)
       stylelint-config-recommended: 18.0.0(stylelint@17.13.0(typescript@6.0.3))
 
-  stylelint-prettier@5.0.3(prettier@3.8.4)(stylelint@17.13.0(typescript@6.0.3)):
+  stylelint-prettier@5.0.3(prettier@3.9.1)(stylelint@17.13.0(typescript@6.0.3)):
     dependencies:
-      prettier: 3.8.4
+      prettier: 3.9.1
       prettier-linter-helpers: 1.0.0
       stylelint: 17.13.0(typescript@6.0.3)
 
@@ -6563,8 +6580,8 @@ snapshots:
       micromatch: 4.0.8
       normalize-path: 3.0.0
       picocolors: 1.1.1
-      postcss: 8.5.15
-      postcss-safe-parser: 7.0.1(postcss@8.5.15)
+      postcss: 8.5.16
+      postcss-safe-parser: 7.0.1(postcss@8.5.16)
       postcss-selector-parser: 7.1.4
       postcss-value-parser: 4.2.0
       string-width: 8.2.1
@@ -6773,7 +6790,7 @@ snapshots:
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
-      postcss: 8.5.15
+      postcss: 8.5.16
       rolldown: 1.0.3
       tinyglobby: 0.2.17
     optionalDependencies:
