@@ -22,6 +22,7 @@ mod test_init;
 mod test_ip_infos;
 mod test_ip_stats;
 mod test_log_file_edge;
+mod test_lookahead_regex;
 mod test_match_events;
 mod test_multi_config_chains;
 mod test_multiple_ips;

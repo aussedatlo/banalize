@@ -45,7 +45,7 @@ impl Config {
             return Err("regex must contain <IP> placeholder".to_string());
         }
         let pattern = self.regex.replace("<IP>", crate::ip_extract::IP_PATTERN);
-        if let Err(e) = regex::Regex::new(&pattern) {
+        if let Err(e) = fancy_regex::Regex::new(&pattern) {
             return Err(format!("regex does not compile: {}", e));
         }
         if self.ban_time == 0 {

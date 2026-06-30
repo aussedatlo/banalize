@@ -1,4 +1,4 @@
-use regex::Regex;
+use fancy_regex::Regex;
 use std::net::IpAddr;
 
 /// Capture pattern substituted for the <IP> placeholder. Shared with config
@@ -14,7 +14,7 @@ pub fn extract_ip(regex_pattern: &str, line: &str) -> Option<IpAddr> {
         Err(_) => return None,
     };
     
-    if let Some(captures) = re.captures(line) {
+    if let Ok(Some(captures)) = re.captures(line) {
         // Find the IP capture group (should be the first capture group)
         for i in 1..captures.len() {
             if let Some(ip_str) = captures.get(i) {
