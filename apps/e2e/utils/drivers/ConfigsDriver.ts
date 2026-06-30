@@ -60,6 +60,26 @@ export class ConfigsDriver extends BaseDriver {
     return id;
   }
 
+  /** Type into the (already open) form's regex field. */
+  async fillRegex(value: string): Promise<void> {
+    await this.page.locator("#regex").fill(value);
+  }
+
+  /** Assert the regex field shows the backend's invalid reason. */
+  async expectRegexInvalid(reason: string): Promise<void> {
+    await expect(this.byTestId("regex-error")).toContainText(reason);
+  }
+
+  /** Assert the regex field reports the pattern as valid. */
+  async expectRegexValid(): Promise<void> {
+    await expect(this.byTestId("regex-valid")).toBeVisible();
+    await expect(this.byTestId("regex-error")).toHaveCount(0);
+  }
+
+  async expectSubmitDisabled(): Promise<void> {
+    await expect(this.byTestId("config-form-submit")).toBeDisabled();
+  }
+
   async deleteConfig(id: string): Promise<void> {
     await this.byTestId(`config-delete-${id}`).click();
     await expect(this.card(id)).toBeHidden();

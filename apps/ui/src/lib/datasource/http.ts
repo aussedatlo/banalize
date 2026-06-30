@@ -10,6 +10,7 @@ import type {
   MatchEvent,
   NotifierConfig,
   NotifierTestResult,
+  RegexValidation,
   TailLine,
   UnbanEvent,
 } from "./types";
@@ -64,6 +65,12 @@ export class HttpDataSource implements DataSource {
   async deleteConfig(id: string) {
     const res = await fetch(`/api/configs/${id}`, { method: "DELETE" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  }
+
+  validateRegex(regex: string) {
+    return fetchJson<RegexValidation>(
+      `/api/configs/validate-regex?regex=${encodeURIComponent(regex)}`,
+    );
   }
 
   async getMatches(configId?: string) {

@@ -24,6 +24,7 @@ export type {
   NotifierEventType,
   NotifierSignalConfig,
   NotifierTestResult,
+  RegexValidation,
   TailLine,
   UnbanEvent,
 } from "./types";

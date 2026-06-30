@@ -53,6 +53,7 @@ pub struct AppState {
         configs::update_config,
         configs::delete_config,
         configs::tail_config_log,
+        configs::validate_regex,
         matches::get_matches,
         matches::get_matches_by_config,
         bans::get_bans,
@@ -85,6 +86,7 @@ pub struct AppState {
         models::TailLineResponse,
         models::EventResponse,
         models::TestResultResponse,
+        models::RegexValidationResponse,
         crate::notifier::NotifierConfig,
         crate::notifier::EmailConfig,
         crate::notifier::SignalConfig,
@@ -153,6 +155,10 @@ pub fn create_router(state: AppState) -> Router {
             get(configs::get_config)
                 .put(configs::update_config)
                 .delete(configs::delete_config),
+        )
+        .route(
+            "/api/configs/validate-regex",
+            get(configs::validate_regex),
         )
         .route("/api/configs/{id}/tail", get(configs::tail_config_log))
         .route("/api/matches", get(matches::get_matches))

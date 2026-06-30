@@ -15,6 +15,14 @@ export interface Config {
   recidive_multiplicator?: number;
 }
 
+/** Result of validating a config regex against the backend. */
+export interface RegexValidation {
+  /** True when the pattern contains `<IP>` and compiles. */
+  valid: boolean;
+  /** Human-readable reason when invalid; absent when valid. */
+  error?: string | null;
+}
+
 export interface BanEvent {
   id: string;
   config_id: string;
@@ -133,6 +141,8 @@ export interface DataSource {
   createConfig(config: Config): Promise<Config>;
   updateConfig(config: Config): Promise<Config>;
   deleteConfig(id: string): Promise<void>;
+  /** Checks a regex the way config save will: must contain `<IP>` and compile. */
+  validateRegex(regex: string): Promise<RegexValidation>;
   getMatches(configId?: string): Promise<MatchEvent[]>;
   getBans(configId?: string): Promise<BanEvent[]>;
   getUnbans(configId?: string): Promise<UnbanEvent[]>;

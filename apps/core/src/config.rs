@@ -19,6 +19,22 @@ pub struct Config {
     pub recidive_multiplicator: Option<f64>,
 }
 
+/// Validate a config regex the way the watcher will actually use it: it must
+/// carry the `<IP>` placeholder, and once that is substituted for the IP
+/// capture pattern the result must compile under `fancy-regex`. Returns a
+/// human-readable reason on failure. Shared by `Config::validate` and the
+/// `/api/configs/validate-regex` endpoint so the two can never drift.
+pub fn validate_regex_pattern(regex: &str) -> Result<(), String> {
+    if !regex.contains("<IP>") {
+        return Err("regex must contain <IP> placeholder".to_string());
+    }
+    let pattern = regex.replace("<IP>", crate::ip_extract::IP_PATTERN);
+    if let Err(e) = fancy_regex::Regex::new(&pattern) {
+        return Err(format!("regex does not compile: {}", e));
+    }
+    Ok(())
+}
+
 impl Config {
     /// Effective ban duration for a ban preceded by `prior_bans` earlier bans of
     /// the same (config, IP). With the multiplicator off this is always
@@ -41,13 +57,7 @@ impl Config {
         if self.param.is_empty() {
             return Err("param cannot be empty".to_string());
         }
-        if !self.regex.contains("<IP>") {
-            return Err("regex must contain <IP> placeholder".to_string());
-        }
-        let pattern = self.regex.replace("<IP>", crate::ip_extract::IP_PATTERN);
-        if let Err(e) = regex::Regex::new(&pattern) {
-            return Err(format!("regex does not compile: {}", e));
-        }
+        validate_regex_pattern(&self.regex)?;
         if self.ban_time == 0 {
             return Err("ban_time must be greater than 0".to_string());
         }
@@ -125,6 +135,25 @@ mod tests {
             ..base_config()
         };
         assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn validate_regex_pattern_accepts_usable_patterns() {
+        assert!(validate_regex_pattern("Failed password .* from <IP>").is_ok());
+        // Look-around is the reason this branch moved to fancy-regex.
+        assert!(validate_regex_pattern("(?<=user )<IP>").is_ok());
+    }
+
+    #[test]
+    fn validate_regex_pattern_requires_ip_placeholder() {
+        let err = validate_regex_pattern("Failed password").unwrap_err();
+        assert!(err.contains("<IP>"), "unexpected message: {err}");
+    }
+
+    #[test]
+    fn validate_regex_pattern_rejects_non_compiling_regex() {
+        let err = validate_regex_pattern("(<IP>").unwrap_err();
+        assert!(err.contains("does not compile"), "unexpected message: {err}");
     }
 }
 
