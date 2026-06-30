@@ -13,8 +13,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ApiError, type Config, useDataSource } from "@/lib/datasource";
-import { slugify } from "@/lib/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useDebouncedValue } from "@/lib/use-debounced-value";
+import { cn, slugify } from "@/lib/utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 const defaultForm = (): Omit<Config, "id"> => ({
@@ -88,6 +89,27 @@ export default function ConfigFormDialog({
   const set = <K extends keyof Omit<Config, "id">>(key: K, value: Config[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
+  // Debounced backend regex validation: only fire once the user pauses typing,
+  // and key the cache by the pattern so identical input is not re-checked.
+  const debouncedRegex = useDebouncedValue(form.regex, 400);
+  const { data: regexCheck, isFetching: regexChecking } = useQuery({
+    queryKey: ["validate-regex", debouncedRegex],
+    queryFn: () => ds.validateRegex(debouncedRegex),
+    enabled: debouncedRegex.length > 0,
+    staleTime: Infinity,
+    retry: false,
+  });
+  // `checking` covers both the debounce gap (input ahead of the settled value)
+  // and the in-flight request, so the field never flashes a stale verdict.
+  const regexStatus: "idle" | "checking" | "valid" | "invalid" =
+    form.regex.length === 0
+      ? "idle"
+      : debouncedRegex !== form.regex || regexChecking || !regexCheck
+        ? "checking"
+        : regexCheck.valid
+          ? "valid"
+          : "invalid";
+
   return (
     <Dialog
       open={open}
@@ -147,12 +169,30 @@ export default function ConfigFormDialog({
             <Label htmlFor="regex">Pattern</Label>
             <Input
               id="regex"
-              className="font-mono"
+              className={cn(
+                "font-mono",
+                regexStatus === "invalid" &&
+                  "border-destructive focus-visible:ring-destructive",
+                regexStatus === "valid" &&
+                  "border-emerald-500 focus-visible:ring-emerald-500",
+              )}
               placeholder="Failed password .* from <IP>"
               value={form.regex}
               onChange={(e) => set("regex", e.target.value)}
+              aria-invalid={regexStatus === "invalid"}
               required
             />
+            {regexStatus === "checking" ? (
+              <p className="text-xs text-muted-foreground">Checking pattern…</p>
+            ) : regexStatus === "invalid" ? (
+              <p className="text-xs text-destructive" data-testid="regex-error">
+                {regexCheck?.error ?? "Invalid regex."}
+              </p>
+            ) : regexStatus === "valid" ? (
+              <p className="text-xs text-emerald-600" data-testid="regex-valid">
+                Pattern is valid.
+              </p>
+            ) : null}
             <Hint>
               Regex matched against every new line. Use{" "}
               <code className="rounded bg-muted px-1 font-mono">
@@ -260,7 +300,7 @@ export default function ConfigFormDialog({
             <Button
               type="submit"
               data-testid="config-form-submit"
-              disabled={isPending || !id}
+              disabled={isPending || !id || regexStatus === "invalid"}
             >
               {isPending
                 ? "Saving…"

@@ -126,6 +126,16 @@ pub struct TestResultResponse {
     pub message: String,
 }
 
+/// Outcome of validating a config regex — an invalid pattern is reported in the
+/// payload, not as an HTTP error.
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct RegexValidationResponse {
+    /// True when the pattern contains `<IP>` and compiles.
+    pub valid: bool,
+    /// Human-readable reason when invalid; `null` when valid.
+    pub error: Option<String>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct IpStatsResponse {
     pub ip: String,

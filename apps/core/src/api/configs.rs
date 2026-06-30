@@ -1,15 +1,46 @@
-use super::models::{ConfigResponse, TailLineResponse};
+use super::models::{ConfigResponse, RegexValidationResponse, TailLineResponse};
 use super::AppState;
 use axum::{
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::StatusCode,
     response::{
         sse::{Event, KeepAlive, Sse},
         Json,
     },
 };
+use serde::Deserialize;
 use std::convert::Infallible;
 use tokio_stream::{wrappers::BroadcastStream, StreamExt};
+
+#[derive(Deserialize, utoipa::IntoParams)]
+pub(crate) struct ValidateRegexQuery {
+    /// The raw config regex to validate, including the `<IP>` placeholder.
+    regex: String,
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/configs/validate-regex",
+    tag = "configs",
+    params(ValidateRegexQuery),
+    responses(
+        (status = 200, description = "Whether the pattern is a usable config regex", body = RegexValidationResponse),
+    )
+)]
+pub(crate) async fn validate_regex(
+    Query(query): Query<ValidateRegexQuery>,
+) -> Json<RegexValidationResponse> {
+    match crate::config::validate_regex_pattern(&query.regex) {
+        Ok(()) => Json(RegexValidationResponse {
+            valid: true,
+            error: None,
+        }),
+        Err(e) => Json(RegexValidationResponse {
+            valid: false,
+            error: Some(e),
+        }),
+    }
+}
 
 #[utoipa::path(
     get,
