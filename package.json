@@ -24,9 +24,9 @@
     "@banalize/stylelint-config": "workspace:*",
     "@banalize/typescript-config": "workspace:*",
     "gitmoji-cli": "^9.7.0",
-    "prettier": "^3.8.4",
+    "prettier": "^3.9.4",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "turbo": "2.9.18"
+    "turbo": "2.10.2"
   },
   "packageManager": "pnpm@10.17.0",
   "engines": {
