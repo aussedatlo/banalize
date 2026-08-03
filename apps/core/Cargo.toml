@@ -12,7 +12,7 @@ tokio = { version = "1.35", features = ["full"] }
 rusqlite = { version = "0.31", features = ["bundled"] }
 
 # Regex (fancy-regex for look-around support)
-fancy-regex = "0.18"
+fancy-regex = "0.19"
 
 # Watchers
 linemux = "0.3"
