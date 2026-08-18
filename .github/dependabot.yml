@@ -20,9 +20,16 @@ updates:
       - "dependencies"
       - "npm"
     groups:
+      # @types/* and @typescript-eslint/* are grouped because their entries
+      # sit on adjacent lines in the same devDependencies block. Solo PRs for
+      # them conflict with each other as soon as one is merged, and a
+      # conflicted package.json is unparseable, so Dependabot then reports
+      # "can't resolve your JavaScript dependency files" and gives up.
       dev-dependencies:
         patterns:
           - "@banalize/*"
+          - "@types/*"
+          - "@typescript-eslint/*"
           - "prettier*"
           - "turbo"
           - "gitmoji*"
