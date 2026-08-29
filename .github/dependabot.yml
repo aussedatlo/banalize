@@ -9,8 +9,7 @@ updates:
     directory: "/"
     target-branch: "main"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "09:00"
     open-pull-requests-limit: 10
     commit-message:
@@ -45,8 +44,7 @@ updates:
     directory: "/apps/core"
     target-branch: "main"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "09:00"
     open-pull-requests-limit: 10
     commit-message:
@@ -67,8 +65,7 @@ updates:
     directory: "/"
     target-branch: "main"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "09:00"
     open-pull-requests-limit: 5
     commit-message:
