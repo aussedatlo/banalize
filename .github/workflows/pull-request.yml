@@ -147,3 +147,18 @@ jobs:
           name: playwright-report
           path: apps/e2e/playwright-report
           retention-days: 7
+
+  # Single required check: goes red as soon as any job above fails, so branch
+  # protection only has to track this one job.
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [build, lint, prettier, typecheck, core-test, e2e]
+    steps:
+      - name: Fail if any job failed or was cancelled
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "One or more jobs did not succeed:"
+          echo '${{ toJSON(needs) }}'
+          exit 1
