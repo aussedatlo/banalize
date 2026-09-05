@@ -9,7 +9,15 @@ import {
 } from "@/lib/datasource";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Mail, MessageSquare, Pencil, Plus, Send, Trash2 } from "lucide-react";
+import {
+  CalendarClock,
+  Mail,
+  MessageSquare,
+  Pencil,
+  Plus,
+  Send,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 
 function NotifierCard({
@@ -31,6 +39,7 @@ function NotifierCard({
   });
 
   const isEmail = Boolean(notifier.email_config);
+  const isWeekly = notifier.email_config?.notification_mode === "weekly";
   const Icon = isEmail ? Mail : MessageSquare;
   const title = isEmail
     ? notifier.email_config?.recipient_email
@@ -69,11 +78,18 @@ function NotifierCard({
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
         <div className="flex flex-wrap gap-1.5">
-          {notifier.events.map((event) => (
-            <Badge key={event} variant="secondary">
-              {event}
+          {isWeekly ? (
+            <Badge variant="outline">
+              <CalendarClock className="mr-1 h-3 w-3" />
+              weekly digest
             </Badge>
-          ))}
+          ) : (
+            notifier.events.map((event) => (
+              <Badge key={event} variant="secondary">
+                {event}
+              </Badge>
+            ))
+          )}
         </div>
         <div className="flex items-center gap-2 pt-1">
           <Button

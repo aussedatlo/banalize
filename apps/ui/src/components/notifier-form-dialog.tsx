@@ -19,6 +19,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import {
   ApiError,
+  type NotificationMode,
   type NotifierConfig,
   type NotifierEventType,
   useDataSource,
@@ -40,6 +41,7 @@ interface FormState {
     username: string;
     password: string;
     recipient_email: string;
+    notification_mode: NotificationMode;
   };
   signal: { server: string; number: string; recipients: string };
 }
@@ -53,6 +55,7 @@ const defaultForm = (): FormState => ({
     username: "",
     password: "",
     recipient_email: "",
+    notification_mode: "immediate",
   },
   signal: { server: "", number: "", recipients: "" },
 });
@@ -62,7 +65,12 @@ function fromConfig(config: NotifierConfig): FormState {
     kind: config.signal_config ? "signal" : "email",
     events: config.events,
     email: config.email_config
-      ? { ...config.email_config }
+      ? {
+          ...config.email_config,
+          // Notifiers created before the digest existed have no mode.
+          notification_mode:
+            config.email_config.notification_mode ?? "immediate",
+        }
       : defaultForm().email,
     signal: config.signal_config
       ? {
@@ -288,6 +296,30 @@ export default function NotifierFormDialog({
                 <Hint>
                   Sent from the username address. Port 465 uses implicit TLS,
                   other ports use STARTTLS when available.
+                </Hint>
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Delivery</Label>
+                <Select
+                  value={form.email.notification_mode}
+                  onValueChange={(mode) =>
+                    setEmail("notification_mode", mode as NotificationMode)
+                  }
+                >
+                  <SelectTrigger aria-label="Delivery">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="immediate">
+                      Immediate (per event)
+                    </SelectItem>
+                    <SelectItem value="weekly">Weekly digest</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Hint>
+                  {form.email.notification_mode === "weekly"
+                    ? "One recap of the last 7 days of bans, every Monday at 08:00 UTC. The events above are not mailed individually."
+                    : "One email per selected event, as it happens."}
                 </Hint>
               </div>
             </>
