@@ -82,12 +82,16 @@ export interface CountryStats {
 
 export type NotifierEventType = "ban" | "unban" | "match";
 
+/** Immediate mails every subscribed event; weekly only sends the Monday digest. */
+export type NotificationMode = "immediate" | "weekly";
+
 export interface NotifierEmailConfig {
   server: string;
   port: number;
   username: string;
   password: string;
   recipient_email: string;
+  notification_mode?: NotificationMode;
 }
 
 export interface NotifierSignalConfig {
