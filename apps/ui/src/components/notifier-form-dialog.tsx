@@ -318,7 +318,7 @@ export default function NotifierFormDialog({
                 </Select>
                 <Hint>
                   {form.email.notification_mode === "weekly"
-                    ? "One recap of the last 7 days of bans, every Monday at 08:00 UTC. The events above are not mailed individually."
+                    ? "One recap of the last 7 days of bans, on the server's configured weekly UTC schedule (Monday at 08:00 by default). The events above are not mailed individually."
                     : "One email per selected event, as it happens."}
                 </Hint>
               </div>
