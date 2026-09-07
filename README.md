@@ -130,14 +130,21 @@ All endpoints return JSON. Full spec at `GET /api/openapi.json`, interactive UI 
 
 ## Environment variables (`apps/core`)
 
-| Variable                         | Default              | Description                                                                  |
-| -------------------------------- | -------------------- | ---------------------------------------------------------------------------- |
-| `BANALIZE_CORE_API_ADDR`         | `0.0.0.0:6040`       | HTTP listen address                                                          |
-| `BANALIZE_CORE_DATABASE_PATH`    | `/tmp/banalize-core` | Directory for the SQLite databases and GeoIP data                            |
-| `BANALIZE_CORE_FIREWALL_CHAIN`   | `INPUT`              | iptables chain to link the `banalize` chain into                             |
-| `BANALIZE_CORE_LOG_LEVEL`        | `INFO`               | Log verbosity (`ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE`)                    |
-| `BANALIZE_CORE_CLEANER_INTERVAL` | `30`                 | How often the expiry cleaner runs, in seconds                                |
-| `BANALIZE_CORE_DIGEST_INTERVAL`  | _unset_              | Runs the weekly digest every N seconds instead of Monday 08:00 UTC (testing) |
+| Variable                         | Default              | Description                                               |
+| -------------------------------- | -------------------- | --------------------------------------------------------- |
+| `BANALIZE_CORE_API_ADDR`         | `0.0.0.0:6040`       | HTTP listen address                                       |
+| `BANALIZE_CORE_DATABASE_PATH`    | `/tmp/banalize-core` | Directory for the SQLite databases and GeoIP data         |
+| `BANALIZE_CORE_FIREWALL_CHAIN`   | `INPUT`              | iptables chain to link the `banalize` chain into          |
+| `BANALIZE_CORE_LOG_LEVEL`        | `INFO`               | Log verbosity (`ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE`) |
+| `BANALIZE_CORE_CLEANER_INTERVAL` | `30`                 | How often the expiry cleaner runs, in seconds             |
+| `BANALIZE_CORE_DIGEST_DAY`       | `Monday`             | Weekly digest day (`Monday`–`Sunday`, case-insensitive)   |
+| `BANALIZE_CORE_DIGEST_TIME`      | `08:00`              | Weekly digest time in UTC (`HH:MM`, 24-hour clock)        |
+
+All weekly email notifiers share this schedule. For example, set
+`BANALIZE_CORE_DIGEST_DAY=Friday` and `BANALIZE_CORE_DIGEST_TIME=18:30` to send
+the last seven days of bans every Friday at 18:30 UTC. Restart the core after
+changing these settings. Invalid days or times prevent startup. No email is
+sent when there are no bans; missed deliveries are not caught up after downtime.
 
 ## Environment variables (`apps/ui`)
 
