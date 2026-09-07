@@ -408,6 +408,21 @@ impl SqliteDatabase {
         Ok(events)
     }
 
+    /// Bans recorded at or after `since` (ms epoch), most recent first — the
+    /// window the weekly digest aggregates over.
+    pub fn get_ban_events_since(&self, since: u64) -> SqliteResult<Vec<BanEvent>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id, config_id, ip, timestamp FROM ban_events WHERE timestamp >= ?1 ORDER BY timestamp DESC"
+        )?;
+        let rows = stmt.query_map(rusqlite::params![since], Self::map_ban_event)?;
+
+        let mut events = Vec::new();
+        for row in rows {
+            events.push(row?);
+        }
+        Ok(events)
+    }
+
     fn map_unban_event(row: &rusqlite::Row) -> rusqlite::Result<UnbanEvent> {
         Ok(UnbanEvent {
             id: row.get(0)?,

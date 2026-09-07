@@ -23,6 +23,16 @@ pub enum NotifyEventType {
     Match,
 }
 
+/// When an email notifier delivers. `Immediate` mails every subscribed event as
+/// it happens; `Weekly` stays silent and is only fed by the weekly digest.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum NotificationMode {
+    #[default]
+    Immediate,
+    Weekly,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct EmailConfig {
     /// SMTP server hostname
@@ -33,6 +43,9 @@ pub struct EmailConfig {
     pub username: String,
     pub password: String,
     pub recipient_email: String,
+    /// Delivery cadence; absent in rows written before the digest existed.
+    #[serde(default)]
+    pub notification_mode: NotificationMode,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
@@ -74,6 +87,14 @@ impl NotifierConfig {
             }
             _ => Err("exactly one of email_config or signal_config must be set".to_string()),
         }
+    }
+
+    /// Weekly notifiers opt out of per-event delivery entirely — the digest
+    /// task is their only sender.
+    pub fn is_weekly(&self) -> bool {
+        self.email_config
+            .as_ref()
+            .is_some_and(|c| c.notification_mode == NotificationMode::Weekly)
     }
 }
 
@@ -161,7 +182,7 @@ pub async fn send(cfg: &NotifierConfig, n: &Notification) -> Result<(), String> 
     }
 }
 
-fn escape_html(s: &str) -> String {
+pub(crate) fn escape_html(s: &str) -> String {
     s.replace('&', "&amp;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")
@@ -169,7 +190,7 @@ fn escape_html(s: &str) -> String {
 }
 
 /// ISO 8601 UTC from a ms-epoch timestamp (no date crate in the tree).
-fn iso8601(timestamp_ms: u64) -> String {
+pub(crate) fn iso8601(timestamp_ms: u64) -> String {
     let secs = (timestamp_ms / 1000) as i64;
     let ms = timestamp_ms % 1000;
     let days = secs.div_euclid(86_400);
@@ -342,7 +363,7 @@ pub async fn run_dispatcher(
             .read()
             .await
             .iter()
-            .filter(|c| c.events.contains(&event_type))
+            .filter(|c| !c.is_weekly() && c.events.contains(&event_type))
             .cloned()
             .collect();
         if subscribed.is_empty() {

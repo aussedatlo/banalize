@@ -19,6 +19,7 @@ export type {
   LogEntry,
   LogLevel,
   MatchEvent,
+  NotificationMode,
   NotifierConfig,
   NotifierEmailConfig,
   NotifierEventType,

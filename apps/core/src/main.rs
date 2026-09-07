@@ -3,6 +3,7 @@ mod cleaner;
 mod config;
 mod database;
 mod detector;
+mod digest;
 mod events;
 mod firewall;
 mod geoip;
@@ -176,6 +177,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         configs.clone(),
         store.clone(),
         geoip.clone(),
+    ));
+
+    // Spawn the weekly digest task (Monday 08:00 UTC); the interval override
+    // exists so tests don't have to wait a week.
+    let digest_interval = env::var("BANALIZE_CORE_DIGEST_INTERVAL")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+        .filter(|secs| *secs > 0);
+    tokio::spawn(digest::run(
+        shutdown_tx.subscribe(),
+        notifiers.clone(),
+        configs.clone(),
+        sqlite_events_db.clone(),
+        geoip.clone(),
+        digest_interval,
     ));
 
     // Hydrate in-memory state from the durable store and re-apply active bans.

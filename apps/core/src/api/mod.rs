@@ -89,6 +89,7 @@ pub struct AppState {
         models::RegexValidationResponse,
         crate::notifier::NotifierConfig,
         crate::notifier::EmailConfig,
+        crate::notifier::NotificationMode,
         crate::notifier::SignalConfig,
         crate::notifier::NotifyEventType,
         crate::log_capture::LogEntry,
