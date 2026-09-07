@@ -12,9 +12,51 @@ use tracing::{debug, info, warn};
 
 const DAY_MS: u64 = 24 * 60 * 60 * 1000;
 const WEEK_MS: u64 = 7 * DAY_MS;
-/// Monday 08:00 UTC — the slot the legacy `0 8 * * 1` cron used.
-const RUN_TIME_OF_DAY_MS: u64 = 8 * 60 * 60 * 1000;
 const TOP_IPS: usize = 5;
+
+/// Weekly delivery schedule in UTC (Sunday = 0).
+#[derive(Debug, Clone, Copy)]
+pub struct DigestSchedule {
+    weekday: u64,
+    time_of_day_ms: u64,
+}
+
+impl DigestSchedule {
+    pub fn parse(day: &str, time: &str) -> Result<Self, String> {
+        let weekday = match day.to_ascii_lowercase().as_str() {
+            "sunday" => 0,
+            "monday" => 1,
+            "tuesday" => 2,
+            "wednesday" => 3,
+            "thursday" => 4,
+            "friday" => 5,
+            "saturday" => 6,
+            _ => {
+                return Err(
+                    "BANALIZE_CORE_DIGEST_DAY must be a weekday name (Monday–Sunday)".into(),
+                )
+            }
+        };
+        let invalid_time =
+            || "BANALIZE_CORE_DIGEST_TIME must be HH:MM in UTC (00:00–23:59)".to_string();
+        let bytes = time.as_bytes();
+        if bytes.len() != 5
+            || bytes[2] != b':'
+            || !bytes[..2].iter().chain(&bytes[3..]).all(u8::is_ascii_digit)
+        {
+            return Err(invalid_time());
+        }
+        let hour: u64 = time[..2].parse().map_err(|_| invalid_time())?;
+        let minute: u64 = time[3..].parse().map_err(|_| invalid_time())?;
+        if hour > 23 || minute > 59 {
+            return Err(invalid_time());
+        }
+        Ok(Self {
+            weekday,
+            time_of_day_ms: (hour * 60 + minute) * 60 * 1000,
+        })
+    }
+}
 
 fn now_ms() -> u64 {
     std::time::SystemTime::now()
@@ -23,18 +65,19 @@ fn now_ms() -> u64 {
         .as_millis() as u64
 }
 
-/// Milliseconds from `now` until the next Monday 08:00 UTC strictly after it.
-pub(crate) fn ms_until_next_run(now: u64) -> u64 {
-    let days = now / DAY_MS;
-    let ms_of_day = now % DAY_MS;
-    // 1970-01-01 was a Thursday, so epoch day 0 has weekday 4 with Sunday = 0.
-    let weekday = (days + 4) % 7;
-    // Days to the next Monday; 0 means today is Monday.
-    let mut days_ahead = (8 - weekday) % 7;
-    if days_ahead == 0 && ms_of_day >= RUN_TIME_OF_DAY_MS {
-        days_ahead = 7;
+impl DigestSchedule {
+    /// Milliseconds until the next configured UTC slot strictly after `now`.
+    fn ms_until_next_run(self, now: u64) -> u64 {
+        let days = now / DAY_MS;
+        let ms_of_day = now % DAY_MS;
+        // 1970-01-01 was a Thursday, so epoch day 0 has weekday 4 with Sunday = 0.
+        let weekday = (days + 4) % 7;
+        let mut days_ahead = (self.weekday + 7 - weekday) % 7;
+        if days_ahead == 0 && ms_of_day >= self.time_of_day_ms {
+            days_ahead = 7;
+        }
+        days_ahead * DAY_MS + self.time_of_day_ms - ms_of_day
     }
-    days_ahead * DAY_MS + RUN_TIME_OF_DAY_MS - ms_of_day
 }
 
 /// The aggregates a digest reports over its window.
@@ -275,35 +318,39 @@ async fn send_digest(
         tokio::spawn(async move {
             match notifier::send(&notifier_config, &notification).await {
                 Ok(()) => info!("Weekly digest sent via notifier {}", notifier_config.id),
-                Err(e) => warn!("Weekly digest via notifier {} failed: {}", notifier_config.id, e),
+                Err(e) => warn!(
+                    "Weekly digest via notifier {} failed: {}",
+                    notifier_config.id, e
+                ),
             }
         });
     }
 }
 
-/// Fires the digest every Monday at 08:00 UTC. `interval_override` (seconds)
-/// replaces that schedule with a fixed period — a testing hook, not a feature.
+/// Wait for the scheduled slot, or stop promptly on shutdown.
+async fn wait_until_run(shutdown_rx: &mut broadcast::Receiver<()>, delay: Duration) -> bool {
+    tokio::select! {
+        _ = shutdown_rx.recv() => false,
+        _ = tokio::time::sleep(delay) => true,
+    }
+}
+
+/// Fires the digest at the configured weekly UTC slot.
 pub async fn run(
     mut shutdown_rx: broadcast::Receiver<()>,
     notifiers: Arc<RwLock<Vec<NotifierConfig>>>,
     configs: Arc<RwLock<ConfigMap>>,
     events_db: Arc<Mutex<SqliteDatabase>>,
     geoip: Arc<GeoIp>,
-    interval_override: Option<u64>,
+    schedule: DigestSchedule,
 ) {
     loop {
-        let delay = match interval_override {
-            Some(secs) => Duration::from_secs(secs),
-            None => Duration::from_millis(ms_until_next_run(now_ms())),
-        };
+        let delay = Duration::from_millis(schedule.ms_until_next_run(now_ms()));
         debug!("Next weekly digest in {}s", delay.as_secs());
 
-        tokio::select! {
-            _ = shutdown_rx.recv() => {
-                info!("Weekly digest task received shutdown signal");
-                return;
-            }
-            _ = tokio::time::sleep(delay) => {}
+        if !wait_until_run(&mut shutdown_rx, delay).await {
+            info!("Weekly digest task received shutdown signal");
+            return;
         }
 
         send_digest(&notifiers, &configs, &events_db, &geoip).await;
@@ -313,6 +360,77 @@ pub async fn run(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const RUN_TIME_OF_DAY_MS: u64 = 8 * 60 * 60 * 1000;
+
+    fn ms_until_next_run(now: u64) -> u64 {
+        DigestSchedule::parse("Monday", "08:00")
+            .unwrap()
+            .ms_until_next_run(now)
+    }
+
+    #[test]
+    fn rejects_invalid_schedules() {
+        assert!(DigestSchedule::parse("Funday", "08:00").is_err());
+        for time in [
+            "", "24:00", "08:60", "8:00", "08:0", "08:00:00", "-1:00", "é:00",
+        ] {
+            assert!(DigestSchedule::parse("Monday", time).is_err(), "{time}");
+        }
+    }
+
+    #[test]
+    fn schedules_every_weekday_and_time_boundary() {
+        for (weekday, day) in [
+            "sunday",
+            "MONDAY",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+        ]
+        .iter()
+        .enumerate()
+        {
+            for time in ["00:00", "13:45", "23:59"] {
+                let schedule = DigestSchedule::parse(day, time).unwrap();
+                for offset in (0..WEEK_MS).step_by(37 * 60 * 1000) {
+                    let now = MONDAY_MIDNIGHT + offset;
+                    let next = now + schedule.ms_until_next_run(now);
+                    assert_eq!((next / DAY_MS + 4) % 7, weekday as u64);
+                    assert_eq!(next % DAY_MS, schedule.time_of_day_ms);
+                    assert!(next > now && next - now <= WEEK_MS);
+                    assert_eq!(schedule.ms_until_next_run(next - 1), 1);
+                    assert_eq!(schedule.ms_until_next_run(next), WEEK_MS);
+                }
+            }
+        }
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn waits_for_the_slot_using_virtual_time() {
+        let (_tx, mut rx) = broadcast::channel(1);
+        let delay = Duration::from_millis(ms_until_next_run(MONDAY_MIDNIGHT));
+        let start = tokio::time::Instant::now();
+        assert!(wait_until_run(&mut rx, delay).await);
+        assert_eq!(start.elapsed(), delay);
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn shutdown_interrupts_the_wait() {
+        let (tx, mut rx) = broadcast::channel(1);
+        let start = tokio::time::Instant::now();
+        let (ready, ()) = tokio::join!(
+            wait_until_run(&mut rx, Duration::from_millis(WEEK_MS)),
+            async {
+                tokio::time::sleep(Duration::from_secs(1)).await;
+                tx.send(()).unwrap();
+            }
+        );
+        assert!(!ready);
+        assert_eq!(start.elapsed(), Duration::from_secs(1));
+    }
 
     /// 2026-08-10T00:00:00Z — a Monday.
     const MONDAY_MIDNIGHT: u64 = 1_786_320_000_000;
@@ -390,7 +508,9 @@ mod tests {
 
     #[test]
     fn caps_the_top_ip_list() {
-        let bans: Vec<BanEvent> = (0..10).map(|i| ban("c1", &format!("10.0.0.{}", i))).collect();
+        let bans: Vec<BanEvent> = (0..10)
+            .map(|i| ban("c1", &format!("10.0.0.{}", i)))
+            .collect();
 
         let data = DigestData::from_bans(&bans, &HashMap::new(), 0, WEEK_MS);
 

@@ -21,13 +21,13 @@ use config::ConfigMap;
 use database::SqliteDatabase;
 use events::{EventEmitter, FirewallCommand};
 use firewall::Firewall;
-use restore::restore_state;
-use store::MemoryStore;
 use log_capture::{LogBuffer, LogCaptureLayer, LOG_BUFFER_CAPACITY};
+use restore::restore_state;
 use std::collections::VecDeque;
 use std::env;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
+use store::MemoryStore;
 use tokio::sync::{broadcast, mpsc, RwLock};
 use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
@@ -50,12 +50,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Starting banalize-core");
 
     // Get configuration from environment
-    let firewall_chain = env::var("BANALIZE_CORE_FIREWALL_CHAIN")
-        .unwrap_or_else(|_| "INPUT".to_string());
+    let firewall_chain =
+        env::var("BANALIZE_CORE_FIREWALL_CHAIN").unwrap_or_else(|_| "INPUT".to_string());
     let database_path = env::var("BANALIZE_CORE_DATABASE_PATH")
         .unwrap_or_else(|_| "/tmp/banalize-core".to_string());
-    let api_addr = env::var("BANALIZE_CORE_API_ADDR")
-        .unwrap_or_else(|_| "0.0.0.0:6040".to_string());
+    let api_addr =
+        env::var("BANALIZE_CORE_API_ADDR").unwrap_or_else(|_| "0.0.0.0:6040".to_string());
 
     // Create database paths
     let db_dir = PathBuf::from(&database_path);
@@ -69,12 +69,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let store = Arc::new(MemoryStore::new());
 
     // Initialize databases
-    info!("Opening SQLite configs database at: {:?}", sqlite_configs_path);
+    info!(
+        "Opening SQLite configs database at: {:?}",
+        sqlite_configs_path
+    );
     let sqlite_configs_db = Arc::new(tokio::sync::Mutex::new(SqliteDatabase::open(
         &sqlite_configs_path,
     )?));
 
-    info!("Opening SQLite events database at: {:?}", sqlite_events_path);
+    info!(
+        "Opening SQLite events database at: {:?}",
+        sqlite_events_path
+    );
     let sqlite_events_db = Arc::new(tokio::sync::Mutex::new(SqliteDatabase::open(
         &sqlite_events_path,
     )?));
@@ -179,19 +185,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         geoip.clone(),
     ));
 
-    // Spawn the weekly digest task (Monday 08:00 UTC); the interval override
-    // exists so tests don't have to wait a week.
-    let digest_interval = env::var("BANALIZE_CORE_DIGEST_INTERVAL")
-        .ok()
-        .and_then(|v| v.parse::<u64>().ok())
-        .filter(|secs| *secs > 0);
+    // All weekly email notifiers share this UTC schedule.
+    let digest_day = env::var("BANALIZE_CORE_DIGEST_DAY").unwrap_or_else(|_| "Monday".into());
+    let digest_time = env::var("BANALIZE_CORE_DIGEST_TIME").unwrap_or_else(|_| "08:00".into());
+    let digest_schedule = digest::DigestSchedule::parse(&digest_day, &digest_time)?;
+    info!(
+        "Weekly digest scheduled for {} at {} UTC",
+        digest_day, digest_time
+    );
     tokio::spawn(digest::run(
         shutdown_tx.subscribe(),
         notifiers.clone(),
         configs.clone(),
         sqlite_events_db.clone(),
         geoip.clone(),
-        digest_interval,
+        digest_schedule,
     ));
 
     // Hydrate in-memory state from the durable store and re-apply active bans.
@@ -334,4 +342,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-
