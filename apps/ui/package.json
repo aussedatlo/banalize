@@ -28,7 +28,7 @@
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.18.3",
     "recharts": "^3.10.1",
-    "tailwind-merge": "^3.6.0"
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@banalize/eslint-config": "workspace:*",
