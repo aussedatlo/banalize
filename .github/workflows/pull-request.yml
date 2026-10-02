@@ -9,8 +9,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Lint
+  # Lint, formatting and typecheck share one job so they share one install.
+  # Each check runs even if an earlier one fails, so all problems show at once.
+  checks:
+    name: Lint, format & typecheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,49 +26,19 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
+        id: install
         run: pnpm install
 
       - name: Run linters
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pnpm lint
 
-  prettier:
-    name: Prettier
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.19.5
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install
-
       - name: Check formatting
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pnpm format:check
 
-  typecheck:
-    name: Typecheck
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.19.5
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install
-
       - name: Typecheck all packages
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pnpm -r typecheck
 
   core-test:
@@ -144,7 +116,7 @@ jobs:
     name: CI
     runs-on: ubuntu-latest
     if: always()
-    needs: [lint, prettier, typecheck, core-test, e2e]
+    needs: [checks, core-test, e2e]
     steps:
       - name: Fail if any job failed or was cancelled
         if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
