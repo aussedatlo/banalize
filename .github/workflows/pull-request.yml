@@ -109,9 +109,23 @@ jobs:
         run: pnpm --filter=@banalize/e2e exec playwright install --with-deps chromium
 
       # Pre-build the Docker images so the run stays within Playwright's
-      # webServer start timeout (ubuntu-latest ships Docker + Compose v2).
+      # webServer start timeout. Layers are cached in the GitHub Actions cache
+      # (one scope per image so they don't evict each other); buildx stays the
+      # active builder, so start-servers.sh's `up --build` hits the same cache.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build e2e stack images
-        run: docker compose -f docker-compose.e2e.yml build
+        uses: docker/bake-action@v6
+        with:
+          source: .
+          files: docker-compose.e2e.yml
+          load: true
+          set: |
+            core.cache-from=type=gha,scope=e2e-core
+            core.cache-to=type=gha,scope=e2e-core,mode=max
+            ui.cache-from=type=gha,scope=e2e-ui
+            ui.cache-to=type=gha,scope=e2e-ui,mode=max
 
       - name: Run Playwright e2e tests
         run: pnpm e2e test
