@@ -77,8 +77,26 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # Cache the downloaded browser per Playwright version; the system deps
+      # are apt packages outside the cache, so they're installed either way.
+      - name: Get Playwright version
+        id: playwright
+        run: echo "version=$(pnpm --filter=@banalize/e2e exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browser
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
       - name: Install Playwright browser
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm --filter=@banalize/e2e exec playwright install --with-deps chromium
+
+      - name: Install Playwright system deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm --filter=@banalize/e2e exec playwright install-deps chromium
 
       # Pre-build the Docker images so the run stays within Playwright's
       # webServer start timeout. Layers are cached in the GitHub Actions cache
