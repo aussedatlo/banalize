@@ -5,15 +5,24 @@ WORKDIR /usr/src/app
 # Install build dependencies (iptables)
 RUN apt update && apt install -y iptables && rm -rf /var/lib/apt/lists/*
 
-# Copy workspace Cargo files
+# Copy workspace and core manifests only
 COPY Cargo.toml Cargo.lock ./
+COPY apps/core/Cargo.toml ./apps/core/Cargo.toml
+
+# Build dependencies against stub binaries so this layer only rebuilds when the
+# manifests or lockfile change, not on every source edit
+RUN mkdir -p apps/core/src/bin \
+    && echo 'fn main() {}' > apps/core/src/main.rs \
+    && echo 'fn main() {}' > apps/core/src/bin/fake_iptables.rs \
+    && cargo build --release --package banalize-core \
+    && rm -rf apps/core/src
 
 # Copy core app source
 COPY apps/core ./apps/core
 
-# Build the release binary
-WORKDIR /usr/src/app
-RUN cargo build --release --package banalize-core
+# Build the release binary (touch so cargo doesn't reuse the stub builds)
+RUN touch apps/core/src/main.rs apps/core/src/bin/fake_iptables.rs \
+    && cargo build --release --package banalize-core
 
 # Runtime stage - use newer Debian to match GLIBC version from builder
 FROM debian:trixie-slim
