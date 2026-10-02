@@ -9,10 +9,58 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Decide which jobs this PR needs from the files it touches. Skipped jobs
+  # count as passing for the CI gate below.
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      js: ${{ steps.filter.outputs.js }}
+      core: ${{ steps.filter.outputs.core }}
+      e2e: ${{ steps.filter.outputs.e2e }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            workflow: &workflow
+              - ".github/workflows/pull-request.yml"
+            js:
+              - *workflow
+              - "apps/ui/**"
+              - "apps/e2e/**"
+              - "packages/**"
+              - "**/*.md"
+              - "package.json"
+              - "pnpm-lock.yaml"
+              - "pnpm-workspace.yaml"
+              - "turbo.json"
+              - "prettier.config.js"
+              - ".prettierignore"
+            core: &core
+              - *workflow
+              - "apps/core/**"
+              - "Cargo.toml"
+              - "Cargo.lock"
+            e2e:
+              - *core
+              - "apps/ui/**"
+              - "apps/e2e/**"
+              - "packages/**"
+              - "package.json"
+              - "pnpm-lock.yaml"
+              - "pnpm-workspace.yaml"
+              - "docker-compose.e2e*.yml"
+              - ".dockerignore"
+
   # Lint, formatting and typecheck share one job so they share one install.
   # Each check runs even if an earlier one fails, so all problems show at once.
   checks:
     name: Lint, format & typecheck
+    needs: changes
+    if: needs.changes.outputs.js == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -43,6 +91,8 @@ jobs:
 
   core-test:
     name: Core test
+    needs: changes
+    if: needs.changes.outputs.core == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -62,6 +112,8 @@ jobs:
 
   e2e:
     name: E2E test
+    needs: changes
+    if: needs.changes.outputs.e2e == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -134,7 +186,7 @@ jobs:
     name: CI
     runs-on: ubuntu-latest
     if: always()
-    needs: [checks, core-test, e2e]
+    needs: [changes, checks, core-test, e2e]
     steps:
       - name: Fail if any job failed or was cancelled
         if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
