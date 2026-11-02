@@ -41,8 +41,8 @@ importers:
         specifier: ^26.6.6
         version: 26.6.6
       monocart-coverage-reports:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^3.2.0
+        version: 3.2.0
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -2607,8 +2607,8 @@ packages:
   minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
 
-  monocart-coverage-reports@3.1.0:
-    resolution: {integrity: sha512-FsS3MNxmrOzPaNu5HoXA6Yk5d8Cn6PiAKmiZmFRwguYKNZiMrrtp09vAFXvgTjE1SEfTI9N1APUzhwwclQSkeg==}
+  monocart-coverage-reports@3.2.0:
+    resolution: {integrity: sha512-hF8GxLozQGJ9P2FDjTrGfo/IAvHSlPdmYiBE3qkfbWUc9Zc+I+mrShta9+cJxmZfC5d6FiaEyrhjzCNrpAflog==}
     engines: {node: '>=22.15.0'}
     hasBin: true
 
@@ -5898,7 +5898,7 @@ snapshots:
 
   minimist@1.2.8: {}
 
-  monocart-coverage-reports@3.1.0:
+  monocart-coverage-reports@3.2.0:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.6.0
       acorn: 8.19.0
