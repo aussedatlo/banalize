@@ -47,6 +47,6 @@
     "stylelint": "^18.0.0",
     "tailwindcss": "^4.3.4",
     "typescript": "^6.0.3",
-    "vite": "^8.3.5"
+    "vite": "^8.3.6"
   }
 }
