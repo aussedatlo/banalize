@@ -177,8 +177,8 @@ importers:
   packages/stylelint-config:
     dependencies:
       stylelint-config-standard:
-        specifier: ^40.0.0
-        version: 40.0.0(stylelint@18.0.0)
+        specifier: ^41.0.0
+        version: 41.0.0(stylelint@18.0.0)
       stylelint-prettier:
         specifier: ^5.0.2
         version: 5.0.3(prettier@3.9.10)(stylelint@18.0.0)
@@ -2955,17 +2955,17 @@ packages:
   stubborn-utils@1.0.2:
     resolution: {integrity: sha512-zOh9jPYI+xrNOyisSelgym4tolKTJCQd5GBhK0+0xJvcYDcwlOoxF/rnFKQ2KRZknXSG9jWAp66fwP6AxN9STg==}
 
-  stylelint-config-recommended@18.0.0:
-    resolution: {integrity: sha512-mxgT2XY6YZ3HWWe3Di8umG6aBmWmHTblTgu/f10rqFXnyWxjKWwNdjSWkgkwCtxIKnqjSJzvFmPT5yabVIRxZg==}
-    engines: {node: '>=20.19.0'}
+  stylelint-config-recommended@19.0.0:
+    resolution: {integrity: sha512-Y15XB19RManqBOpbRC42tF8R/Hfe314xYLzedRlnnYxYzZ0777RakDQIGcqYfrz9jWGoVyjaGTdpSl9F+roOOw==}
+    engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
     peerDependencies:
-      stylelint: ^17.0.0
+      stylelint: ^18.0.0
 
-  stylelint-config-standard@40.0.0:
-    resolution: {integrity: sha512-EznGJxOUhtWck2r6dJpbgAdPATIzvpLdK9+i5qPd4Lx70es66TkBPljSg4wN3Qnc6c4h2n+WbUrUynQ3fanjHw==}
-    engines: {node: '>=20.19.0'}
+  stylelint-config-standard@41.0.0:
+    resolution: {integrity: sha512-EJIvMOMARieBOLhw2yzN7BaVFiIY2Ex8CkbXahxP6tQZK41+N8OVUo57Uvx9iTr862h+thqDoDH7vQbeth1ryg==}
+    engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
     peerDependencies:
-      stylelint: ^17.0.0
+      stylelint: ^18.0.0
 
   stylelint-prettier@5.0.3:
     resolution: {integrity: sha512-B6V0oa35ekRrKZlf+6+jA+i50C4GXJ7X1PPmoCqSUoXN6BrNF6NhqqhanvkLjqw2qgvrS0wjdpeC+Tn06KN3jw==}
@@ -6066,14 +6066,14 @@ snapshots:
 
   stubborn-utils@1.0.2: {}
 
-  stylelint-config-recommended@18.0.0(stylelint@18.0.0):
+  stylelint-config-recommended@19.0.0(stylelint@18.0.0):
     dependencies:
       stylelint: 18.0.0
 
-  stylelint-config-standard@40.0.0(stylelint@18.0.0):
+  stylelint-config-standard@41.0.0(stylelint@18.0.0):
     dependencies:
       stylelint: 18.0.0
-      stylelint-config-recommended: 18.0.0(stylelint@18.0.0)
+      stylelint-config-recommended: 19.0.0(stylelint@18.0.0)
 
   stylelint-prettier@5.0.3(prettier@3.9.10)(stylelint@18.0.0):
     dependencies:
