@@ -21,11 +21,11 @@ importers:
         specifier: ^9.7.0
         version: 9.7.0(@types/node@26.6.6)
       prettier:
-        specifier: ^3.8.4
-        version: 3.8.4
+        specifier: ^3.10.1
+        version: 3.10.1
       prettier-plugin-organize-imports:
         specifier: ^4.3.0
-        version: 4.3.0(prettier@3.8.4)(typescript@6.0.3)
+        version: 4.3.0(prettier@3.10.1)(typescript@6.0.3)
       turbo:
         specifier: 2.11.10
         version: 2.11.10
@@ -172,7 +172,7 @@ importers:
         version: 2.32.0(@typescript-eslint/parser@8.72.2(eslint@10.14.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.14.0(jiti@2.7.0))
       eslint-plugin-prettier:
         specifier: ^5.5.7
-        version: 5.5.7(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.14.0(jiti@2.7.0)))(eslint@10.14.0(jiti@2.7.0))(prettier@3.9.10)
+        version: 5.5.7(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.14.0(jiti@2.7.0)))(eslint@10.14.0(jiti@2.7.0))(prettier@3.10.1)
 
   packages/stylelint-config:
     dependencies:
@@ -181,7 +181,7 @@ importers:
         version: 41.0.0(stylelint@18.0.0)
       stylelint-prettier:
         specifier: ^5.1.0
-        version: 5.1.0(prettier@3.9.10)(stylelint@18.0.0)
+        version: 5.1.0(prettier@3.10.1)(stylelint@18.0.0)
 
   packages/typescript-config: {}
 
@@ -2603,13 +2603,8 @@ packages:
       vue-tsc:
         optional: true
 
-  prettier@3.8.4:
-    resolution: {integrity: sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==}
-    engines: {node: '>=14'}
-    hasBin: true
-
-  prettier@3.9.10:
-    resolution: {integrity: sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA==}
+  prettier@3.10.1:
+    resolution: {integrity: sha512-70vp3ZUYoPlFbF9uiTdXHUUCGEIp7d4+6p+8DYbkm2jP7x/3i/paXVF6dopSI3zd/CEitrZN1rc4i85xWmmXlg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -4721,10 +4716,10 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-prettier@5.5.7(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.14.0(jiti@2.7.0)))(eslint@10.14.0(jiti@2.7.0))(prettier@3.9.10):
+  eslint-plugin-prettier@5.5.7(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.14.0(jiti@2.7.0)))(eslint@10.14.0(jiti@2.7.0))(prettier@3.10.1):
     dependencies:
       eslint: 10.14.0(jiti@2.7.0)
-      prettier: 3.9.10
+      prettier: 3.10.1
       prettier-linter-helpers: 1.0.1
       synckit: 0.12.3
     optionalDependencies:
@@ -5654,14 +5649,12 @@ snapshots:
     dependencies:
       fast-diff: 1.3.0
 
-  prettier-plugin-organize-imports@4.3.0(prettier@3.8.4)(typescript@6.0.3):
+  prettier-plugin-organize-imports@4.3.0(prettier@3.10.1)(typescript@6.0.3):
     dependencies:
-      prettier: 3.8.4
+      prettier: 3.10.1
       typescript: 6.0.3
 
-  prettier@3.8.4: {}
-
-  prettier@3.9.10: {}
+  prettier@3.10.1: {}
 
   pretty-ms@9.3.1:
     dependencies:
@@ -6073,9 +6066,9 @@ snapshots:
       stylelint: 18.0.0
       stylelint-config-recommended: 19.0.0(stylelint@18.0.0)
 
-  stylelint-prettier@5.1.0(prettier@3.9.10)(stylelint@18.0.0):
+  stylelint-prettier@5.1.0(prettier@3.10.1)(stylelint@18.0.0):
     dependencies:
-      prettier: 3.9.10
+      prettier: 3.10.1
       prettier-linter-helpers: 1.0.1
       stylelint: 18.0.0
 
